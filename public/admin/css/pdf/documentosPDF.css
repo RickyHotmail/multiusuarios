@@ -1,0 +1,215 @@
+@page {
+    /*margin: 200px 50px;*/
+    margin-top: 170px;
+    margin-bottom: 60px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+header {
+    position: fixed;
+    left: 0px;
+    top: -150px;
+    right: 0px;
+    height: 150px;
+    text-align: center;
+}
+.right {
+    text-align: right;
+    margin-right: 1em;
+  }
+  
+  .left {
+    text-align: left;
+    margin-left: 1em;
+  }
+footer {
+    position: fixed;
+    left: 0px;
+    bottom: -40px;
+    right: 0px;
+    height: 35px;
+    border-bottom: 2px solid #CDCACA;
+}
+footer .page:after {
+    content: counter(page);
+}
+footer table {
+    width: 100%;
+}
+footer p {
+    text-align: right;
+}
+footer .izq {
+    text-align: left;
+}
+.logo {
+    width: auto;
+    height: 80px;
+}
+.letra25 {
+    font-size: 25px;
+}
+.letra20 {
+    font-size: 20px;
+    }
+.conBorder{
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid rgb(0, 0, 0);
+        }
+.letra17 {
+    font-size: 15px;
+}
+.letra15 {
+    font-size: 15px;
+}
+.letra14 {
+    font-size: 14px;
+}
+.letra12 {
+    font-size: 12px;
+}
+.letra11 {
+    font-size: 11px;
+}
+.letra10 {
+    font-size: 10px;
+}
+.letra8 {
+    font-size: 8px;
+}
+.izquierda{
+    text-align:left;
+}
+.dereche{
+    text-align:right;
+}
+.centrar {
+    text-align:center;
+}
+.negrita{
+    font-weight: bold;
+}
+table {
+    width: 100%;
+    white-space:nowrap; 
+}
+
+#tabladetalle {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+#tabladetalle th{
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+    border-collapse: collapse;
+}
+#tabladetalle td{
+    border-right: 1px solid black;
+    border-collapse: collapse;
+    padding-left: 7px;
+    padding-right: 7px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+.espacio1 {
+    text-indent: 0px;
+}
+.espacio2 {
+    text-indent: 20px;
+}
+.espacio3 {
+    text-indent: 40px;
+}
+.espacio4 {
+    text-indent: 60px;
+}
+.espacio5 {
+    text-indent: 80px;
+}
+.espacio6 {
+    text-indent: 100px;
+}
+.page-break {
+    page-break-after: always;
+}
+@font-face {
+    font-family: 'Comic Sans MS Custom';
+    src: url("{{ asset('admin/fonts/aAreaKilometer50.ttf') }}") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-variant: normal;
+}
+body {
+    font-family: 'Comic Sans MS Custom', sans-serif
+}
+.interlinea {
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+.interlinea2 {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    text-align: right;
+}
+.cabecera-diario {
+    border-top: 1px solid black; 
+    border-bottom: 1px solid black;
+    padding: 6px 6px;
+}
+.detalle-diario {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+.borde-izquierdo {
+    border-left: 1px solid black;
+}
+.borde-derecho {
+    border-right: 1px solid black;
+}
+.foot-diario {
+    border: 1px solid black;
+    font-weight: bold;
+    padding: 6px 6px;
+}
+.foot-rol {
+    border: 1px solid black;
+    font-weight: bold;
+    padding: 3px 3px;
+}
+.foot-rol-linea-left {
+    border-left: 1px solid black;
+}
+.foot-rol-linea {
+    border: 1px solid black;
+}
+.borde-gris {
+    border-bottom: 1px solid #BFC1C2;
+}
+.fondo-azul-claro{
+	background-color: #005792;
+ /* background-color: #6c757d;*/
+}
+.fondo-celeste{
+	background-color: #afd3eb;
+ /* background-color: #6c757d;*/
+}
+.letra-blanca{
+	color: #fff;
+}
+.invisible{
+	display: none;
+}
+.fondo-naranja{
+	background-color: #d84a08;
+}
+.fondo-naranja-claro{
+	background-color: #db9f84;
+}
+.fondo-verde{
+	background-color: #207a36;
+}
+.fondo-verde-claro{
+	background-color: #83c794;
+}

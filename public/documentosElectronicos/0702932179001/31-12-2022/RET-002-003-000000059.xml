@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<comprobanteRetencion id="comprobante" version="1.0.0">
+ <infoTributaria>
+  <ambiente>1</ambiente>
+  <tipoEmision>1</tipoEmision>
+  <razonSocial>JEAN PAUL GUZMAN PAZMINO</razonSocial>
+  <nombreComercial>PAGUPASOFT</nombreComercial>
+  <ruc>0702932179001</ruc>
+  <claveAcceso>3112202207070293217900110020030000000590000000111</claveAcceso>
+  <codDoc>07</codDoc>
+  <estab>002</estab>
+  <ptoEmi>003</ptoEmi>
+  <secuencial>000000059</secuencial>
+  <dirMatriz>AV. MADERO VARGAS 2106 E/29 Y 30AVA OESTE</dirMatriz>
+  <agenteRetencion>1</agenteRetencion>
+ </infoTributaria>
+ <infoCompRetencion>
+  <fechaEmision>31/12/2022</fechaEmision>
+  <dirEstablecimiento>av. madero vargas</dirEstablecimiento>
+  <obligadoContabilidad>SI</obligadoContabilidad>
+  <tipoIdentificacionSujetoRetenido>04</tipoIdentificacionSujetoRetenido>
+  <razonSocialSujetoRetenido>Cristhian Armijos</razonSocialSujetoRetenido>
+  <identificacionSujetoRetenido>0705433332001</identificacionSujetoRetenido>
+  <periodoFiscal>12/2022</periodoFiscal>
+ </infoCompRetencion>
+ <impuestos>
+  <impuesto>
+   <codigo>1</codigo>
+   <codigoRetencion>303</codigoRetencion>
+   <baseImponible>20.00</baseImponible>
+   <porcentajeRetener>10</porcentajeRetener>
+   <valorRetenido>2.00</valorRetenido>
+   <codDocSustento>01</codDocSustento>
+   <numDocSustento>001001000110000</numDocSustento>
+   <fechaEmisionDocSustento>03/02/2022</fechaEmisionDocSustento>
+  </impuesto>
+ </impuestos>
+ <infoAdicional>
+  <campoAdicional nombre="Dirección">Circunvalación Sur Entre Sexta Y Séptima Oeste</campoAdicional>
+  <campoAdicional nombre="Email">cristhianj.armijosc@gmail.com</campoAdicional>
+ </infoAdicional>
+</comprobanteRetencion>

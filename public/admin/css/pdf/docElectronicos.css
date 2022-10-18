@@ -1,0 +1,93 @@
+.logo {
+  width: 330px;
+}
+/*table td {
+  border: 1px solid black;
+}*/
+.infoFac{
+  font-family: Arial, Helvetica, sans-serif;
+  padding-left: 7px;
+}
+.infoFac2{
+  font-family: Arial, Helvetica, sans-serif;
+}
+.infoAdicional{
+  width: 450px;
+}
+.infoAdicional2{
+  width: 445px;
+}
+.datosTotalFac{
+  width: 252px;
+}
+.datosNC{
+  width: 252px;
+}
+.datosFilaToto{
+  width: 75px;
+}
+#tabladetalle {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+#tabladetalle td{
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+}
+.bordenormal{
+  border: solid #000 1px;
+}
+
+.anchoFilaCompleta{
+  width: 710px;
+}
+.bordered {
+border: solid #000 1px;
+border-radius: 13px;
+}
+.infoFacAncho td{
+  width: 350px;
+  padding-top: 10px; 
+}
+.infocliente td{
+  padding-top: 5px; 
+}
+.infoFactop td{
+  padding-top: 13px; 
+}
+.size-claveacceso{
+  font-size: 12px;
+}
+.size-codigo-barras{
+  width: 340px;
+}
+.txt11{
+  font-size: 11px;
+}
+.txt12{
+  font-size: 12px;
+}
+.txt14{
+  font-size: 14px;
+}
+.txt16{
+  font-size: 16px;
+}
+.infoRet td{
+  padding-top: 5px; 
+  padding-bottom: 5px; 
+}
+.nctotal td{
+  padding-top: 2px; 
+  padding-bottom: 2px; 
+}
+.linea-nc hr{
+  width: 97%;
+}
+.observacion-word {
+  word-wrap: break-word;
+}
+.pie{
+  width: 90%;
+}
