@@ -73,8 +73,7 @@ class verificarComprasSriController extends Controller
             if ($request->get('sucursal') != "--TODOS--")
                 $transaccionCompras->where('sucursal_nombre','=',$request->get('sucursal'));
 
-            $transaccionCompras= $transaccionCompras->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)
-                                                    ->where('transaccion_estado','=','1')
+            $transaccionCompras= $transaccionCompras->where('transaccion_estado','=','1')
                                                     ->distinct()
                                                     ->orderBy('transaccion_fecha','asc')
                                                     ->get();

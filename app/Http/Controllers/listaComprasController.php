@@ -59,7 +59,6 @@ class listaComprasController extends Controller
 
             if ($request->get('fecha_todo') != "on" && $request->get('idProveedor') != "--TODOS--" && $request->get('sucursal') != "--TODOS--"){                 
                 $transaccionCompras=Transaccion_Compra::reporteTransacciones()
-                ->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)
                 ->where('transaccion_fecha','>=',$request->get('idDesde'))
                 ->where('transaccion_fecha','<=',$request->get('idHasta'))
                 ->where('proveedor_id','=',$request->get('idProveedor'))
@@ -68,33 +67,28 @@ class listaComprasController extends Controller
             } 
             if ($request->get('fecha_todo') == "on" && $request->get('idProveedor') == "--TODOS--" && $request->get('sucursal') == "--TODOS--"){  
                 $transaccionCompras=Transaccion_Compra::reporteTransacciones()
-                ->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)
                 ->where('transaccion_estado','=','1')->distinct()->orderBy('transaccion_fecha','asc')->get();
             }
             if ($request->get('fecha_todo') != "on" && $request->get('idProveedor') == "--TODOS--" && $request->get('sucursal') == "--TODOS--"){  
                  $transaccionCompras=Transaccion_Compra::reporteTransacciones()
                 ->where('transaccion_fecha','>=',$request->get('idDesde'))
                 ->where('transaccion_fecha','<=',$request->get('idHasta'))
-                ->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)
                 ->where('transaccion_estado','=','1')->distinct()->orderBy('transaccion_fecha','asc')->get();
             }
             if ($request->get('fecha_todo') == "on" && $request->get('idProveedor') != "--TODOS--" && $request->get('sucursal') == "--TODOS--"){  
                 $transaccionCompras=Transaccion_Compra::reporteTransacciones()
-                ->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)
                 ->where('proveedor_id','=',$request->get('idProveedor'))
                 ->where('transaccion_estado','=','1')->distinct()->orderBy('transaccion_fecha','asc')->get();
             }
             if ($request->get('fecha_todo') == "on" && $request->get('idProveedor') == "--TODOS--" && $request->get('sucursal') != "--TODOS--"){  
                 $transaccionCompras=Transaccion_Compra::reporteTransacciones()
                 ->where('sucursal_nombre','=',$request->get('sucursal'))
-                ->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)
                 ->where('transaccion_estado','=','1')->distinct()->orderBy('transaccion_fecha','asc')->get();
             }
             if ($request->get('fecha_todo') == "on" && $request->get('idProveedor') != "--TODOS--" && $request->get('sucursal') != "--TODOS--"){  
                  $transaccionCompras=Transaccion_Compra::reporteTransacciones()
                 ->where('proveedor_id','=',$request->get('idProveedor'))
                 ->where('sucursal_nombre','=',$request->get('sucursal'))
-                ->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)
                 ->where('transaccion_estado','=','1')->distinct()->orderBy('transaccion_fecha','asc')->get();
             }
             if ($request->get('fecha_todo') != "on" && $request->get('idProveedor') == "--TODOS--" && $request->get('sucursal') != "--TODOS--"){  
@@ -102,7 +96,6 @@ class listaComprasController extends Controller
                 ->where('transaccion_fecha','>=',$request->get('idDesde'))
                 ->where('transaccion_fecha','<=',$request->get('idHasta'))
                 ->where('sucursal_nombre','=',$request->get('sucursal'))
-                ->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)
                 ->where('transaccion_estado','=','1')->distinct()->orderBy('transaccion_fecha','asc')->get();
             }
             if ($request->get('fecha_todo') != "on" && $request->get('idProveedor') != "--TODOS--" && $request->get('sucursal') == "--TODOS--"){  
@@ -110,7 +103,6 @@ class listaComprasController extends Controller
                 ->where('transaccion_fecha','>=',$request->get('idDesde'))
                 ->where('transaccion_fecha','<=',$request->get('idHasta'))
                 ->where('proveedor_id','=',$request->get('idProveedor'))
-                ->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)
                 ->where('transaccion_estado','=','1')->distinct()->orderBy('transaccion_fecha','asc')->get();
               
             }
