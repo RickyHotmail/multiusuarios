@@ -25,6 +25,12 @@ class Permiso extends Model
     ];
     protected $guarded =[
     ];
+    protected $hidden =[
+        'created_at	',
+        'updated_at	',
+        'permiso_estado'
+    ];
+
     public function scopePermisos($query){
         return $query->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->where('permiso_estado','=','1')->orderBy('grupo_orden','asc');
     }

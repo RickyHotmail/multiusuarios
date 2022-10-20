@@ -14,6 +14,8 @@ class Parametrizacion_Permiso extends Model
     protected $fillable = [
         'permiso_id',
         'parametrizacionp_general',
+        'parametrizacionp_medico',
+        'parametrizacionp_camaronero',
         'parametrizacionp_facturacion',
         'parametrizacionp_estado'
     ];
@@ -24,6 +26,12 @@ class Parametrizacion_Permiso extends Model
     public function scopeParametrizacionesPermiso($query){
         return $query->where('parametrizacionp_estado', '=', 1);
     }
+
+    public function permiso(){
+        return $this->hasOne(Permiso::class, 'permiso_id', 'permiso_id');
+    }
+
+
 
     public function scopeByTipo($query, $nombre){
         $query->join('permiso', 'permiso.permiso_id', '=', 'parametrizacion_permiso.permiso_id')

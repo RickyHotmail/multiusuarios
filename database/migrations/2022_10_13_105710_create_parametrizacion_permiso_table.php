@@ -18,6 +18,8 @@ class CreateParametrizacionPermisoTable extends Migration
             $table->integer('permiso_id');
             $table->foreign('permiso_id')->references('permiso_id')->on('permiso');
             $table->integer('parametrizacionp_general')->default(1);
+            $table->integer('parametrizacionp_medico')->default(1);
+            $table->integer('parametrizacionp_camaronero')->default(1);
             $table->integer('parametrizacionp_facturacion')->default(1);
             $table->integer('parametrizacionp_estado')->default(1);
             $table->timestamps();
