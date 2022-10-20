@@ -14,6 +14,7 @@ use App\Models\Categoria_Proveedor;
 use App\Models\Ciudad;
 use App\Models\Cliente;
 use App\Models\Credito;
+use App\Models\Email_Empresa;
 use App\Models\Empresa;
 use App\Models\Grupo_Producto;
 use App\Models\Marca_Producto;
@@ -120,8 +121,17 @@ class SuscripcionController extends Controller{
                 $empresa->empresa_estado=1;
             $empresa->save();
 
-
-            
+            $emailEmpresa = new Email_Empresa();
+            $emailEmpresa->email_servidor = 'neopagupa-com.correoseguro.dinaserver.com';
+            $emailEmpresa->email_email = 'neopagupa@neopagupa.com';
+            $emailEmpresa->email_usuario = 'neopagupa';
+            $emailEmpresa->email_pass = 'ELWc0X]3:96{';
+            $emailEmpresa->email_puerto = '465';
+            $emailEmpresa->email_mensaje = ' NEOPAGUPA // SISTEMA DE FACTURACIÓN ELECTRÓNICA  !!! ATENCIÓN ESTE DOCUMENTO TIENE VALIDEZ TRIBUTARIA!!!  Con la finalidad de brindar un mejor servicio, adjunto encontrará la Factura Electrónica, legalmente válida para las declaraciones de impuestos ante el SRI.  El archivo XML adjunto, le sugerimos que almacene de manera segura puesto que tiene validez tributaria.  La factura electrónica en formato PDF adjunto, no es necesario que la imprima, le sirve para verificar el detalle del servicio. ';
+            $emailEmpresa->email_neopagupa = '1';
+            $emailEmpresa->email_estado  = 1;
+            $emailEmpresa->empresa_id = Auth::user()->empresa_id;
+            $emailEmpresa->save();
 
 
             //////////////////////crear una sucursal /////////////////////////////////////////////
