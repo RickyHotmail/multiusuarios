@@ -19,6 +19,7 @@ class Email_Empresa extends Model
         'email_pass',
         'email_puerto',
         'email_mensaje',
+        'email_neopagupa',
         'email_estado',
         'empresa_id',
     ];

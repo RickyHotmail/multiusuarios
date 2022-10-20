@@ -21,6 +21,7 @@ class CreateEmailEmpresaTable extends Migration
             $table->string('email_pass');
             $table->string('email_puerto'); 
             $table->string('email_mensaje');
+            $table->string('email_neopagupa');
             $table->string('email_estado');
             $table->integer('empresa_id');
             $table->foreign('empresa_id')->references('empresa_id')->on('empresa');  
