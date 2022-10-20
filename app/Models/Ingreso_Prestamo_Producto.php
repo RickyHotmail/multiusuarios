@@ -31,19 +31,32 @@ class Ingreso_Prestamo_Producto extends Model
     protected $guarded =[
     ];
     public function scopeIngresos($query){
-        return $query->join('rango_documento','rango_documento.rango_id','=','ingreso_prestamo_producto.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('ingreso_estado','=','1')->orderBy('ingreso_fecha','asc');
+        return $query->join('rango_documento','rango_documento.rango_id','=','ingreso_prestamo_producto.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('ingreso_estado','=','1')
+                    ->orderBy('ingreso_fecha','asc');
     }
     public function scopebuscar($query,$desde,$hasta,$cliente){
-        $query->join('rango_documento','rango_documento.rango_id','=','ingreso_prestamo_producto.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')
-        ->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('ingreso_estado','=','1')
-        ->where('ingreso_fecha', '>=', $desde)->where('ingreso_fecha', '<=', $hasta);
-        if($cliente != '0'){
-            $query->where('cliente_id', '=', $cliente);
-        } 
+        $query->join('rango_documento','rango_documento.rango_id','=','ingreso_prestamo_producto.rango_id')
+            ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+            ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+            ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+            ->where('ingreso_estado','=','1')
+            ->where('ingreso_fecha', '>=', $desde)
+            ->where('ingreso_fecha', '<=', $hasta);
+
+        if($cliente != '0') $query->where('cliente_id', '=', $cliente);
+
         return $query->orderBy('ingreso_fecha','asc') ;
     }
     public function scopeSecuencial($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','ingreso_prestamo_producto.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('rango_documento.rango_id','=',$id);
+        return $query->join('rango_documento','rango_documento.rango_id','=','ingreso_prestamo_producto.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('rango_documento.rango_id','=',$id);
 
     }
     public function movimiento(){

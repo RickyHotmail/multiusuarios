@@ -31,22 +31,48 @@ class Egreso_Caja extends Model
     protected $guarded =[
     ];
     public function scopeEgresoCajas($query){
-        return $query->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('egreso_estado','=','1')->orderBy('egreso_fecha','asc');
+        return $query->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('egreso_estado','=','1')
+                    ->orderBy('egreso_fecha','asc');
     }
     public function scopeReporteEgresoCajas($query){
-        return $query->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('egreso_estado','=','1');
+        return $query->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('egreso_estado','=','1');
     }
     public function scopeEgresoCaja($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('egreso_id','=',$id);
+        return $query->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('egreso_id','=',$id);
     }
     public function scopeEgresoCajaIdArqueo($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('egreso_caja.arqueo_id','=',$id);
+        return $query->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('egreso_caja.arqueo_id','=',$id);
     }
     public function scopeEgresoCajaIdArqueoSuma($query, $id){
-        return $query->select(DB::raw('SUM(egreso_valor) as sumaEgreso'))->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('egreso_caja.arqueo_id','=',$id);
+        return $query->select(DB::raw('SUM(egreso_valor) as sumaEgreso'))
+                    ->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('egreso_caja.arqueo_id','=',$id);
     }
     public function scopeSecuencial($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('rango_documento.rango_id','=',$id);
+        return $query->join('rango_documento','rango_documento.rango_id','=','egreso_caja.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('rango_documento.rango_id','=',$id);
     }
     public function diario()
     {
