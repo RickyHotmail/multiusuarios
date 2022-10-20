@@ -52,15 +52,15 @@
                 <tr style="background: @if($cuenta->cuenta_nivel == 1) #C9FABE; @endif @if($cuenta->cuenta_nivel == 2) #AFFFFB; @endif  @if($cuenta->cuenta_nivel == 3) #D6AEF8; @endif  @if($cuenta->cuenta_nivel == 4) #F9FA87; @endif  @if($cuenta->cuenta_nivel == 5) #F9D07A; @endif">
                     @if($cuenta->cuenta_nivel <=5)
                         <td ><b>
-                            <a href="{{ url("cuenta/{$cuenta->cuenta_id}/edit") }}" class="btn btn-xs btn-primary"  data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-edit" aria-hidden="true"></i></a>
-                            <a href="{{ url("cuenta/{$cuenta->cuenta_id}/eliminar") }}" class="btn btn-xs btn-danger"  data-toggle="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                        @if($cuenta->empresa_id) <a href="{{ url("cuenta/{$cuenta->cuenta_id}/edit") }}" class="btn btn-xs btn-primary"  data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-edit" aria-hidden="true"></i></a> @endif
+                        @if($cuenta->empresa_id) <a href="{{ url("cuenta/{$cuenta->cuenta_id}/eliminar") }}" class="btn btn-xs btn-danger"  data-toggle="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-trash" aria-hidden="true"></i></a> @endif
                             @if($cuenta->detallescontable == 0) <a href="{{ url("cuenta/{$cuenta->cuenta_id}/subcuenta") }}" class="btn btn-xs btn-secondary"  data-toggle="tooltip" data-placement="top" title="Añadir Cuenta"><i class="fa fa-tasks" aria-hidden="true"></i></a>@endif
                         </b></td>
                         <td class="espacio{{$cuenta->cuenta_nivel}}"><b>{{ $cuenta->cuenta_numero.'  - '.$cuenta->cuenta_nombre}}</b></td>   
                     @else
                         <td >
-                            <a href="{{ url("cuenta/{$cuenta->cuenta_id}/edit") }}" class="btn btn-xs btn-primary"  data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-edit" aria-hidden="true"></i></a>
-                            <a href="{{ url("cuenta/{$cuenta->cuenta_id}/eliminar") }}" class="btn btn-xs btn-danger"  data-toggle="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                        @if($cuenta->empresa_id) <a href="{{ url("cuenta/{$cuenta->cuenta_id}/edit") }}" class="btn btn-xs btn-primary"  data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-edit" aria-hidden="true"></i></a> @endif
+                        @if($cuenta->empresa_id) <a href="{{ url("cuenta/{$cuenta->cuenta_id}/eliminar") }}" class="btn btn-xs btn-danger"  data-toggle="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-trash" aria-hidden="true"></i></a> @endif
                             @if($cuenta->detallescontable == 0) <a href="{{ url("cuenta/{$cuenta->cuenta_id}/subcuenta") }}" class="btn btn-xs btn-secondary"  data-toggle="tooltip" data-placement="top" title="Añadir Cuenta"><i class="fa fa-tasks" aria-hidden="true"></i></a>@endif
                         </td>
                         <td class="espacio{{$cuenta->cuenta_nivel}}">{{ $cuenta->cuenta_numero.'  - '.$cuenta->cuenta_nombre}}</td> 

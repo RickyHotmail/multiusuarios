@@ -28,7 +28,7 @@ class cuentaController extends Controller
     $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
             $cuentas=Cuenta::nivel(0)->get();
             $arbol='';
-            $cuentas = Cuenta::cuentas()->select('cuenta_id','cuenta_numero','cuenta_nombre','cuenta_nivel',DB::raw('(select count(*) from detalle_diario where cuenta.cuenta_id=detalle_diario.cuenta_id ) as detallesContable'))->get();
+            $cuentas = Cuenta::cuentas()->select('cuenta_id','cuenta_numero','cuenta_nombre','empresa_id','cuenta_nivel',DB::raw('(select count(*) from detalle_diario where cuenta.cuenta_id=detalle_diario.cuenta_id ) as detallesContable'))->get();
           /*  foreach($cuentas as $cuenta){
                 $arbol=$arbol.'<li style="border: 1px solid rgba(0,0,0,.125);font-weight: bold;"><span class="caret">'.$cuenta->cuenta_numero.' - '.$cuenta->cuenta_nombre.'     ';
                 $arbol=$arbol.'&nbsp;&nbsp;&nbsp;<a href="{{ url('."'".'cuenta/'.$cuenta->cuenta_id.'/edit'."'".') }}" class="btn btn-xs btn-primary"  data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-edit" aria-hidden="true"></i></a>
@@ -44,10 +44,10 @@ class cuentaController extends Controller
             }*/
             $secuencial = 1;
             $secuencialAux=Cuenta::nivel(0)->max('cuenta_secuencial');
-            $cuentas = Cuenta::cuentas()->select('cuenta_id','cuenta_numero','cuenta_nombre','cuenta_nivel',DB::raw('(select count(*) from detalle_diario where cuenta.cuenta_id=detalle_diario.cuenta_id ) as detallesContable'))->get();
+            $cuentas = Cuenta::cuentas()->select('cuenta_id','cuenta_numero','cuenta_nombre','empresa_id','cuenta_nivel',DB::raw('(select count(*) from detalle_diario where cuenta.cuenta_id=detalle_diario.cuenta_id ) as detallesContable'))->get();
             if($secuencialAux){$secuencial=$secuencialAux+1;}
 
-            return $cuentas;
+           
             return view('admin.contabilidad.planCuenta.index',['secuencial'=>$secuencial,'PE'=>Punto_Emision::puntos()->get(),'cuentas'=>$cuentas, 'arbol'=>$arbol, 'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
         }catch(\Exception $ex){
     
