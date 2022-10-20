@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bodega;
 use App\Models\Caja;
 use App\Models\Categoria_Cliente;
+use App\Models\Categoria_Producto;
 use App\Models\Categoria_Proveedor;
 use App\Models\Ciudad;
 use App\Models\Cliente;
@@ -26,6 +27,7 @@ use App\Models\Rango_Documento;
 use App\Models\Rol;
 use App\Models\Rol_Permiso;
 use App\Models\sucursal;
+use App\Models\Tamano_Producto;
 use App\Models\Tarifa_Iva;
 use App\Models\Tipo_Cliente;
 use App\Models\Tipo_Identificacion;
@@ -347,6 +349,20 @@ class SuscripcionController extends Controller{
                 $categoriaCliente->empresa_id = $empresa->empresa_id;
                 $categoriaCliente->categoria_cliente_estado = 1;
             $categoriaCliente->save();
+
+            $categoriaproducto = new Categoria_Producto();
+            $categoriaproducto->categoria_nombre = 'SIN CATEGORIA';
+            $categoriaproducto->categoria_tipo = '-';
+            $categoriaproducto->empresa_id = $empresa->empresa_id;
+            $categoriaproducto->categoria_estado = 1;
+            $categoriaproducto->save();
+
+            $Tamano = new Tamano_Producto();
+            $Tamano->tamano_nombre = 'SIN TAMAÑO';
+            $Tamano->empresa_id = $empresa->empresa_id;
+            $Tamano->tamano_estado = 1;
+            $Tamano->save();
+
 
             $cliente = new Cliente();
                 $cliente->cliente_cedula = '9999999999999';

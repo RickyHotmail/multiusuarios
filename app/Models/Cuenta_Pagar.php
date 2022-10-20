@@ -49,38 +49,38 @@ class Cuenta_Pagar extends Model
     }
     public function scopeCuentaByNumero($query, $numeroFactura, $proveedor_id){
         return $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')
-            ->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')
+             ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')
             ->select('cuenta_pagar.cuenta_id','cuenta_pagar.cuenta_descripcion','cuenta_pagar.cuenta_valor_factura','cuenta_pagar.cuenta_saldo','cuenta_pagar.cuenta_fecha','proveedor.proveedor_nombre','proveedor.proveedor_ruc','proveedor.proveedor_id')
-            ->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_descripcion','like','%'.$numeroFactura.'%')
+            ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_descripcion','like','%'.$numeroFactura.'%')
             ->where('cuenta_estado','=','1')->where('cuenta_pagar.proveedor_id','=',$proveedor_id)
             ->havingRaw("(SELECT transaccion_compra.transaccion_id FROM transaccion_compra WHERE transaccion_compra.cuenta_id = cuenta_pagar.cuenta_id) is null")
             ->groupBy('cuenta_pagar.cuenta_id','cuenta_pagar.cuenta_descripcion','cuenta_pagar.cuenta_valor_factura','cuenta_pagar.cuenta_saldo','cuenta_pagar.cuenta_fecha','proveedor.proveedor_nombre','proveedor.proveedor_ruc','proveedor.proveedor_id')
             ->orderBy('cuenta_pagar.cuenta_fecha','asc');
     }
     public function scopeCuentaByFacturaMigrada($query, $facturaMigrada){
-        return $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_descripcion','like','%'.$facturaMigrada.'%');
+        return $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_descripcion','like','%'.$facturaMigrada.'%');
     }
     public function scopeCuenta($query, $id){
-        return $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_id','=',$id)->orderBy('proveedor.proveedor_nombre','asc');
+        return $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_id','=',$id)->orderBy('proveedor.proveedor_nombre','asc');
     }
     public function scopeProveedoresCXPSucursal($query,$sucursal_id){
-        $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->orderBy('proveedor.proveedor_nombre','asc');
+        $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->orderBy('proveedor.proveedor_nombre','asc');
         if($sucursal_id != 0){
             $query->where('sucursal_id','=',$sucursal_id);
         }
         return $query;
     }
     public function scopeProveedoresCXP($query){
-        return $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->orderBy('proveedor.proveedor_nombre_comercial','asc');
+        return $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->orderBy('proveedor.proveedor_nombre_comercial','asc');
     }
     public function scopeCuentasProveedores($query, $id){
-        return $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('proveedor.proveedor_id','=',$id)->orderBy('cuenta_pagar.cuenta_fecha','asc');
+        return $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('proveedor.proveedor_id','=',$id)->orderBy('cuenta_pagar.cuenta_fecha','asc');
     }
     public function scopeCuentaPagarPagos($query, $id){
         return $query->join('detalle_pago_cxp','detalle_pago_cxp.cuenta_pagar_id','=','cuenta_pagar.cuenta_id')->where('cuenta_pagar.cuenta_id','=',$id);
     }
     public function scopeCuentasDeudas($query, $proveedor_id, $fechaI,$fechaF,$todo,$sucursal_id,$credito,$contado,$efectivo,$otro){
-        $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_pagar.proveedor_id','=',$proveedor_id);
+        $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_pagar.proveedor_id','=',$proveedor_id);
         if($todo == 0){
             $query->where('cuenta_fecha','>=',$fechaI)->where('cuenta_fecha','<=',$fechaF);
         }
@@ -105,8 +105,8 @@ class Cuenta_Pagar extends Model
     }
     public function scopeCuentasByProveedor($query, $proveedor_id,$sucursal){
         $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')
-        ->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')
-        ->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_pagar.proveedor_id','=',$proveedor_id)
+         ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')
+        ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_pagar.proveedor_id','=',$proveedor_id)
         ->where('cuenta_estado','=','1')->orderBy('cuenta_pagar.cuenta_fecha','asc');
         if($sucursal != 0){
             $query->where('cuenta_pagar.sucursal_id','=',$sucursal);
@@ -114,7 +114,7 @@ class Cuenta_Pagar extends Model
         return $query;
     }
     public function scopeCuentasPagarByPagos($query,$fecha_ini,$fecha_fin,$proveedor_id,$todo,$sucursal){
-        $query->join('detalle_pago_cxp','cuenta_pagar.cuenta_id','=','detalle_pago_cxp.cuenta_pagar_id')->join('pago_cxp','detalle_pago_cxp.pago_id','=','pago_cxp.pago_id')->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_pagar.proveedor_id','=',$proveedor_id)->orderBy('cuenta_pagar.cuenta_fecha','asc')->orderBy('cuenta_pagar.cuenta_id', 'asc');
+        $query->join('detalle_pago_cxp','cuenta_pagar.cuenta_id','=','detalle_pago_cxp.cuenta_pagar_id')->join('pago_cxp','detalle_pago_cxp.pago_id','=','pago_cxp.pago_id')->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_pagar.proveedor_id','=',$proveedor_id)->orderBy('cuenta_pagar.cuenta_fecha','asc')->orderBy('cuenta_pagar.cuenta_id', 'asc');
         if($sucursal != '0'){
             $query->where('sucursal_id','=',$sucursal);
         }
@@ -124,20 +124,20 @@ class Cuenta_Pagar extends Model
         return $query;
     }
     public function scopeCuentasPagarPendientes($query,$fecha_corte,$proveedor_id,$sucursal){
-        $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_pagar.cuenta_saldo','>', 0)->where('cuenta_pagar.proveedor_id','=',$proveedor_id)->where('cuenta_fecha','<=',$fecha_corte)->orderBy('cuenta_pagar.cuenta_fecha','asc')->orderBy('cuenta_pagar.cuenta_id', 'asc');
+        $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_pagar.cuenta_saldo','>', 0)->where('cuenta_pagar.proveedor_id','=',$proveedor_id)->where('cuenta_fecha','<=',$fecha_corte)->orderBy('cuenta_pagar.cuenta_fecha','asc')->orderBy('cuenta_pagar.cuenta_id', 'asc');
         if($sucursal != '0'){
             $query->where('sucursal_id','=',$sucursal);
         }
         return $query;
     }
     public function scopeCuentasPagarPendientesCorte($query,$fecha_corte,$proveedor_id,$sucursal){
-        $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_pagar.proveedor_id','=',$proveedor_id)->where('cuenta_fecha','<=',$fecha_corte)->orderBy('cuenta_pagar.cuenta_fecha','asc')->orderBy('cuenta_pagar.cuenta_id', 'asc');
+        $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_pagar.proveedor_id','=',$proveedor_id)->where('cuenta_fecha','<=',$fecha_corte)->orderBy('cuenta_pagar.cuenta_fecha','asc')->orderBy('cuenta_pagar.cuenta_id', 'asc');
         if($sucursal != '0'){
             $query->where('sucursal_id','=',$sucursal);
         }
         return $query;
     }
     public function scopeScucursalesxCXP($query,$proveedor_id){
-        return $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','proveedor.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->where('cuenta_pagar.proveedor_id','=',$proveedor_id);
+        return $query->join('proveedor','proveedor.proveedor_id','=','cuenta_pagar.proveedor_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->where('cuenta_pagar.proveedor_id','=',$proveedor_id);
     }
 }

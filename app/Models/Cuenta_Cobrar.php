@@ -54,33 +54,33 @@ class Cuenta_Cobrar extends Model
     
     public function scopeCuentaByNumero($query, $numeroFactura){
         return $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id')
-            ->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')
+            ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')
             ->select('cuenta_cobrar.cuenta_id','cuenta_cobrar.cuenta_descripcion','cuenta_cobrar.cuenta_valor_factura','cuenta_cobrar.cuenta_saldo','cuenta_cobrar.cuenta_fecha','cliente.cliente_nombre','cliente.cliente_cedula','cliente.cliente_id')
-            ->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_descripcion','like','%'.$numeroFactura.'%')
+            ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_descripcion','like','%'.$numeroFactura.'%')
             ->where('cuenta_estado','=','1')
             ->orderBy('cuenta_cobrar.cuenta_fecha','asc');
     }
     public function scopeCuenta($query, $id){
-        return $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_id','=',$id)->orderBy('cliente.cliente_nombre','asc');
+        return $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_id','=',$id)->orderBy('cliente.cliente_nombre','asc');
     }
     public function scopeClientesCXC($query){
-        return $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->orderBy('cliente.cliente_nombre','asc');
+        return $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->orderBy('cliente.cliente_nombre','asc');
     }
     public function scopeClientesCXCSucursal($query,$sucursal_id){
-        $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->orderBy('cliente.cliente_nombre','asc');
+        $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->orderBy('cliente.cliente_nombre','asc');
         if($sucursal_id != 0){
             $query->where('sucursal_id','=',$sucursal_id);
         }
         return $query;
     }
     public function scopeCuentasClientes($query, $id){
-        return $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_cobrar.cliente_id','=',$id)->orderBy('cuenta_cobrar.cuenta_fecha','asc');
+        return $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_cobrar.cliente_id','=',$id)->orderBy('cuenta_cobrar.cuenta_fecha','asc');
     }
     public function scopeCuentaCobrarPagos($query, $id){
         return $query->join('detalle_pago_cxc','detalle_pago_cxc.cuenta_id','=','cuenta_cobrar.cuenta_id')->where('cuenta_cobrar.cuenta_id','=',$id);
     }
     public function scopeCuentasCartera($query, $cliente_id, $fechaI,$fechaF,$todo,$sucursal_id,$credito,$contado,$efectivo){
-        $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_cobrar.cliente_id','=',$cliente_id);
+        $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_cobrar.cliente_id','=',$cliente_id);
         if($todo == 0){
             $query->where('cuenta_fecha','>=',$fechaI)->where('cuenta_fecha','<=',$fechaF);
         }
@@ -101,14 +101,14 @@ class Cuenta_Cobrar extends Model
         return $query;
     }
     public function scopeCuentasByCliente($query, $cliente_id,$sucursal){
-        $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_cobrar.cliente_id','=',$cliente_id)->where('cuenta_estado','=','1')->orderBy('cuenta_cobrar.cuenta_fecha','asc')->orderBy('cuenta_cobrar.cuenta_id','asc');
+        $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_cobrar.cliente_id','=',$cliente_id)->where('cuenta_estado','=','1')->orderBy('cuenta_cobrar.cuenta_fecha','asc')->orderBy('cuenta_cobrar.cuenta_id','asc');
         if($sucursal != 0){
             $query->where('sucursal_id','=',$sucursal);
         }
         return $query;
     }
     public function scopeCuentasCobrarByPagos($query,$fecha_ini,$fecha_fin,$cliente_id,$todo,$sucursal){
-        $query->join('detalle_pago_cxc','cuenta_cobrar.cuenta_id','=','detalle_pago_cxc.cuenta_id')->join('pago_cxc','detalle_pago_cxc.pago_id','=','pago_cxc.pago_id')->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_cobrar.cliente_id','=',$cliente_id)->orderBy('cuenta_cobrar.cuenta_fecha','asc')->orderBy('cuenta_cobrar.cuenta_id', 'asc');
+        $query->join('detalle_pago_cxc','cuenta_cobrar.cuenta_id','=','detalle_pago_cxc.cuenta_id')->join('pago_cxc','detalle_pago_cxc.pago_id','=','pago_cxc.pago_id')->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_cobrar.cliente_id','=',$cliente_id)->orderBy('cuenta_cobrar.cuenta_fecha','asc')->orderBy('cuenta_cobrar.cuenta_id', 'asc');
         if($sucursal != '0'){
             $query->where('sucursal_id','=',$sucursal);
         }
@@ -118,16 +118,16 @@ class Cuenta_Cobrar extends Model
         return $query;
     }
     public function scopeCuentasCobrarPendientes($query,$fecha_corte,$cliente_id,$sucursal){
-        $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_cobrar.cliente_id','=',$cliente_id)->where('cuenta_fecha','<=',$fecha_corte)->orderBy('cuenta_cobrar.cuenta_fecha','asc')->orderBy('cuenta_cobrar.cuenta_id', 'asc');
+        $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_cobrar.cliente_id','=',$cliente_id)->where('cuenta_fecha','<=',$fecha_corte)->orderBy('cuenta_cobrar.cuenta_fecha','asc')->orderBy('cuenta_cobrar.cuenta_id', 'asc');
         if($sucursal != '0'){
             $query->where('sucursal_id','=',$sucursal);
         }
         return $query;
     }
     public function scopeScucursalesxCXC($query,$cliente_id){
-        return $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->where('cuenta_cobrar.cliente_id','=',$cliente_id);
+        return $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_estado','=','1')->where('cuenta_cobrar.cliente_id','=',$cliente_id);
     }
     public function scopeCuentaByFacturaMigrada($query, $facturaMigrada){
-        return $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_descripcion','like','%'.$facturaMigrada.'%');
+        return $query->join('cliente','cliente.cliente_id','=','cuenta_cobrar.cliente_id') ->join('sucursal','sucursal.sucursal_id','=','sucursal.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('cuenta_descripcion','like','%'.$facturaMigrada.'%');
     }
 }

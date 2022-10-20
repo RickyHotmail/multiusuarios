@@ -46,7 +46,7 @@ class Guia_Remision extends Model
     protected $guarded =[
     ];
     public function scopeClientesDistinsc($query){
-        return $query->join('cliente','cliente.cliente_id','=','guia_remision.cliente_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('tipo_identificacion.empresa_id','=',Auth::user()->empresa_id)->where('gr_estado','=','1')->orderBy('cliente.cliente_nombre','asc');
+        return $query->join('cliente','cliente.cliente_id','=','guia_remision.cliente_id')->join('bodega','bodega.bodega_id','=','orden_despacho.bodega_id')->join('sucursal','sucursal.sucursal_id','=','bodega.sucursal_id')->join('tipo_identificacion','tipo_identificacion.tipo_identificacion_id','=','cliente.tipo_identificacion_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('gr_estado','=','1')->orderBy('cliente.cliente_nombre','asc');
     }
     public function scopeEstadoDistinsc($query){
         return $query->join('bodega','bodega.bodega_id','=','guia_remision.bodega_id')->join('sucursal','sucursal.sucursal_id','=','bodega.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->orderBy('gr_estado','asc');

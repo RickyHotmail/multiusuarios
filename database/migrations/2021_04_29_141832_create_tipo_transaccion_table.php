@@ -18,7 +18,7 @@ class CreateTipoTransaccionTable extends Migration
             $table->string('tipo_transaccion_nombre');
             $table->string('tipo_transaccion_codigo');
             $table->string('tipo_transaccion_estado');
-            $table->bigInteger('empresa_id');            
+            $table->bigInteger('empresa_id')->nullable();            
             $table->foreign('empresa_id')->references('empresa_id')->on('empresa');
             $table->timestamps();
         });

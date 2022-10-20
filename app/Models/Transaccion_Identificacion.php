@@ -16,22 +16,22 @@ class Transaccion_Identificacion extends Model
         'transaccion_codigo',         
         'transaccion_estado',       
         'tipo_transaccion_id', 
-        'tipo_identificacion_id',    
+        'tipo_identificacion_id',
                  
     ];
     protected $guarded =[
     ];
 
     public function scopeTransaccionIdentificaciones($query){
-        return $query->join('tipo_transaccion', 'tipo_transaccion.tipo_transaccion_id','=','transaccion_identificacion.tipo_transaccion_id')->join('tipo_identificacion', 'tipo_identificacion.tipo_identificacion_id','=','transaccion_identificacion.tipo_identificacion_id')->where('tipo_transaccion.empresa_id','=',Auth::user()->empresa_id)->where('transaccion_estado','=','1')->orderBy('transaccion_codigo','asc');
+        return $query->join('tipo_transaccion', 'tipo_transaccion.tipo_transaccion_id','=','transaccion_identificacion.tipo_transaccion_id')->join('tipo_identificacion', 'tipo_identificacion.tipo_identificacion_id','=','transaccion_identificacion.tipo_identificacion_id')->where(function ($query){ $query->whereNull('tipo_transaccion.empresa_id')->orwhere('tipo_transaccion.empresa_id','=',Auth::user()->empresa_id); })->where('transaccion_estado','=','1')->orderBy('transaccion_codigo','asc');
     }
 
     public function scopeTransaccionIdentificacion($query, $id){
-        return $query->join('tipo_transaccion', 'tipo_transaccion.tipo_transaccion_id','=','transaccion_identificacion.tipo_transaccion_id')->join('tipo_identificacion', 'tipo_identificacion.tipo_identificacion_id','=','transaccion_identificacion.tipo_identificacion_id')->where('tipo_transaccion.empresa_id','=',Auth::user()->empresa_id)->where('transaccion_id','=',$id);
+        return $query->join('tipo_transaccion', 'tipo_transaccion.tipo_transaccion_id','=','transaccion_identificacion.tipo_transaccion_id')->join('tipo_identificacion', 'tipo_identificacion.tipo_identificacion_id','=','transaccion_identificacion.tipo_identificacion_id')->where(function ($query){ $query->whereNull('tipo_transaccion.empresa_id')->orwhere('tipo_transaccion.empresa_id','=',Auth::user()->empresa_id); })->where('transaccion_id','=',$id);
     }
 
     public function scopeIdentificacion($query, $identificacion_id, $transaccion){
-        return $query->join('tipo_transaccion', 'tipo_transaccion.tipo_transaccion_id','=','transaccion_identificacion.tipo_transaccion_id')->where('tipo_transaccion.empresa_id','=',Auth::user()->empresa_id)->where('tipo_transaccion.tipo_transaccion_nombre','=',$transaccion)->where('tipo_identificacion_id','=',$identificacion_id);
+        return $query->join('tipo_transaccion', 'tipo_transaccion.tipo_transaccion_id','=','transaccion_identificacion.tipo_transaccion_id')->where(function ($query){ $query->whereNull('tipo_transaccion.empresa_id')->orwhere('tipo_transaccion.empresa_id','=',Auth::user()->empresa_id); })->where('tipo_transaccion.tipo_transaccion_nombre','=',$transaccion)->where('tipo_identificacion_id','=',$identificacion_id);
     }
 
     public function transaccion()

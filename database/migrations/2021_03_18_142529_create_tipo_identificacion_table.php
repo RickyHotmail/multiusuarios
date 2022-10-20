@@ -18,7 +18,7 @@ class CreateTipoIdentificacionTable extends Migration
             $table->string('tipo_identificacion_nombre')->unique();
             $table->string('tipo_identificacion_codigo')->unique();
             $table->string('tipo_identificacion_estado');            
-            $table->bigInteger('empresa_id');
+            $table->bigInteger('empresa_id')->nullable();
             $table->foreign('empresa_id')->references('empresa_id')->on('empresa');     
             $table->timestamps();
         });
