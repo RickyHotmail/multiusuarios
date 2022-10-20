@@ -10,10 +10,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Bodega;
 use App\Models\Caja;
 use App\Models\Categoria_Cliente;
+use App\Models\Categoria_Proveedor;
+use App\Models\Ciudad;
 use App\Models\Cliente;
 use App\Models\Credito;
 use App\Models\Empresa;
+use App\Models\Grupo_Producto;
+use App\Models\Marca_Producto;
+use App\Models\Pais;
 use App\Models\Parametrizacion_Permiso;
+use App\Models\Provincia;
 use App\Models\Punto_Emision;
 use App\Models\Rango_Documento;
 use App\Models\Rol;
@@ -22,6 +28,7 @@ use App\Models\sucursal;
 use App\Models\Tarifa_Iva;
 use App\Models\Tipo_Cliente;
 use App\Models\Tipo_Identificacion;
+use App\Models\Unidad_Medida_Producto;
 use App\Models\User;
 use App\Models\Usuario_PuntoE;
 use App\Models\Usuario_Rol;
@@ -103,7 +110,7 @@ class SuscripcionController extends Controller{
             
 
 
-            //crear una sucursal
+            //////////////////////crear una sucursal /////////////////////////////////////////////
             $sucursal = new sucursal();
                 $sucursal->sucursal_nombre = $request->get('idNombreSucursal');
                 $sucursal->sucursal_codigo = $request->get('idCodigoSucursal');
@@ -112,7 +119,14 @@ class SuscripcionController extends Controller{
                 $sucursal->empresa_id = $empresa->empresa_id;
                 $sucursal->sucursal_estado = 1;
             $sucursal->save();
-            
+
+            $puntoEmision = new Punto_Emision();
+                $puntoEmision->punto_serie = $request->get('idCodigoPuntoVenta');
+                $puntoEmision->punto_descripcion = 'Punto de Venta '.$request->get('idCodigoPuntoVenta');
+                $puntoEmision->punto_estado = 1;
+                $puntoEmision->sucursal_id = $sucursal->sucursal_id;
+            $puntoEmision->save();
+
             $caja = new Caja();
                 $caja->caja_nombre = 'Efectivo';            
                 $caja->empresa_id = $empresa->empresa_id;
@@ -132,16 +146,6 @@ class SuscripcionController extends Controller{
             $bodega->save();
 
 
-            //crear un punto de Emisión
-            $puntoEmision = new Punto_Emision();
-                $puntoEmision->punto_serie = $request->get('idCodigoPuntoVenta');
-                $puntoEmision->punto_descripcion = 'Punto de Venta '.$request->get('idCodigoPuntoVenta');
-                $puntoEmision->punto_estado = 1;
-                $puntoEmision->sucursal_id = $sucursal->sucursal_id;
-            $puntoEmision->save();
-
-            
-
             $rango=new Rango_Documento();
                 $rango->rango_descripcion='DOC ELECTRONICOS';
                 $rango->rango_inicio=$request->idSecuencia;
@@ -156,7 +160,7 @@ class SuscripcionController extends Controller{
             
 
 
-            //Buscar el rol de Facturacion electrónica
+            //Buscar los permisos permitidos para facturacion
             $parmetrizacionesP=Parametrizacion_Permiso::parametrizacionesPermiso()->get();
             $rol=new Rol();
             $rol->rol_nombre='Administrador';
@@ -165,15 +169,14 @@ class SuscripcionController extends Controller{
             $rol->rol_estado=1;
             $rol->save();
 
-            foreach($parmetrizacionesP as $permiso){
-                $rolPermiso=new Rol_Permiso();
-                $rolPermiso->permiso_id=$permiso->permiso_id;
-                $rolPermiso->rol_id=$rol->rol_id;
-                $rolPermiso->save();
+            foreach($parmetrizacionesP as $param){
+                if($param->parametrizacionp_facturacion==1){
+                    $rolPermiso=new Rol_Permiso();
+                    $rolPermiso->permiso_id=$param->permiso_id;
+                    $rolPermiso->rol_id=$rol->rol_id;
+                    $rolPermiso->save();
+                }
             }
-
-
-
 
             $usuarioControlador = new usuarioController();
             $usuario = new User();
@@ -293,13 +296,32 @@ class SuscripcionController extends Controller{
             $credito->save();
 
 
+            
+
+            $medida = new Unidad_Medida_Producto();
+                $medida->unidad_medida_nombre = 'UNIDAD';           
+                $medida->empresa_id = $empresa->empresa_id;
+                $medida->unidad_medida_estado = 1;
+            $medida->save();
+
+            $grupo = new Grupo_Producto();
+                $grupo->grupo_nombre = 'SIN GRUPO';
+                $grupo->empresa_id = $empresa->empresa_id;
+                $grupo->grupo_estado = 1;
+            $grupo->save();
+
+            $marca = new Marca_Producto();
+                $marca->marca_nombre = 'SIN MARCA';           
+                $marca->empresa_id = $empresa->empresa_id;
+                $marca->marca_estado = 1;
+            $marca->save();
+
             $categoriaCliente = new Categoria_Cliente();
                 $categoriaCliente->categoria_cliente_nombre = 'SIN CATEGORIA';
                 $categoriaCliente->categoria_cliente_descripcion = '-';
                 $categoriaCliente->empresa_id = $empresa->empresa_id;
                 $categoriaCliente->categoria_cliente_estado = 1;
             $categoriaCliente->save();
-
 
             $cliente = new Cliente();
                 $cliente->cliente_cedula = '9999999999999';
@@ -320,11 +342,83 @@ class SuscripcionController extends Controller{
                 $cliente->cliente_estado  = 1;            
             $cliente->save();
 
+            $categoriaProv = new Categoria_Proveedor();
+                $categoriaProv->categoria_proveedor_nombre = 'SIN CATEGORÍA';
+                $categoriaProv->categoria_proveedor_descripcion = '-';
+                $categoriaProv->empresa_id = $empresa->empresa_id;
+                $categoriaProv->categoria_proveedor_estado = 1;
+            $categoriaProv->save();
+
+            $Pais = new Pais();
+                $Pais->pais_nombre = "ECUADOR";
+                $Pais->pais_codigo = "+593";
+                $Pais->pais_estado = 1;
+                $Pais->empresa_id = $empresa->empresa_id;
+            $Pais->save();
+
+            $provincia = new Provincia();
+                $provincia->provincia_nombre = 'AZUAY';
+                $provincia->provincia_codigo = '1';
+                $provincia->pais_id = $Pais->pais_id;
+                $provincia->provincia_estado = 1;
+            $provincia->save();
+
+            $provincia = new Provincia();
+                $provincia->provincia_nombre = 'BOLIVAR';
+                $provincia->provincia_codigo = '2';
+                $provincia->pais_id = $Pais->pais_id;
+                $provincia->provincia_estado = 1;
+            $provincia->save();
+
+            $provincia = new Provincia();
+                $provincia->provincia_nombre = 'CAÑAR';
+                $provincia->provincia_codigo = '3';
+                $provincia->pais_id = $Pais->pais_id;
+                $provincia->provincia_estado = 1;
+            $provincia->save();
+
+            $provincia = new Provincia();
+                $provincia->provincia_nombre = 'CARCHI';
+                $provincia->provincia_codigo = '4';
+                $provincia->pais_id = $Pais->pais_id;
+                $provincia->provincia_estado = 1;
+            $provincia->save();
+
+            $provincia = new Provincia();
+                $provincia->provincia_nombre = 'COTOPAXI';
+                $provincia->provincia_codigo = '5';
+                $provincia->pais_id = $Pais->pais_id;
+                $provincia->provincia_estado = 1;
+            $provincia->save();
+
+            $provincia = new Provincia();
+                $provincia->provincia_nombre = 'CHIMBORAZO';
+                $provincia->provincia_codigo = '6';
+                $provincia->pais_id = $Pais->pais_id;
+                $provincia->provincia_estado = 1;
+            $provincia->save();
+
+            $provincia = new Provincia();
+                $provincia->provincia_nombre = 'EL ORO';
+                $provincia->provincia_codigo = '7';
+                $provincia->pais_id = $Pais->pais_id;
+                $provincia->provincia_estado = 1;
+            $provincia->save();
+
+            $ciudad = new Ciudad();
+                $ciudad->ciudad_nombre = 'MACHALA';
+                $ciudad->ciudad_codigo = '070202';
+                $ciudad->provincia_id = $provincia->provincia_id;
+                $ciudad->ciudad_estado = 1;
+            $ciudad->save();
+
+            
+
+
             DB::commit();
             return redirect('login')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
             DB::rollBack();
-            return $ex->getMessage();
             return back()->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
