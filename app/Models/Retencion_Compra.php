@@ -67,10 +67,10 @@ class Retencion_Compra extends Model
     }
     public function scoperetbyNumero($query, $numero){
         return $query->join('rango_documento','rango_documento.rango_id','=','retencion_compra.rango_id')
-        ->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')
-        ->join('punto_emision','rango_documento.punto_id','=','punto_emision.punto_id')->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+        ->join('punto_emision','rango_documento.punto_id','=','punto_emision.punto_id')
+        ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
         ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
-        ->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('retencion_numero', 'like', '%'.$numero.'%');
+        ->where('retencion_numero', 'like', '%'.$numero.'%');
     }
     public function detalles(){
         return $this->hasMany(Detalle_RC::class, 'retencion_id', 'retencion_id');

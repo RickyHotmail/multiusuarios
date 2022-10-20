@@ -36,7 +36,12 @@ class Punto_Emision extends Model
         return $query->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('punto_emision.sucursal_id','=',$sucursal_id);
     }
     public function scopePuntoSucursalRango($query, $sucursal_id){
-        return $query->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')->join('rango_documento','rango_documento.punto_id','=','punto_emision.punto_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('tipo_comprobante.tipo_comprobante_nombre','=','Quincena')->where('punto_emision.sucursal_id','=',$sucursal_id);
+        return $query->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+        ->join('rango_documento','rango_documento.punto_id','=','punto_emision.punto_id')
+        ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+        ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+        ->where('tipo_comprobante.tipo_comprobante_nombre','=','Quincena')
+        ->where('punto_emision.sucursal_id','=',$sucursal_id);
     }
     public function sucursal()
     {

@@ -258,6 +258,7 @@ use App\Http\Controllers\ordenRecepcionController;
 use App\Http\Controllers\parametrizarDetalleOrdenController;
 use App\Http\Controllers\parametrizarOrdenController;
 use App\Http\Controllers\ParametrizarPrioridadController;
+use App\Http\Controllers\permisoGeneralController;
 use App\Http\Controllers\piscinaController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\preFacturaController;
@@ -334,6 +335,9 @@ Route::resource('/suscripcion', SuscripcionController::class);
 Route::get('/registro', [SuscripcionController::class,'registro']);
 Route::get('/pagos', [SuscripcionController::class,'pago'])->middleware('auth');
 Route::get('/suscri', [SuscripcionController::class,'pago'])->middleware('auth');
+Route::get('/gestionPermisos', [permisoGeneralController::class,'index'])->middleware('auth');
+Route::post('/gestionPermisos/guardar', [permisoGeneralController::class,'store'])->middleware('auth');
+
 
 
 Route::get('/buscarimpuestorenta/searchN/', [impuestoRentaRolController::class, 'buscarBy'])->middleware('auth');

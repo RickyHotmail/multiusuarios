@@ -31,22 +31,49 @@ class Nota_Debito_banco extends Model
     protected $guarded =[
     ];
     public function scopeNotasCreditoBancos($query){
-        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('nota_estado','=','1')->orderBy('nota_fecha','asc');
+        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('nota_estado','=','1')
+                    ->orderBy('nota_fecha','asc');
     }
     public function scopeNotaCreditoBanco($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('nota_id','=',$id);
+        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('nota_id','=',$id);
     }
     public function scopeNotaDebitoBancoByDiario($query, $diario_id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('nota_debito_banco.diario_id','=',$diario_id);
+        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('nota_debito_banco.diario_id','=',$diario_id);
     }
     public function scopeNDbancoByCuenta($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('nota_debito_banco.cuenta_bancaria_id','=',$id)->orderby('nota_debito_banco.nota_fecha','asc');
+        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('nota_debito_banco.cuenta_bancaria_id','=',$id)
+                    ->orderby('nota_debito_banco.nota_fecha','asc');
     }
     public function scopeNDbancoOtrosByCuenta($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('nota_debito_banco.cuenta_bancaria_id','=',$id)->orderby('nota_debito_banco.nota_fecha','asc');
+        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('nota_debito_banco.cuenta_bancaria_id','=',$id)
+                    ->orderby('nota_debito_banco.nota_fecha','asc');
     }
     public function scopeSecuencial($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)->where('rango_documento.rango_id','=',$id);
+        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')
+                    ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                    ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                    ->where('rango_documento.rango_id','=',$id);
     }
     public function diario()
     {
@@ -66,12 +93,19 @@ class Nota_Debito_banco extends Model
     public function scopeNotaDebitoSumatoria($query, $idCuentaBancaria,$fechaHasta){
         return $query->select(DB::raw('SUM(nota_valor) as sumanotadebito'))
         ->join('rango_documento','rango_documento.rango_id','=','nota_debito_banco.rango_id')
-        ->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')
-        ->where('tipo_comprobante.empresa_id','=',Auth::user()->empresa_id)
+        
+         ->join('punto_emision','punto_emision.punto_id','=','rango_documento.punto_id')
+                ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')
+        
+        ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+        
         ->where('nota_estado','=','1') 
         ->where('cuenta_bancaria_id','=',$idCuentaBancaria)      
+        
         ->where('nota_conciliacion','=',true)        
+        
         ->where('nota_fecha','<=',$fechaHasta)
+        
         ->where('nota_fecha_conciliacion','<=',$fechaHasta);
 
     }
