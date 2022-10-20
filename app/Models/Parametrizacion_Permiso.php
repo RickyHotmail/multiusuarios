@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Parametrizacion_Permiso extends Model
 {
@@ -23,8 +24,16 @@ class Parametrizacion_Permiso extends Model
     protected $guarded =[
     ];
 
+    public function scopeByPermisoId($query, $id){
+        return $query->where('permiso_id', '=', $id);
+    }
+
     public function scopeParametrizacionesPermiso($query){
-        return $query->where('parametrizacionp_estado', '=', 1);
+        return $query->where('parametrizacionp_estado', '=', 1)
+                     ->join('permiso', 'permiso.permiso_id', '=', 'parametrizacion_permiso.permiso_id')        
+                     ->orderBy('permiso.grupo_id')
+                     ->orderBy('permiso.tipo_id')
+                     ->select(DB::raw('parametrizacion_permiso.*'));
     }
 
     public function permiso(){

@@ -68,20 +68,6 @@ class SuscripcionController extends Controller{
         ]);
     }
 
-    public function actualizarPermisos(){
-        $parmetrizacionesP=Parametrizacion_Permiso::parametrizacionesPermiso()->get();
-        $rol=Rol::findOrFail(17);
-
-        foreach($parmetrizacionesP as $param){
-            if($param->parametrizacionp_facturacion==1){
-                $rolPermiso=new Rol_Permiso();
-                $rolPermiso->permiso_id=$param->permiso_id;
-                $rolPermiso->rol_id=$rol->rol_id;
-                $rolPermiso->save();
-            }
-        }
-    }
-
     public function store(Request $request){
         try{
             DB::beginTransaction();
@@ -121,8 +107,7 @@ class SuscripcionController extends Controller{
             $empresa->save();
 
 
-            
-
+    
 
             //////////////////////crear una sucursal /////////////////////////////////////////////
             $sucursal = new sucursal();
