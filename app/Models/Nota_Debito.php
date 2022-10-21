@@ -50,16 +50,16 @@ class Nota_Debito extends Model
     protected $guarded =[
     ];
     public function scopeNotasDebito($query){
-        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('nd_estado','=','1')->orderBy('nd_numero','asc');
+        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->join('punto_emision','rango_documento.punto_id','=','punto_emision.punto_id')->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('nd_estado','=','1')->orderBy('nd_numero','asc');
     }
     public function scopeSucursales($query){
         return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->join('punto_emision','rango_documento.punto_id','=','punto_emision.punto_id')->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->orderBy('sucursal_nombre','asc');
     }
     public function scopeNotaDebito($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('nd_id','=',$id);
+        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->join('punto_emision','rango_documento.punto_id','=','punto_emision.punto_id')->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('nd_id','=',$id);
     }
     public function scopeSecuencial($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('nota_debito.rango_id','=',$id);
+        return $query->join('rango_documento','rango_documento.rango_id','=','nota_debito.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->join('punto_emision','rango_documento.punto_id','=','punto_emision.punto_id')->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('nota_debito.rango_id','=',$id);
     }
     public function scopeNotaDebitoNumero($query, $numeroDoc, $bodega){
         return $query->join('factura_venta','factura_venta.factura_id','=','nota_debito.factura_id')->join('cliente','cliente.cliente_id','=','factura_venta.cliente_id')->join('tipo_cliente', 'tipo_cliente.tipo_cliente_id','=','cliente.tipo_cliente_id')->where('tipo_cliente.empresa_id','=',Auth::user()->empresa_id)->where('factura_venta.bodega_id','=',$bodega)->where('nd_estado','=','1')->where('nd_numero','like','%'.$numeroDoc.'%')->orderBy('nd_numero','asc');

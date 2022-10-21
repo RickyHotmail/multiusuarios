@@ -52,10 +52,10 @@ class Nota_Credito extends Model
     
    
     public function scopeNotaCredito($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','nota_credito.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('nc_id','=',$id);
+        return $query->join('rango_documento','rango_documento.rango_id','=','nota_credito.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->join('punto_emision','rango_documento.punto_id','=','punto_emision.punto_id')->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('nc_id','=',$id);
     }
     public function scopeSecuencial($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','nota_credito.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('nota_credito.rango_id','=',$id);
+        return $query->join('rango_documento','rango_documento.rango_id','=','nota_credito.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->join('punto_emision','rango_documento.punto_id','=','punto_emision.punto_id')->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('nota_credito.rango_id','=',$id);
     }
     public function scopeNotaCreditoNumero($query, $numeroDoc, $bodega){
         return $query->join('factura_venta','factura_venta.factura_id','=','nota_credito.factura_id')->join('cliente','cliente.cliente_id','=','factura_venta.cliente_id')->join('tipo_cliente', 'tipo_cliente.tipo_cliente_id','=','cliente.tipo_cliente_id')->where('tipo_cliente.empresa_id','=',Auth::user()->empresa_id)->where('factura_venta.bodega_id','=',$bodega)->where('nc_estado','=','1')->where('nc_numero','like','%'.$numeroDoc.'%')->orderBy('nc_numero','asc');
