@@ -10,10 +10,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Bodega;
 use App\Models\Caja;
 use App\Models\Categoria_Cliente;
+use App\Models\Categoria_Producto;
 use App\Models\Categoria_Proveedor;
 use App\Models\Ciudad;
 use App\Models\Cliente;
 use App\Models\Credito;
+use App\Models\Email_Empresa;
 use App\Models\Empresa;
 use App\Models\Grupo_Producto;
 use App\Models\Marca_Producto;
@@ -25,6 +27,7 @@ use App\Models\Rango_Documento;
 use App\Models\Rol;
 use App\Models\Rol_Permiso;
 use App\Models\sucursal;
+use App\Models\Tamano_Producto;
 use App\Models\Tarifa_Iva;
 use App\Models\Tipo_Cliente;
 use App\Models\Tipo_Identificacion;
@@ -106,8 +109,18 @@ class SuscripcionController extends Controller{
                 $empresa->empresa_estado=1;
             $empresa->save();
 
+            $emailEmpresa = new Email_Empresa();
+            $emailEmpresa->email_servidor = 'neopagupa-com.correoseguro.dinaserver.com';
+            $emailEmpresa->email_email = 'neopagupa@neopagupa.com';
+            $emailEmpresa->email_usuario = 'neopagupa';
+            $emailEmpresa->email_pass = 'ELWc0X]3:96{';
+            $emailEmpresa->email_puerto = '465';
+            $emailEmpresa->email_mensaje = ' NEOPAGUPA // SISTEMA DE FACTURACIÓN ELECTRÓNICA  !!! ATENCIÓN ESTE DOCUMENTO TIENE VALIDEZ TRIBUTARIA!!!  Con la finalidad de brindar un mejor servicio, adjunto encontrará la Factura Electrónica, legalmente válida para las declaraciones de impuestos ante el SRI.  El archivo XML adjunto, le sugerimos que almacene de manera segura puesto que tiene validez tributaria.  La factura electrónica en formato PDF adjunto, no es necesario que la imprima, le sirve para verificar el detalle del servicio. ';
+            $emailEmpresa->email_neopagupa = '1';
+            $emailEmpresa->email_estado  = 1;
+            $emailEmpresa->empresa_id = Auth::user()->empresa_id;
+            $emailEmpresa->save();
 
-    
 
             //////////////////////crear una sucursal /////////////////////////////////////////////
             $sucursal = new sucursal();
@@ -322,6 +335,20 @@ class SuscripcionController extends Controller{
                 $categoriaCliente->empresa_id = $empresa->empresa_id;
                 $categoriaCliente->categoria_cliente_estado = 1;
             $categoriaCliente->save();
+
+            $categoriaproducto = new Categoria_Producto();
+            $categoriaproducto->categoria_nombre = 'SIN CATEGORIA';
+            $categoriaproducto->categoria_tipo = '-';
+            $categoriaproducto->empresa_id = $empresa->empresa_id;
+            $categoriaproducto->categoria_estado = 1;
+            $categoriaproducto->save();
+
+            $Tamano = new Tamano_Producto();
+            $Tamano->tamano_nombre = 'SIN TAMAÑO';
+            $Tamano->empresa_id = $empresa->empresa_id;
+            $Tamano->tamano_estado = 1;
+            $Tamano->save();
+
 
             $cliente = new Cliente();
                 $cliente->cliente_cedula = '9999999999999';
