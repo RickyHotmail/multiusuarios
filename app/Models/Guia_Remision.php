@@ -226,7 +226,7 @@ class Guia_Remision extends Model
     }
 
     public function empresa(){
-        return $this->hasOneThrough(Empresa::class, Forma_Pago::class,'forma_pago_id','empresa_id','forma_pago_id','empresa_id');
+        return $this->hasOneThrough(Empresa::class, Transportista::class,'transportista_id','empresa_id','transportista_id','empresa_id');
     }
 
 }

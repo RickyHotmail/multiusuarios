@@ -183,7 +183,140 @@ class SuscripcionController extends Controller{
                 $rango->tipo_comprobante_id=1;
                 $rango->punto_id=$puntoEmision->punto_id;
             $rango->save();
+
             
+            
+
+            $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC ELECTRONICOS';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=2;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
+
+            $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC ELECTRONICOS';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=3;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
+
+            $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC ELECTRONICOS';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=4;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
+
+            $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC ELECTRONICOS';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=5;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
+
+            $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC ELECTRONICOS';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=6;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
+
+            $rango=new Rango_Documento();
+            $rango->rango_descripcion='DOC ELECTRONICOS';
+            $rango->rango_inicio=$request->idSecuencia;
+            $rango->rango_fin=100000000;
+            $rango->rango_fecha_inicio='2022-01-01';
+            $rango->rango_fecha_fin='2030-12-31';
+            $rango->rango_autorizacion=0;
+            $rango->rango_estado=1;
+            $rango->tipo_comprobante_id=7;
+            $rango->punto_id=$puntoEmision->punto_id;
+        $rango->save();
+        
+            $rango=new Rango_Documento();
+            $rango->rango_descripcion='DOC FISICO';
+            $rango->rango_inicio=$request->idSecuencia;
+            $rango->rango_fin=100000000;
+            $rango->rango_fecha_inicio='2022-01-01';
+            $rango->rango_fecha_fin='2030-12-31';
+            $rango->rango_autorizacion=0;
+            $rango->rango_estado=1;
+            $rango->tipo_comprobante_id=8;
+            $rango->punto_id=$puntoEmision->punto_id;
+        $rango->save();
+        $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC FISICO';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=9;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
+
+            $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC FISICO';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=11;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
+
+            $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC FISICO';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=56;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
+
+            $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC FISICO';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=41;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
 
 
             //Buscar los permisos permitidos para facturacion

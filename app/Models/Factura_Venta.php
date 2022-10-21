@@ -290,7 +290,7 @@ class Factura_Venta extends Model
         return $this->belongsTo(Vendedor::class, 'vendedor_id', 'vendedor_id');
     }
     public function empresa(){
-        return $this->hasOneThrough(Empresa::class, Forma_Pago::class,'forma_pago_id','empresa_id','forma_pago_id','empresa_id');
+        return $this->hasOneThrough(Empresa::class, Diario::class,'diario_id','empresa_id','diario_id','empresa_id');
     }
     public function tamano(){
         return $this->belongsTo(Tamano_Producto::class, 'tamano_id', 'tamano_id');

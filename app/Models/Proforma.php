@@ -78,8 +78,6 @@ class Proforma extends Model
     public function rangoDocumento(){
         return $this->belongsTo(Rango_Documento::class, 'rango_id', 'rango_id');
     }
-    public function empresa(){
-        return $this->hasOneThrough(Empresa::class, Forma_Pago::class,'forma_pago_id','empresa_id','forma_pago_id','empresa_id');
-    }
+    
 
 }

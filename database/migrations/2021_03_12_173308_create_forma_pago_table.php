@@ -18,7 +18,7 @@ class CreateFormaPagoTable extends Migration
             $table->string('forma_pago_nombre')->unique();
             $table->string('forma_pago_codigo')->unique();
             $table->string('forma_pago_estado');            
-            $table->bigInteger('empresa_id');
+            $table->bigInteger('empresa_id')->nullable();
             $table->foreign('empresa_id')->references('empresa_id')->on('empresa');               
             $table->timestamps();
         });
