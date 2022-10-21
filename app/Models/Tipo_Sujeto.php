@@ -21,15 +21,15 @@ class Tipo_Sujeto extends Model
     protected $guarded =[
     ];
     public function scopeTipoSujetos($query){
-        return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('tipo_sujeto_estado','=','1')->orderBy('tipo_sujeto_codigo','asc');
+        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('tipo_sujeto_estado','=','1')->orderBy('tipo_sujeto_codigo','asc');
     
     }
     public function scopeTipoSujeto($query, $id){
-        return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('tipo_sujeto_id','=',$id);
+        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('tipo_sujeto_id','=',$id);
     
     } 
     public function scopeTipoSujetoNombre($query, $nombre){
-        return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('tipo_sujeto_nombre','=',$nombre);
+        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('tipo_sujeto_nombre','=',$nombre);
     
     }   
 }
