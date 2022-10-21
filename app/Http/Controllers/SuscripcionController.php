@@ -426,12 +426,6 @@ class SuscripcionController extends Controller{
                 $tipoClien1->tipo_cliente_estado = 1;
             $tipoClien1->save();
 
-            $tipoClien2 = new Tipo_Cliente();
-                $tipoClien2->tipo_cliente_nombre = 'INSTITUCIÓN PÚBLICA';
-                $tipoClien2->empresa_id = $empresa->empresa_id;
-                $tipoClien2->tipo_cliente_estado = 1;
-            $tipoClien2->save();
-
 
             $credito = new Credito();
                 $credito->credito_nombre = 'SIN CRÉDITO';
