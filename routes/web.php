@@ -337,6 +337,9 @@ Route::get('/pagos', [SuscripcionController::class,'pago'])->middleware('auth');
 Route::get('/suscri', [SuscripcionController::class,'pago'])->middleware('auth');
 Route::get('/gestionPermisos', [permisoGeneralController::class,'index'])->middleware('auth');
 Route::post('/gestionPermisos/guardar', [permisoGeneralController::class,'store'])->middleware('auth');
+Route::get('/permisosAdministrador/{id}/actualizar', [permisoGeneralController::class,'actualizarPermisosAdministrador'])->middleware('auth');
+
+
 
 
 
