@@ -26,19 +26,19 @@ class Concepto_Retencion extends Model
     protected $guarded =[
     ];   
     public function scopeConceptoRetenciones($query){
-        return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('concepto_estado','=','1')->orderBy('concepto_nombre','asc');
+        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('concepto_estado','=','1')->orderBy('concepto_nombre','asc');
     }
     public function scopeConceptoRetencion($query, $id){
-        return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('concepto_id','=',$id);
+        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('concepto_id','=',$id);
     }
     public function scopeConceptoRetencionByCodigo($query, $codigo){
-        return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('concepto_codigo','=',$codigo);
+        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('concepto_codigo','=',$codigo);
     }
     public function scopeConceptosFuente($query){
-        return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('concepto_estado','=','1')->where('concepto_tipo','=','1')->orderBy('concepto_nombre','asc');
+        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('concepto_estado','=','1')->where('concepto_tipo','=','1')->orderBy('concepto_nombre','asc');
     }
     public function scopeConceptosIva($query){
-        return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('concepto_estado','=','1')->where('concepto_tipo','=','2')->orderBy('concepto_nombre','asc');
+        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('concepto_estado','=','1')->where('concepto_tipo','=','2')->orderBy('concepto_nombre','asc');
     }   
     public function cuentaEmitida(){
         return $this->belongsTo(Cuenta::class, 'concepto_emitida_cuenta', 'cuenta_id');
