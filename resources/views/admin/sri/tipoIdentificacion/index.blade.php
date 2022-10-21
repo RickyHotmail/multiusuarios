@@ -19,9 +19,9 @@
                 @foreach($tipoIdentificacion as $tipoIdentificacion)
                 <tr class="text-center">
                     <td>                        
-                        <a href="{{ url("tipoIdentificacion/{$tipoIdentificacion->tipo_identificacion_id}/edit") }}" class="btn btn-xs btn-primary" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                        @if($tipoIdentificacion->empresa_id)<a href="{{ url("tipoIdentificacion/{$tipoIdentificacion->tipo_identificacion_id}/edit") }}" class="btn btn-xs btn-primary" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-edit" aria-hidden="true"></i></a> @endif   
                         <a href="{{ url("tipoIdentificacion/{$tipoIdentificacion->tipo_identificacion_id}") }}" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="top" title="Ver"><i class="fa fa-eye"></i></a>                   
-                        <a href="{{ url("tipoIdentificacion/{$tipoIdentificacion->tipo_identificacion_id}/eliminar") }}" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-trash" aria-hidden="true"></i></a>                        
+                        @if($tipoIdentificacion->empresa_id)<a href="{{ url("tipoIdentificacion/{$tipoIdentificacion->tipo_identificacion_id}/eliminar") }}" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-trash" aria-hidden="true"></i></a>      @endif                      
                     </td>                                        
                     <td>{{ $tipoIdentificacion->tipo_identificacion_nombre }}</td>
                     <td>{{ $tipoIdentificacion->tipo_identificacion_codigo }}</td>                                                     
