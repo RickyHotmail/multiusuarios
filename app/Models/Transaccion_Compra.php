@@ -116,7 +116,7 @@ class Transaccion_Compra extends Model
     }
     public function scopeTransaccionSinFecha($query){
         return $query->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
-                     ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
+                     ->where('sucursal.empresa_id','=',Auth::user()->empresa_id);
     }
     public function scopeMovimientoCConsumo($query, $cc, $fechaInicio, $fechaFin){
         $query->join('detalle_tc','detalle_tc.transaccion_id','=','transaccion_compra.transaccion_id')
