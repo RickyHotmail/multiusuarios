@@ -212,7 +212,7 @@ class facturasinOrdenController extends Controller
                 $general->registrarAuditoria('Registro de cuenta por cobrar de factura -> '.$factura->factura_numero,$factura->factura_numero,'Registro de cuenta por cobrar de factura -> '.$factura->factura_numero.' con cliente -> '.$request->get('buscarCliente').' con un total de -> '.$request->get('idTotal').' con clave de acceso -> '.$factura->factura_autorizacion);
                 /****************************************************************/
             $factura->cuentaCobrar()->associate($cxc);
-            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+           
                 /**********************asiento diario****************************/
                 $diario = new Diario();
                 $diario->diario_codigo = $general->generarCodigoDiario($request->get('factura_fecha'),'CFVE');
@@ -256,7 +256,7 @@ class facturasinOrdenController extends Controller
                     /************************************************************************/
                     $factura->diarioCosto()->associate($diarioC);
                 }
-            }
+            
                 if($cxc->cuenta_estado == '2'){
                     /********************Pago por Venta en efectivo***************************/
                     $pago = new Pago_CXC();
@@ -309,7 +309,7 @@ class facturasinOrdenController extends Controller
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$factura->factura_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
                 }
                 if ($request->get('idIva') > 0){
-                    if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                    
                         $detalleDiario = new Detalle_Diario();
                         $detalleDiario->detalle_debe = 0.00;
                         $detalleDiario->detalle_haber = $request->get('idIva') ;
@@ -322,13 +322,13 @@ class facturasinOrdenController extends Controller
                         $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
                         $diario->detalles()->save($detalleDiario);
                         $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$factura->factura_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el haber por un valor de -> '.$request->get('idIva'));
-                    }
+                    
                 }
                 /****************************************************************/
                 /****************************************************************/
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $factura->diario()->associate($diario);
-                }
+                
             if($arqueoCaja){
                 $factura->arqueo_id = $arqueoCaja->arqueo_id;
             }
@@ -381,7 +381,7 @@ class facturasinOrdenController extends Controller
                 $detalleFV->movimiento()->associate($movimientoProducto);
                 $factura->detalles()->save($detalleFV);
                 $general->registrarAuditoria('Registro de detalle de factura de venta numero -> '.$factura->factura_numero,$factura->factura_numero,'Registro de detalle de factura de venta numero -> '.$factura->factura_numero.' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' a un precio unitario de -> '.$pu[$i]);
-                if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
                     $detalleDiario->detalle_haber = $total[$i];
@@ -394,10 +394,10 @@ class facturasinOrdenController extends Controller
                     $detalleDiario->cuenta_id = $producto->producto_cuenta_venta;
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$factura->factura_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$producto->cuentaVenta->cuenta_numero.' en el haber por un valor de -> '.$total[$i]);
-                }
+                
                 if($banderaP){
                     if($producto->producto_tipo == '1'){
-                        if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                       
                             $detalleDiario = new Detalle_Diario();
                             $detalleDiario->detalle_debe = 0.00;
                             $detalleDiario->detalle_haber = $movimientoProducto->movimiento_costo_promedio;
@@ -424,7 +424,7 @@ class facturasinOrdenController extends Controller
                             $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
                             $diarioC->detalles()->save($detalleDiario);
                             $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diarioC->diario_codigo,$factura->factura_numero,'Registro de detalle de diario con codigo -> '.$diarioC->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$detalleDiario->detalle_debe);
-                        }
+                        
                     }
                 }
             }
