@@ -51,7 +51,8 @@ class Transaccion_Compra extends Model
     ];
     public function scopeTransaccionDuplicada($query, $numero,$tipoDocumento,$proveedor){
         return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')
-                    ->where('empresa_id','=',Auth::user()->empresa_id)
+                    ->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
                     ->where('transaccion_compra.transaccion_numero','=',$numero)
                     ->where('transaccion_compra.proveedor_id','=',$proveedor)
                     ->where('transaccion_compra.tipo_comprobante_id','=',$tipoDocumento)
@@ -59,7 +60,8 @@ class Transaccion_Compra extends Model
     }
     public function scopeTransaccionDuplicadaActualizar($query, $numero,$tipoDocumento,$proveedor,$transaccionID){
         return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')
-                    ->where('empresa_id','=',Auth::user()->empresa_id)
+                    ->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
+                    ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
                     ->where('transaccion_compra.transaccion_numero','=',$numero)
                     ->where('transaccion_compra.proveedor_id','=',$proveedor)
                     ->where('transaccion_compra.tipo_comprobante_id','=',$tipoDocumento)
@@ -67,13 +69,19 @@ class Transaccion_Compra extends Model
                     ->where('transaccion_estado','=','1');
     }
     public function scopeTransacciones($query, $proveedor_id){
-        return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('transaccion_compra.proveedor_id','=',$proveedor_id)->where('transaccion_estado','=','1')->orderBy('transaccion_numero','desc');
+        return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')
+        ->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
+        ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('transaccion_compra.proveedor_id','=',$proveedor_id)->where('transaccion_estado','=','1')->orderBy('transaccion_numero','desc');
     }
     public function scopeTransaccionactiva($query, $proveedor_id){
-        return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->join('cuenta_pagar','cuenta_pagar.cuenta_id','=','transaccion_compra.cuenta_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('transaccion_compra.proveedor_id','=',$proveedor_id)->where('transaccion_estado','=','1')->where('cuenta_estado','=','1')->orderBy('transaccion_numero','desc');
+        return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->join('cuenta_pagar','cuenta_pagar.cuenta_id','=','transaccion_compra.cuenta_id')
+        ->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
+        ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('transaccion_compra.proveedor_id','=',$proveedor_id)->where('transaccion_estado','=','1')->where('cuenta_estado','=','1')->orderBy('transaccion_numero','desc');
     }
     public function scopeTransaccionID($query, $transaccion_id){
-        return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('transaccion_compra.transaccion_id','=',$transaccion_id)->where('transaccion_estado','=','1')->orderBy('transaccion_numero','desc');
+        return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')
+        ->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
+        ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('transaccion_compra.transaccion_id','=',$transaccion_id)->where('transaccion_estado','=','1')->orderBy('transaccion_numero','desc');
     }
     public function scopeReporteTransacciones($query){
         return $query->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
@@ -92,7 +100,9 @@ class Transaccion_Compra extends Model
         return $query->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->orderBy('sucursal_nombre','asc');
     }
     public function scopeProveedorDistinsc($query){
-        return $query->join('proveedor','transaccion_compra.proveedor_id','=','proveedor.proveedor_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->orderBy('proveedor_nombre','asc');
+        return $query->join('proveedor','transaccion_compra.proveedor_id','=','proveedor.proveedor_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')
+        ->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
+        ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->orderBy('proveedor_nombre','asc');
     }
     public function scopeTransaccionesalimentacion($query,$numeroFactura,$proveedor){
         return $query->join('proveedor','transaccion_compra.proveedor_id','=','proveedor.proveedor_id')
@@ -103,10 +113,13 @@ class Transaccion_Compra extends Model
                     ->where('transaccion_numero','like','%'.$numeroFactura.'%');
     }
     public function scopeTransaccion($query, $id){
-        return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('transaccion_id','=',$id)->orderBy('transaccion_numero','desc');
+        return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
+        ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('transaccion_id','=',$id)->orderBy('transaccion_numero','desc');
     }
     public function scopeTransaccionpunto($query, $id){
-        return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->join('rango_documento','rango_documento.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('transaccion_id','=',$id)->orderBy('transaccion_numero','desc');
+        return $query->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->join('rango_documento','rango_documento.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')
+        ->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
+        ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('transaccion_id','=',$id)->orderBy('transaccion_numero','desc');
     }
     public function scopeTransaccionByFecha($query, $fechaInicio, $fechaFin){
         return $query->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
@@ -133,7 +146,9 @@ class Transaccion_Compra extends Model
         return $query; 
     }
     public function scopeFacturaNumeroAnt($query, $numeroFactura, $proveedor){
-        return $query->join('cuenta_pagar','transaccion_compra.cuenta_id','=','cuenta_pagar.cuenta_id')->join('proveedor','proveedor.proveedor_id','=','transaccion_compra.proveedor_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('transaccion_compra.proveedor_id','=',$proveedor)->where('transaccion_estado','=','1')->where('transaccion_numero','like','%'.$numeroFactura.'%')->orderBy('transaccion_numero','desc');
+        return $query->join('cuenta_pagar','transaccion_compra.cuenta_id','=','cuenta_pagar.cuenta_id')->join('proveedor','proveedor.proveedor_id','=','transaccion_compra.proveedor_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')
+        ->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
+        ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('transaccion_compra.proveedor_id','=',$proveedor)->where('transaccion_estado','=','1')->where('transaccion_numero','like','%'.$numeroFactura.'%')->orderBy('transaccion_numero','desc');
     }
     public function scopeTransaccionFiltrar($query, $fechatodo, $fechaInicio, $fechaFin,$numeroDoc,$sucursal,$proveedor){
         $query->join('proveedor','proveedor.proveedor_id','=','transaccion_compra.proveedor_id')
