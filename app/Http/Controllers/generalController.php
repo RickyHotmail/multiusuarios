@@ -325,6 +325,7 @@ class generalController extends Controller
         return PDF::loadHTML($view)->save($ruta.'/'.$nombreArchivo)->stream($nombreArchivo);
     }
     public function NotaEntrega(Nota_Entrega $nota,$url){
+        $nota=Nota_Entrega::findOrFail($nota->nt_id);
         $empresa = Empresa::empresa()->first();
         $ruta = public_path().'/notasEntrega/'.$empresa->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $nota->nt_fecha)->format('d-m-Y');
         if (!is_dir($ruta)) {
