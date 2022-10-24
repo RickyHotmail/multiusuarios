@@ -265,7 +265,29 @@ class SuscripcionController extends Controller{
                 $rango->punto_id=$puntoEmision->punto_id;
             $rango->save();
 
-            
+            $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC FISICO';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=47;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
+
+            $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC FISICO';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=48;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
             
 
             $rango=new Rango_Documento();
