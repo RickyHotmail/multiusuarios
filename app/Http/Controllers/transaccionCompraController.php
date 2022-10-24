@@ -189,7 +189,7 @@ class transaccionCompraController extends Controller
                 /****************************************************************/
                 $transaccion->cuentaPagar()->associate($cxp);
             }
-            if (Auth::user()->empresa->empresa_contabilidad == '1') {
+           
                 /**********************asiento diario****************************/
                 $diario = new Diario();
                 $diario->diario_comentario = 'COMPROBANTE DIARIO DE COMPRA DE '. strtoupper($tipoComprobante->tipo_comprobante_nombre) .' : '.$transaccion->transaccion_numero;
@@ -233,7 +233,7 @@ class transaccionCompraController extends Controller
                 $diario->save();
                 $general->registrarAuditoria('Registro de diario de compra con '. strtoupper($tipoComprobante->tipo_comprobante_nombre) .' -> '.$transaccion->transaccion_numero,$transaccion->transaccion_numero,'Registro de diario de compra de '. strtoupper($tipoComprobante->tipo_comprobante_nombre) .' -> '.$transaccion->transaccion_numero.' con proveedor -> '.$request->get('buscarProveedor').' con un total de -> '.$request->get('idTotal').' y con codigo de diario -> '.$diario->diario_codigo);
                 /****************************************************************/
-            }
+            
                 if($tipoComprobante->tipo_comprobante_codigo <> '04'){
                 if($cxp->cuenta_estado == '2'){
                     /********************Pago por compra en efectivo***************************/
@@ -243,9 +243,9 @@ class transaccionCompraController extends Controller
                     $pago->pago_tipo = 'PAGO EN EFECTIVO';
                     $pago->pago_valor = $cxp->cuenta_monto;
                     $pago->pago_estado = '1';
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                   
                         $pago->diario()->associate($diario);
-                    }
+                    
                     if($arqueoCaja){
                         $pago->arqueo_id = $arqueoCaja->arqueo_id;
                     }
@@ -316,12 +316,12 @@ class transaccionCompraController extends Controller
                     $anticipoProveedor->proveedor_id = $transaccion->proveedor_id;
                     $anticipoProveedor->anticipo_estado = 1; 
                     $anticipoProveedor->rango_id = $rangoDocumentoAnticipo->rango_id;
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                   
                         $anticipoProveedor->diario()->associate($diario);
-                    }
+                    
                     $anticipoProveedor->save();
                     $general->registrarAuditoria('Registro de Anticipo de Proveedor -> '.$request->get('buscarProveedor'),'0','Con motivo: Nota de Crédito');
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                   
                         /********************detalle de diario de venta********************/
                         $detalleDiario = new Detalle_Diario();
                         $detalleDiario->detalle_debe = $request->get('idTotal');
@@ -341,7 +341,7 @@ class transaccionCompraController extends Controller
                         }
                         $diario->detalles()->save($detalleDiario);
                         $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo, $transaccion->transaccion_numero, 'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
-                    }
+                    
                 }elseif(round($cxpAux->cuenta_saldo,2) == 0){
                     $rangoDocumentoAnticipo=Rango_Documento::PuntoRango($request->get('punto_id'), 'Anticipo de Proveedor')->first();
                     if($rangoDocumentoAnticipo){
@@ -377,13 +377,13 @@ class transaccionCompraController extends Controller
                     $anticipoProveedor->anticipo_saldo = $request->get('idTotal');   
                     $anticipoProveedor->proveedor_id = $facturaAux->proveedor_id;
                     $anticipoProveedor->anticipo_estado = 1; 
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                   
                         $anticipoProveedor->diario()->associate($diario);
-                    }
+                    
                     $anticipoProveedor->rango_id = $rangoDocumentoAnticipo->rango_id;
                     $anticipoProveedor->save();
                     $general->registrarAuditoria('Registro de Anticipo de Proveedor -> '.$request->get('buscarProveedor'),'0','Con motivo: Nota de Crédito');
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                    
                         /********************detalle de diario de venta********************/
                         $detalleDiario = new Detalle_Diario();
                         $detalleDiario->detalle_debe = $request->get('idTotal');
@@ -404,7 +404,7 @@ class transaccionCompraController extends Controller
                         $diario->detalles()->save($detalleDiario);
                         $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
                         /*******************************************************************/
-                    }
+                    
                 }else if(round($cxpAux->cuenta_saldo,2) >= round($transaccion->transaccion_total,2)){
                     /********************Pago por Nota de Credito***************************/
                     $pago = new Pago_CXP();
@@ -413,9 +413,9 @@ class transaccionCompraController extends Controller
                     $pago->pago_tipo = strtoupper($tipoComprobante->tipo_comprobante_nombre);
                     $pago->pago_valor = $request->get('idTotal');
                     $pago->pago_estado = '1';
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                    
                         $pago->diario()->associate($diario);
-                    }
+                    
                     $pago->save();
 
                     $detallePago = new Detalle_Pago_CXP();
@@ -435,7 +435,7 @@ class transaccionCompraController extends Controller
                     }
                     $cxpAux->update();
                     /****************************************************************/
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                    
                         /********************detalle de diario de venta********************/
                         $detalleDiario = new Detalle_Diario();
                         $detalleDiario->detalle_debe = $request->get('idTotal');
@@ -456,7 +456,7 @@ class transaccionCompraController extends Controller
                         $diario->detalles()->save($detalleDiario);
                         $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
                         /*******************************************************************/
-                    }
+                    
                 }else{
                     /********************Anticipo a proveedor**************************/
                     $rangoDocumentoAnticipo=Rango_Documento::PuntoRango($request->get('punto_id'), 'Anticipo de Proveedor')->first();
@@ -493,13 +493,13 @@ class transaccionCompraController extends Controller
                     $anticipoProveedor->anticipo_saldo = $request->get('idTotal') - $cxpAux->cuenta_saldo;
                     $anticipoProveedor->proveedor_id = $facturaAux->proveedor_id;
                     $anticipoProveedor->anticipo_estado = 1; 
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                   
                         $anticipoProveedor->diario()->associate($diario);
-                    }   
+                       
                     $anticipoProveedor->rango_id = $rangoDocumentoAnticipo->rango_id;
                     $anticipoProveedor->save();
                     $general->registrarAuditoria('Registro de Anticipo de Proveedor -> '.$request->get('buscarProveedor'),'0','Con motivo: Nota de Crédito');
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                    
                         /********************detalle de diario de venta********************/
                         $detalleDiario = new Detalle_Diario();
                         $detalleDiario->detalle_debe = $request->get('idTotal') - $cxpAux->cuenta_saldo;
@@ -520,7 +520,7 @@ class transaccionCompraController extends Controller
                         $diario->detalles()->save($detalleDiario);
                         $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal') - $cxpAux->cuenta_saldo);
                         /*******************************************************************/
-                    }
+                    
                     /********************Pago por Nota de Credito***************************/
                     $pago = new Pago_CXP();
                     $pago->pago_descripcion = $request->get('transaccion_descripcion'). ' POR '.strtoupper($tipoComprobante->tipo_comprobante_nombre).' No. '.$transaccion->transaccion_numero;
@@ -528,9 +528,9 @@ class transaccionCompraController extends Controller
                     $pago->pago_tipo = strtoupper($tipoComprobante->tipo_comprobante_nombre);
                     $pago->pago_valor = $cxpAux->cuenta_saldo;
                     $pago->pago_estado = '1';
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                   
                         $pago->diario()->associate($diario);
-                    }
+                    
                     $pago->save();
 
                     $detallePago = new Detalle_Pago_CXP();
@@ -550,7 +550,7 @@ class transaccionCompraController extends Controller
                     }
                     $cxpAux->update();
                     /****************************************************************/
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                    
                         /********************detalle de diario de venta********************/
                         $detalleDiario = new Detalle_Diario();
                         $detalleDiario->detalle_debe = $cxpAux->cuenta_saldo;
@@ -571,12 +571,12 @@ class transaccionCompraController extends Controller
                         $diario->detalles()->save($detalleDiario);
                         $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$cxpAux->cuenta_saldo);
                         /*******************************************************************/
-                    }
+                    
                 }
             }
-            if (Auth::user()->empresa->empresa_contabilidad == '1') {
+           
                 $transaccion->diario()->associate($diario);
-            }
+            
             if($arqueoCaja){
                 $transaccion->arqueo_id = $arqueoCaja->arqueo_id;
             }
@@ -632,7 +632,7 @@ class transaccionCompraController extends Controller
                
                 /********************detalle de diario de compra********************/
                 $producto = Producto::findOrFail($isProducto[$i]);
-                if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                
                     $detalleDiario = new Detalle_Diario();
                     if($tipoComprobante->tipo_comprobante_codigo <> '04'){
                         $detalleDiario->detalle_debe = $total[$i];
@@ -647,17 +647,28 @@ class transaccionCompraController extends Controller
                     $detalleDiario->detalle_conciliacion = '0';
                     $detalleDiario->detalle_estado = '1';
                   
-                    $detalleDiario->movimientoProducto()->associate($movimientoProducto);
-                    
+                    $detalleDiario->movimientoProducto()->associate($movimientoProducto); 
                     if($producto->producto_compra_venta == '3'){
-                        $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;
+                        $parametrizacionContable  = Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'INVENTARIO')->first();
+                        if($parametrizacionContable->parametrizacion_cuenta_general=='1'){
+                            $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
+                        }else{
+                            
+                            $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;
+                        }
                     }else{
-                        $detalleDiario->cuenta_id = $producto->producto_cuenta_gasto;
+                        $parametrizacionContable  = Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'COSTOS DE MERCADERIA')->first();
+                        if($parametrizacionContable->parametrizacion_cuenta_general=='1'){
+                            $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
+                        }else{
+                            
+                            $detalleDiario->cuenta_id = $producto->producto_cuenta_gasto;
+                        }
                     }
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta_id.' por un valor de -> '.$total[$i]);
                     /**********************************************************************/
-                } 
+                
                
                     $detalleTC->movimiento()->associate($movimientoProducto);
                 
@@ -668,7 +679,7 @@ class transaccionCompraController extends Controller
             $sustentoTributario = Sustento_Tributario::findOrFail($request->get('sustento_id'));
             /********************detalle de diario de compra********************/
             if ($request->get('IvaBienesID') > 0){
-                if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                
                     $detalleDiario = new Detalle_Diario();
                     if($tipoComprobante->tipo_comprobante_codigo <> '04'){
                         if($squareVat){
@@ -700,10 +711,10 @@ class transaccionCompraController extends Controller
                     $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' por un valor de -> '.$request->get('IvaBienesID'));
-                }
+                
             }
             if ($request->get('IvaServiciosID') > 0){
-                if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                
                     $detalleDiario = new Detalle_Diario();
                     if($tipoComprobante->tipo_comprobante_codigo <> '04'){
                         if($squareVat){
@@ -735,7 +746,7 @@ class transaccionCompraController extends Controller
                     $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' por un valor de -> '.$request->get('IvaServiciosID'));
-                }
+                
             }
             /****************************************************************/
             if($tipoComprobante->tipo_comprobante_codigo <> '04'){
@@ -752,17 +763,14 @@ class transaccionCompraController extends Controller
                 $retencion->rango_id = $request->get('rango_id');
                 $retencion->transaccionCompra()->associate($transaccion);
                 $retencion->save();
-                if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                
                     $general->registrarAuditoria('Registro de retencion de compra numero -> '.$retencion->retencion_numero,$retencion->retencion_numero,'Registro de retencion de compra numero -> '.$retencion->retencion_numero.' y con codigo de diario -> '.$diario->diario_codigo);
-                }
-                else{
-                    $general->registrarAuditoria('Registro de retencion de compra numero -> '.$retencion->retencion_numero,$retencion->retencion_numero,'Registro de retencion de compra numero -> '.$retencion->retencion_numero);  
-                } 
-                if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                
+                
                     /******************************************************************/
                     $diario->diario_comentario = $diario->diario_comentario.' RET: '.$retencion->retencion_numero;
                     $diario->update();
-                }
+                
                 /********************Detalle retencion de compra*******************/
                 for ($i = 1; $i < count($baseF); ++$i){
                         $detalleRC = new Detalle_RC();
@@ -776,7 +784,7 @@ class transaccionCompraController extends Controller
                         $retencion->detalles()->save($detalleRC);
                         $general->registrarAuditoria('Registro de detalle de retencion de compra numero -> '.$retencion->retencion_numero,$retencion->retencion_numero,'Registro de detalle de retencion de compra, con base imponible -> '.$baseF[$i].' porcentaje -> '.$porcentajeF[$i].' valor de retencion -> '.$valorF[$i]);
                         if($valorF[$i] > 0){
-                            if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                            
                                 /********************detalle de diario de compra*******************/
                                 $detalleDiario = new Detalle_Diario();
                                 $cuentaContableRetencion=Concepto_Retencion::ConceptoRetencion($idRetF[$i])->first();
@@ -791,7 +799,7 @@ class transaccionCompraController extends Controller
                                 $diario->detalles()->save($detalleDiario);
                                 $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$cuentaContableRetencion->cuentaEmitida->cuenta_numero.' en el haber por un valor de -> '.$valorF[$i]);
                                 /******************************************************************/
-                            }
+                            
                         }
                 }
                 for ($i = 1; $i < count($baseI); ++$i){
@@ -805,7 +813,7 @@ class transaccionCompraController extends Controller
                     $detalleRC->concepto_id = $idRetI[$i];
                     $retencion->detalles()->save($detalleRC);
                     $general->registrarAuditoria('Registro de detalle de retencion de compra numero -> '.$retencion->retencion_numero,$retencion->retencion_numero,'Registro de detalle de retencion de compra, con base imponible -> '.$baseI[$i].' porcentaje -> '.$porcentajeI[$i].' valor de retencion -> '.$valorI[$i]);
-                    if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                   
                         /********************detalle de diario de compra*******************/
                         $detalleDiario = new Detalle_Diario();
                         $cuentaContableRetencion=Concepto_Retencion::ConceptoRetencion($idRetI[$i])->first();
@@ -821,11 +829,11 @@ class transaccionCompraController extends Controller
                         $diario->detalles()->save($detalleDiario);
                         $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$cuentaContableRetencion->cuentaEmitida->cuenta_numero.' en el haber por un valor de -> '.$valorI[$i]);
                             /******************************************************************/
-                    }
+                    
                 }
             }
             if($tipoComprobante->tipo_comprobante_codigo <> '04'){
-                if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                
                     /********************detalle de diario de compra*******************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
@@ -851,7 +859,7 @@ class transaccionCompraController extends Controller
                     }
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' por un valor de -> '.$valorCXP);
-                }
+                
                 if($request->get('transaccion_tipo_pago') == 'EN EFECTIVO'){
                     /**********************movimiento caja****************************/
                     $movimientoCaja = new Movimiento_Caja();          
@@ -887,7 +895,7 @@ class transaccionCompraController extends Controller
                 /******************************************************************/
             }
             $url='';
-            if (Auth::user()->empresa->empresa_llevaContabilidad == '1') {
+            if (Auth::user()->empresa->empresa_contabilidad == '1') {
                 $url = $general->pdfDiario($diario);          
             }
             DB::commit();
@@ -1599,15 +1607,24 @@ class transaccionCompraController extends Controller
                 $detalleDiario->detalle_conciliacion = '0';
                 $detalleDiario->detalle_estado = '1';
                 if($banderaOrdenRecepcion){
-                   
-                    
-                        $detalleDiario->movimientoProducto()->associate($movimientoProducto);
-                    
+                    $detalleDiario->movimientoProducto()->associate($movimientoProducto);
                     if($producto->producto_compra_venta == '3'){
-                        $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;
+                        $parametrizacionContable  = Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'INVENTARIO')->first();
+                        if($parametrizacionContable->parametrizacion_cuenta_general=='1'){
+                            $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
+                        }else{
+                            
+                            $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;
+                        }
                     }else{
-                        $detalleDiario->cuenta_id = $producto->producto_cuenta_gasto;
-                    }
+                        $parametrizacionContable  = Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'COSTOS DE MERCADERIA')->first();
+                        if($parametrizacionContable->parametrizacion_cuenta_general=='1'){
+                            $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
+                        }else{
+                            
+                            $detalleDiario->cuenta_id = $producto->producto_cuenta_gasto;
+                        }
+                    }       
                 }else{
                     $parametrizacionContable=Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'MERCADERIA POR RECEPTAR')->first();
                     $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
@@ -1837,9 +1854,10 @@ class transaccionCompraController extends Controller
                 }
                 /******************************************************************/
             }
-         //   $url = " ";
-            $url = $general->pdfDiario($diario);
-         
+            $url = " ";
+            if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                $url = $general->pdfDiario($diario);
+            }
             DB::commit();
             if ($request->get('editret')=="on") {
                 if($tipoComprobante->tipo_comprobante_codigo == '04'){
