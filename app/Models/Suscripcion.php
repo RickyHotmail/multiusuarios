@@ -35,4 +35,10 @@ class Suscripcion extends Model
     public function pagos(){
         return $this->hasMany(Pago::class, 'suscripcion_id', 'suscripcion_id');
     }
+    
+    public function scopeByEmpresa($query, $id){
+        return $query->join('empresa', 'empresa.empresa_id','=','suscripcion.empresa_id')
+                     ->where('empresa.empresa_id', '=', $id)
+                     ->where('estado','=',1);
+    }
 }

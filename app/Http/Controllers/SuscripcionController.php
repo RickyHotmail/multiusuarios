@@ -7,13 +7,17 @@ use App\Models\Banco_Lista;
 use App\Models\Plan;
 use App\Models\Pago;
 use App\Http\Controllers\Controller;
+use App\Models\Arqueo_Caja;
 use App\Models\Bodega;
 use App\Models\Caja;
+use App\Models\Caja_Usuario;
 use App\Models\Categoria_Cliente;
 use App\Models\Categoria_Producto;
 use App\Models\Categoria_Proveedor;
+use App\Models\Centro_Consumo;
 use App\Models\Ciudad;
 use App\Models\Cliente;
+use App\Models\Concepto_Retencion;
 use App\Models\Credito;
 use App\Models\Email_Empresa;
 use App\Models\Empresa;
@@ -27,6 +31,7 @@ use App\Models\Rango_Documento;
 use App\Models\Rol;
 use App\Models\Rol_Permiso;
 use App\Models\sucursal;
+use App\Models\Sustento_Tributario;
 use App\Models\Tamano_Producto;
 use App\Models\Tarifa_Iva;
 use App\Models\Tipo_Cliente;
@@ -109,6 +114,22 @@ class SuscripcionController extends Controller{
                 $empresa->empresa_estado=1;
             $empresa->save();
 
+            
+            $usuarioControlador = new usuarioController();
+            $usuario = new User();
+                $usuario->user_username = $request->idNombre;
+                $usuario->user_cedula = $request->idCedula;
+                $usuario->user_nombre = $request->idNombre;
+                $usuario->user_correo = $request->idEmail;
+                $usuario->user_tipo  = 1;
+                $usuario->user_cambio_clave=1;
+                $usuario->user_estado  = 1;
+                $password=$usuarioControlador->generarPass();
+                $usuario->password  = bcrypt($password);
+                $usuario->empresa()->associate($empresa);
+            $usuario->save();
+
+
             $emailEmpresa = new Email_Empresa();
             $emailEmpresa->email_servidor = 'neopagupa-com.correoseguro.dinaserver.com';
             $emailEmpresa->email_email = 'neopagupa@neopagupa.com';
@@ -118,7 +139,7 @@ class SuscripcionController extends Controller{
             $emailEmpresa->email_mensaje = ' NEOPAGUPA // SISTEMA DE FACTURACIÓN ELECTRÓNICA  !!! ATENCIÓN ESTE DOCUMENTO TIENE VALIDEZ TRIBUTARIA!!!  Con la finalidad de brindar un mejor servicio, adjunto encontrará la Factura Electrónica, legalmente válida para las declaraciones de impuestos ante el SRI.  El archivo XML adjunto, le sugerimos que almacene de manera segura puesto que tiene validez tributaria.  La factura electrónica en formato PDF adjunto, no es necesario que la imprima, le sirve para verificar el detalle del servicio. ';
             $emailEmpresa->email_neopagupa = '1';
             $emailEmpresa->email_estado  = 1;
-            $emailEmpresa->empresa_id = Auth::user()->empresa_id;
+            $emailEmpresa->empresa_id = $empresa->empresa_id;
             $emailEmpresa->save();
 
 
@@ -145,6 +166,80 @@ class SuscripcionController extends Controller{
                 $caja->sucursal_id = $sucursal->sucursal_id;
                 $caja->caja_estado = 1;
             $caja->save();
+
+            $CajaUsuario = new Caja_Usuario();
+                $CajaUsuario->caja_id = $caja->caja_id;
+                $CajaUsuario->user_id = $usuario->user_id;
+            $CajaUsuario->save();
+
+            $arqueoCaja = new Arqueo_Caja();
+                $arqueoCaja->arqueo_fecha= date("Y")."-".date("m")."-".date("d");
+                $arqueoCaja->arqueo_hora=date("H:i:s");
+                $arqueoCaja->arqueo_observacion= '';
+                $arqueoCaja->arqueo_tipo="APERTURA";
+                $arqueoCaja->arqueo_saldo_inicial=0;
+                $arqueoCaja->arqueo_monto= 0;
+                $arqueoCaja->arqueo_billete1= 0;
+                $arqueoCaja->arqueo_billete5= 0;
+                $arqueoCaja->arqueo_billete10= 0;
+                $arqueoCaja->arqueo_billete20= 0;
+                $arqueoCaja->arqueo_billete50= 0;
+                $arqueoCaja->arqueo_billete100= 0;
+                $arqueoCaja->arqueo_moneda01= 0;
+                $arqueoCaja->arqueo_moneda05= 0;
+                $arqueoCaja->arqueo_moneda10= 0;
+                $arqueoCaja->arqueo_moneda25= 0;
+                $arqueoCaja->arqueo_moneda50= 0;
+                $arqueoCaja->arqueo_moneda1= 0;
+                $arqueoCaja->arqueo_estado='1';
+                $arqueoCaja->empresa_id =  $empresa->empresa_id;
+                $arqueoCaja->caja_id= $caja->caja_id;
+                $arqueoCaja->user_id=$usuario->user_id;                    
+            $arqueoCaja->save();
+
+
+            
+
+
+            $cr2=Concepto_Retencion::byEmpresa(1)->get();
+            foreach($cr2 as $conRet){
+                $cr=new Concepto_Retencion();
+                $cr->concepto_nombre = $conRet->concepto_nombre;
+                $cr->concepto_codigo = $conRet->concepto_codigo;
+                $cr->concepto_porcentaje = $conRet->concepto_porcentaje;
+                $cr->concepto_tipo = $conRet->concepto_tipo;
+                $cr->concepto_objeto = $conRet->concepto_objeto;
+                $cr->concepto_emitida_cuenta=$conRet->concepto_emitida_cuenta;
+                $cr->concepto_recibida_cuenta = $conRet->concepto_recibida_cuenta;            
+                $cr->empresa_id = $empresa->empresa_id;
+                $cr->concepto_estado = 1;
+                $cr->save();
+            }
+
+            $st2=Sustento_Tributario::byEmpresa(1)->get();
+            foreach($st2 as $st){
+                $sustentoTributario = new Sustento_Tributario();
+                    $sustentoTributario->sustento_nombre = $st->sustento_nombre;
+                    $sustentoTributario->sustento_codigo = $st->sustento_codigo;  
+                    $sustentoTributario->sustento_credito = $st->sustento_credito;            
+                    $sustentoTributario->sustento_venta12 = $st->sustento_venta12;   
+                    $sustentoTributario->sustento_venta0 = $st->sustento_venta0;   
+                    $sustentoTributario->sustento_compra12 = $st->sustento_compra12;   
+                    $sustentoTributario->sustento_compra0 = $st->sustento_compra0;
+                    $sustentoTributario->sustento_estado  = 1;
+                    $sustentoTributario->empresa_id = $empresa->empresa_id;
+                $sustentoTributario->save();
+            }
+
+            $centroCon = new Centro_Consumo();
+                $centroCon->centro_consumo_nombre = 'General';
+                $centroCon->centro_consumo_descripcion = 'General';
+                $centroCon->centro_consumo_fecha_ingreso = Carbon::now();;
+                $centroCon->sustento_id = $st2[0]->sustento_id;
+                $centroCon->empresa_id = $empresa->empresa_id;
+                $centroCon->centro_consumo_estado = 1;
+            $centroCon->save();
+
 
             $bodega = new Bodega();
                 $bodega->bodega_nombre = 'BODEGA '.$sucursal->sucursal_nombre;
@@ -234,29 +329,30 @@ class SuscripcionController extends Controller{
             $rango->save();
 
             $rango=new Rango_Documento();
-            $rango->rango_descripcion='DOC ELECTRONICOS';
-            $rango->rango_inicio=$request->idSecuencia;
-            $rango->rango_fin=100000000;
-            $rango->rango_fecha_inicio='2022-01-01';
-            $rango->rango_fecha_fin='2030-12-31';
-            $rango->rango_autorizacion=0;
-            $rango->rango_estado=1;
-            $rango->tipo_comprobante_id=7;
-            $rango->punto_id=$puntoEmision->punto_id;
-        $rango->save();
+                $rango->rango_descripcion='DOC ELECTRONICOS';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=7;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
         
             $rango=new Rango_Documento();
-            $rango->rango_descripcion='DOC FISICO';
-            $rango->rango_inicio=$request->idSecuencia;
-            $rango->rango_fin=100000000;
-            $rango->rango_fecha_inicio='2022-01-01';
-            $rango->rango_fecha_fin='2030-12-31';
-            $rango->rango_autorizacion=0;
-            $rango->rango_estado=1;
-            $rango->tipo_comprobante_id=8;
-            $rango->punto_id=$puntoEmision->punto_id;
-        $rango->save();
-        $rango=new Rango_Documento();
+                $rango->rango_descripcion='DOC FISICO';
+                $rango->rango_inicio=$request->idSecuencia;
+                $rango->rango_fin=100000000;
+                $rango->rango_fecha_inicio='2022-01-01';
+                $rango->rango_fecha_fin='2030-12-31';
+                $rango->rango_autorizacion=0;
+                $rango->rango_estado=1;
+                $rango->tipo_comprobante_id=8;
+                $rango->punto_id=$puntoEmision->punto_id;
+            $rango->save();
+
+            $rango=new Rango_Documento();
                 $rango->rango_descripcion='DOC FISICO';
                 $rango->rango_inicio=$request->idSecuencia;
                 $rango->rango_fin=100000000;
@@ -323,19 +419,6 @@ class SuscripcionController extends Controller{
                 }
             }
 
-            $usuarioControlador = new usuarioController();
-            $usuario = new User();
-                $usuario->user_username = $request->idNombre;
-                $usuario->user_cedula = $request->idCedula;
-                $usuario->user_nombre = $request->idNombre;
-                $usuario->user_correo = $request->idEmail;
-                $usuario->user_tipo  = 1;
-                $usuario->user_cambio_clave=1;
-                $usuario->user_estado  = 1;
-                $password=$usuarioControlador->generarPass();
-                $usuario->password  = bcrypt($password);
-                $usuario->empresa()->associate($empresa);
-            $usuario->save();
 
             $zona = new Zona();
                 $zona->zona_nombre = 'Sin zona';
@@ -503,7 +586,7 @@ class SuscripcionController extends Controller{
                 $categoriaProv->categoria_proveedor_estado = 1;
             $categoriaProv->save();
 
-            $Pais = new Pais();
+            /* $Pais = new Pais();
                 $Pais->pais_nombre = "ECUADOR";
                 $Pais->pais_codigo = "+593";
                 $Pais->pais_estado = 1;
@@ -564,7 +647,7 @@ class SuscripcionController extends Controller{
                 $ciudad->ciudad_codigo = '070202';
                 $ciudad->provincia_id = $provincia->provincia_id;
                 $ciudad->ciudad_estado = 1;
-            $ciudad->save();
+            $ciudad->save(); */
 
             
 
@@ -573,7 +656,9 @@ class SuscripcionController extends Controller{
             return redirect('login')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
             DB::rollBack();
-            return back()->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+
+            return $ex->getMessage();
+            return redirect('/registro')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
 
