@@ -223,7 +223,7 @@ class anticipoClienteController extends Controller
             }
             /**********************asiento diario****************************/
             $general = new generalController();
-            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+            
                 $diario = new Diario();
                 $diario->diario_codigo = $general->generarCodigoDiario($request->get('idFecha'),'CIAC');
                 $diario->diario_fecha = $request->get('idFecha');
@@ -246,7 +246,7 @@ class anticipoClienteController extends Controller
                 if($request->get('idTipo') == "Efectivo"){
                     $movimientoCaja->diario()->associate($diario);
                 }
-            }
+            
           
             
             
@@ -267,7 +267,7 @@ class anticipoClienteController extends Controller
                $general->registrarAuditoria('Registro de Movimiento numero: -> '.$request->get('anticipo_serie').substr(str_repeat(0, 9).$request->get('anticipo_numero'), - 9),'0','Por motivo de: -> '.$request->get('idMensaje').' con el valor de: -> '.$request->get('idValor'));
 
            }
-           if(Auth::user()->empresa->empresa_contabilidad== '1'){
+           
                 /********************detalle de diario de venta********************/
                 $detalleDiario = new Detalle_Diario();
                 $detalleDiario->detalle_debe = $request->get('idValor');
@@ -308,7 +308,7 @@ class anticipoClienteController extends Controller
                 }
                 $diario->detalles()->save($detalleDiario);
                 $general->registrarAuditoria('Registro de Detalle de Diario codigo: -> '.$diario->diario_codigo,'0','En la cuenta del Haber -> '.$detalleDiario->cuenta->cuenta_numero.' con el valor de: -> '.$request->get('idValor'));
-            }
+            
             $anticipoCliente->save();            
             /*Inicio de registro de auditoria */
             $general = new generalController();

@@ -154,8 +154,10 @@ class descontarAnticipoClienteController extends Controller
             $diario->detalles()->save($detalleDiario);
             $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,substr($cxcAux->cuenta_descripcion, 38),'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' por un valor de -> '.$request->get('idSeleccionado'));
             /*************************************************************************/
-            
-            $url = $general->pdfDiario($diario);
+            $url ='';
+            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                $url = $general->pdfDiario($diario);
+            }
             DB::commit();
             return redirect('descontarAntCli')->with('success','Anticipo descontado exitosamente')->with('diario',$url);
         }catch(\Exception $ex){
@@ -173,7 +175,7 @@ class descontarAnticipoClienteController extends Controller
             if($cierre){
                 return redirect('descontarAntCli')->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
             } 
-            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+            
                 /**********************asiento diario****************************/
                 $diario = new Diario();
                 $diario->diario_codigo = $general->generarCodigoDiario($request->get('fechaCruce'),'CDAC');
@@ -196,7 +198,7 @@ class descontarAnticipoClienteController extends Controller
                 $general->registrarAuditoria('Registro de Diario de Diario codigo: -> '.$diario->diario_codigo,'0','Tipo de Diario -> '.$diario->diario_referencia.'');
                 /*Fin de registro de auditoria*/ 
                 /****************************************************************/
-            }
+            
             $valAnt = $request->get('ADescontar');
             for ($i = 0; $i < count($valAnt); ++$i){
                 if($request->get('checkAnt'.$i)){
@@ -209,9 +211,9 @@ class descontarAnticipoClienteController extends Controller
                         $descuento->descuento_estado = "1";
                         $descuento->anticipo_id = $anticipo->anticipo_id;
                         $descuento->factura_id = $factura->factura_id;
-                        if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                        
                             $descuento->diario()->associate($diario);
-                        }
+                        
                         $descuento->save();
                         /*Inicio de registro de auditoria*/
                         $general->registrarAuditoria('Registro de descuentos de anticipo de cliente -> '.$request->get('nombreCliente'),'0','Registro de descuentos de anticipo de cliente -> '.$request->get('nombreCliente').' con factura -> '.$request->get('buscarFactura').' por un valor de -> '.$valAnt[$i]);
@@ -244,7 +246,7 @@ class descontarAnticipoClienteController extends Controller
             /*Inicio de registro de auditoria*/
             $general->registrarAuditoria('Actualizacion de cuenta por cobrar de cliente -> '.$request->get('nombreCliente'),'0','Actualizacion de cuenta por cobrar de cliente -> '.$request->get('nombreCliente').' con factura -> '.$request->get('buscarFactura'));
             /*Fin de registro de auditoria*/ 
-            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+            
                 /********************detalle de diario anticipo cliente*******************/
                 $detalleDiario = new Detalle_Diario();
                 $detalleDiario->detalle_debe = $request->get('idSeleccionado');
@@ -285,7 +287,7 @@ class descontarAnticipoClienteController extends Controller
                 $diario->detalles()->save($detalleDiario);
                 $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$factura->factura_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' por un valor de -> '.$request->get('idSeleccionado'));
                 /*************************************************************************/
-            }
+            
             $url ='';
             if(Auth::user()->empresa->empresa_llevaContabilidad== '1'){
                 $url = $general->pdfDiario($diario);
