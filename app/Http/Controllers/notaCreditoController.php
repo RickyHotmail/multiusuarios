@@ -1012,13 +1012,13 @@ class notaCreditoController extends Controller
                 $nc->update();
             }
            
-                if($ncAux->nc_xml_estado == 'AUTORIZADO'){
-                    return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada y autorizada exitosamente')->with('diario',$url)->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $request->get('nc_fecha'))->format('d-m-Y').'/'.$nc->nc_xml_nombre.'.pdf');
-                }if($nc->nc_emision == 'ELECTRONICA'){
-                    return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada exitosamente')->with('diario',$url);
-                }else{
-                    return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada exitosamente')->with('diario',$url)->with('error2','ERROR SRI--> '.$ncAux->nc_xml_estado.' : '.$ncAux->nc_xml_mensaje);
-                }
+            if($ncAux->nc_xml_estado == 'AUTORIZADO'){
+                return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada y autorizada exitosamente')->with('diario',$url)->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $request->get('nc_fecha'))->format('d-m-Y').'/'.$nc->nc_xml_nombre.'.pdf');
+            }if($nc->nc_emision == 'ELECTRONICA'){
+                return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada exitosamente')->with('diario',$url);
+            }else{
+                return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada exitosamente')->with('diario',$url)->with('error2','ERROR SRI--> '.$ncAux->nc_xml_estado.' : '.$ncAux->nc_xml_mensaje);
+            }
             
            
         }catch(\Exception $ex){

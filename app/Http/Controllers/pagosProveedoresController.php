@@ -146,7 +146,7 @@ class pagosProveedoresController extends Controller
                 $general->registrarAuditoria('Registro de transferencia por pago a proveedor',$docPago,'Registro de transferencia por pago a proveedor en '.$request->get('radioPago')); 
             }
             $valPago = $request->get('Ddescontar');
-            $sucursales = Cuenta_Pagar::ScucursalesxCXP($request->get('idProveedor'))->select('sucursal_id')->distinct('sucursal_id')->get();
+            $sucursales = Cuenta_Pagar::ScucursalesxCXP($request->get('idProveedor'))->select('sucursal.sucursal_id')->distinct('sucursal.sucursal_id')->get();
             $datosSuc = null;
             $filS=0;
             $contDiarios = 0;
@@ -179,7 +179,7 @@ class pagosProveedoresController extends Controller
                     $tipDocAux = '';
                     if(is_null($datosSuc[$i]['cuentas']) == false){
                         if(count($datosSuc[$i]['cuentas'])>0){
-                            if(Auth::user()->empresa->empresa_contabilidad == '1'){
+                            
                                 $diario = new Diario();
                                
                                 $diario->diario_fecha = $request->get('fechaPago');
@@ -209,7 +209,7 @@ class pagosProveedoresController extends Controller
                                 $general->registrarAuditoria('Registro de Diario de Diario codigo: -> '.$diario->diario_codigo,'0','Tipo de Diario -> '.$diario->diario_referencia.'');
                                 $diarios[$contDiarios] = $diario;
                                 $contDiarios ++;
-                            }
+                            
                             if($request->get('radioPago') == 'NDB'){
                                 $puntosEmision = Punto_Emision::PuntoxSucursal($datosSuc[$i]['sucursal_id'])->get();
                                 foreach($puntosEmision as $punto){
@@ -235,9 +235,9 @@ class pagosProveedoresController extends Controller
                                 $nota->cuenta_bancaria_id= $request->get('cuenta_nd');
                                 $nota->rango_id = $rangoDocumento->rango_id;
                                 $nota->nota_estado = 1;        
-                                if(Auth::user()->empresa->empresa_contabilidad == '1'){
+                               
                                     $nota->diario()->associate($diario);
-                                }
+                                
                                 $nota->save();
                                 $general->registrarAuditoria('Registro de Nota de Debito de Banco -> '.$request->get('idNombre'),$diario->diario_codigo,'Con motivo: Pago de factura por modulo de pago cxp.');
                             }
@@ -247,9 +247,9 @@ class pagosProveedoresController extends Controller
                             $pago->pago_tipo = $request->get('radioPago');
                             $pago->pago_valor = $datosSuc[$i]['valorSeleccion'];
                             $pago->pago_estado = '1';
-                            if(Auth::user()->empresa->empresa_contabilidad == '1'){
+                            
                                 $pago->diario()->associate($diario);
-                            }
+                            
                             if($request->get('radioPago') == 'EFECTIVO'){
                                 if($arqueoCaja){
                                     $pago->arqueo_id = $arqueoCaja->arqueo_id;
@@ -320,7 +320,7 @@ class pagosProveedoresController extends Controller
                                     $general->registrarAuditoria('Actualizacion de cuenta por pagar de proveedor -> '.$request->get('idNombre'),'0','Actualizacion de cuenta por pagar de proveedor -> '.$request->get('idNombre').' con Factura -> '.substr($cxpAux->cuenta_descripcion, 39));
                                 }
                                 /*Fin de registro de auditoria*/ 
-                                if(Auth::user()->empresa->empresa_contabilidad == '1'){
+                                
                                     /********************detalle de diario de pago a proveedor********************/
                                     $detalleDiario = new Detalle_Diario();
                                     $detalleDiario->detalle_debe = $datosSuc[$i]['cuentas'][$c]['descontar']; 
@@ -341,10 +341,10 @@ class pagosProveedoresController extends Controller
                                     $diario->detalles()->save($detalleDiario);
                                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$docPago,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$datosSuc[$i]['cuentas'][$c]['descontar']);
                                     /***************************************************************************/
-                                }
+                                
                             }
                             $general->registrarAuditoria('Registro de pago de proveedor -> '.$request->get('idNombre'),$docPago,'Pago de documentos No. '.$facturas.' en '.$request->get('radioPago')); 
-                            if(Auth::user()->empresa->empresa_contabilidad == '1'){
+                            
                                 if($request->get('radioPago') == 'NDB'){
                                     $diario->diario_comentario = 'COMPROBANTE DE NOTA DE DEBITO BANCARIA A PROVEEDOR : '.$request->get('idNombre').' - '.$facturas.' '.$request->get('idConcepto');
                                 }else{
@@ -374,7 +374,7 @@ class pagosProveedoresController extends Controller
                                 $diario->detalles()->save($detalleDiario);
                                 $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$docPago,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.Cuenta::cuenta($cuentaPago)->first()->cuenta_numero.' en el debe por un valor de -> '.$datosSuc[$i]['valorSeleccion']);
                                 /***************************************************************************/
-                            }
+                            
                         }
                     }
                 }
@@ -399,9 +399,9 @@ class pagosProveedoresController extends Controller
                 $movimientoCaja->movimiento_numero_documento= 0;
                 $movimientoCaja->movimiento_estado = 1;
                 $movimientoCaja->arqueo_id = $arqueoCaja->arqueo_id;
-                if(Auth::user()->empresa->empresa_contabilidad == '1'){
+               
                     $movimientoCaja->diario()->associate($diario);
-                }
+                
                 $movimientoCaja->save();
                 /*********************************************************************/
             }

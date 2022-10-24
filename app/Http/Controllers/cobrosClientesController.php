@@ -159,7 +159,7 @@ class cobrosClientesController extends Controller
                 $voucher->save();
             }
             $valPago = $request->get('Ddescontar');
-            $sucursales = Cuenta_Cobrar::ScucursalesxCXC($request->get('idCliente'))->select('sucursal_id')->distinct('sucursal_id')->get();
+            $sucursales = Cuenta_Cobrar::ScucursalesxCXC($request->get('idCliente'))->select('sucursal.sucursal_id')->distinct('sucursal.sucursal_id')->get();
             $datosSuc = null;
             $filS=0;
             $contDiarios = 0;
@@ -192,7 +192,7 @@ class cobrosClientesController extends Controller
                     $tipDocAuc = '';
                     if(is_null($datosSuc[$i]['cuentas']) == false){
                         if(count($datosSuc[$i]['cuentas'])>0){
-                            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                            
                                 $diario = new Diario();
                                 $diario->diario_codigo = $general->generarCodigoDiario($request->get('fechaPago'),'CIPC');
                                 $diario->diario_fecha = $request->get('fechaPago');
@@ -213,16 +213,16 @@ class cobrosClientesController extends Controller
                                 $general->registrarAuditoria('Registro de Diario de Diario codigo: -> '.$diario->diario_codigo,'0','Tipo de Diario -> '.$diario->diario_referencia.'');
                                 $diarios[$contDiarios] = $diario;
                                 $contDiarios ++;
-                            }
+                            
                             $pago = new Pago_CXC();
                             $pago->pago_descripcion = $request->get('idConcepto');
                             $pago->pago_fecha = $request->get('fechaPago');
                             $pago->pago_tipo = $request->get('radioPago');
                             $pago->pago_valor = $datosSuc[$i]['valorSeleccion'];
                             $pago->pago_estado = '1';
-                            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                            
                                 $pago->diario()->associate($diario);
-                            }
+                            
                             if($request->get('radioPago') == 'EFECTIVO'){
                                 if($arqueoCaja){
                                     $pago->arqueo_id = $arqueoCaja->arqueo_id;
@@ -307,7 +307,7 @@ class cobrosClientesController extends Controller
                                     $general->registrarAuditoria('Actualizacion de cuenta por cobrar de cliente -> '.$request->get('idNombre'),'0','Actualizacion de cuenta por cobrar de cliente -> '.$request->get('idNombre').' con factura -> '.substr($cxcAux->cuenta_descripcion, 38));
                                 }
                                 /*Fin de registro de auditoria*/ 
-                                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                                
                                     /********************detalle de diario de pago a cliente********************/
                                     $detalleDiario = new Detalle_Diario();
                                     $detalleDiario->detalle_debe = 0.00;
@@ -328,10 +328,10 @@ class cobrosClientesController extends Controller
                                     $diario->detalles()->save($detalleDiario);
                                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$docPago,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$datosSuc[$i]['cuentas'][$c]['descontar']);
                                     /***************************************************************************/
-                                }
+                                
                             }
                             $general->registrarAuditoria('Registro de pago de Cliente -> '.$request->get('idNombre'),$docPago,'Pago de documentos No. '.$facturas.' en '.$request->get('radioPago')); 
-                            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                            
                                 $diario->diario_comentario = 'COMPROBANTE DE INGRESO DE PAGO DE CLIENTE : '.$request->get('idNombre').' - '.$facturas.' '.$request->get('idConcepto');
                                 $diario->update();
                                 /********************detalle de diario de pago a cliente********************/
@@ -353,7 +353,7 @@ class cobrosClientesController extends Controller
                                 $diario->detalles()->save($detalleDiario);
                                 $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$docPago,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.Cuenta::cuenta($cuentaPago)->first()->cuenta_numero.' en el debe por un valor de -> '.$datosSuc[$i]['valorSeleccion']);
                                 /***************************************************************************/
-                            }
+                            
                         }
                     }
                 }
@@ -374,9 +374,9 @@ class cobrosClientesController extends Controller
                 $movimientoCaja->movimiento_numero_documento= $facturas;
                 $movimientoCaja->movimiento_estado = 1;
                 $movimientoCaja->arqueo_id = $arqueoCaja->arqueo_id;
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $movimientoCaja->diario()->associate($diario);
-                }
+                
                 $movimientoCaja->save();
                 /*********************************************************************/
             }
