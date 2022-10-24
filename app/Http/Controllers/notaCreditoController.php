@@ -107,7 +107,7 @@ class notaCreditoController extends Controller
             $nc->factura_id = $request->get('factura_id');
             $nc->rango_id = $request->get('rango_id');
 
-            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+ 
                 /**********************asiento diario****************************/
                 $diario = new Diario();
                 $diario->diario_codigo = $general->generarCodigoDiario($request->get('nc_fecha'),'CNCE');
@@ -152,15 +152,11 @@ class notaCreditoController extends Controller
                     $nc->diarioCosto()->associate($diarioC);
                 }            
                 $nc->diario()->associate($diario);
-            }
+            
             $nc->save();
-            if(Auth::user()->empresa->empresa_contabilidad== '1'){
-                $general->registrarAuditoria('Registro de nota de crédito de venta numero -> '.$nc->nc_numero,$nc->nc_numero,'Registro de nota de crédito de venta numero -> '.$nc->nc_numero.' con cliente -> '.$request->get('nombreCliente').' con un total de -> '.$request->get('idTotal').' con clave de acceso -> '.$nc->nc_autorizacion.' y con codigo de diario -> '.$diario->diario_codigo);
-            }
-            else{
-                $general->registrarAuditoria('Registro de nota de crédito de venta numero -> '.$nc->nc_numero,$nc->nc_numero,'Registro de nota de crédito de venta numero -> '.$nc->nc_numero.' con cliente -> '.$request->get('nombreCliente').' con un total de -> '.$request->get('idTotal').' con clave de acceso -> '.$nc->nc_autorizacion);
            
-            }
+                $general->registrarAuditoria('Registro de nota de crédito de venta numero -> '.$nc->nc_numero,$nc->nc_numero,'Registro de nota de crédito de venta numero -> '.$nc->nc_numero.' con cliente -> '.$request->get('nombreCliente').' con un total de -> '.$request->get('idTotal').' con clave de acceso -> '.$nc->nc_autorizacion.' y con codigo de diario -> '.$diario->diario_codigo);
+            
             /*******************************************************************/
             /********************Pago por Nota de Credito***************************/
             $facturaAux = Factura_Venta::Factura($request->get('factura_id'))->first(); 
@@ -202,12 +198,12 @@ class notaCreditoController extends Controller
                 $anticipoCliente->cliente_id = $facturaAux->cliente_id;
                 $anticipoCliente->rango_id = $rangoDocumentoRetencion->rango_id;
                 $anticipoCliente->anticipo_estado = 1; 
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+               
                     $anticipoCliente->diario()->associate($diario);
-                }
+                
                 $anticipoCliente->save();
                 $general->registrarAuditoria('Registro de Anticipo de Cliente -> '.$request->get('idCliente'),'0','Con motivo: Nota de Crédito');
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     /********************detalle de diario de venta********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
@@ -228,7 +224,7 @@ class notaCreditoController extends Controller
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
                     /*******************************************************************/
-                }
+                
             }else if($cxcAux->cuenta_saldo >= $nc->nc_total){
                 /********************Pago por Nota de Credito***************************/
                 $pago = new Pago_CXC();
@@ -237,9 +233,9 @@ class notaCreditoController extends Controller
                 $pago->pago_tipo = 'NOTA DE CRÉDITO';
                 $pago->pago_valor = $request->get('idTotal');
                 $pago->pago_estado = '1';
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $pago->diario()->associate($diario);
-                }
+                
                 $pago->save();
 
                 $general->registrarAuditoria('Registro de pago a Cliente -> '.$request->get('nombreCliente'),'0','Pago de factura No. '.$facturaAux->factura_numero.' con motivo: Nota de Crédito').' No. '.$nc->nc_numero; 
@@ -265,7 +261,7 @@ class notaCreditoController extends Controller
                 /*Inicio de registro de auditoria*/
                 $general->registrarAuditoria('Actualizacion de cuenta por cobrar de cliente -> '.$request->get('nombreCliente'),'0','Actualizacion de cuenta por cobrar de cliente -> '.$request->get('nombreCliente').' con factura -> '.$facturaAux->factura_numero);
                 /*Fin de registro de auditoria*/ 
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+               
                 /********************detalle de diario de venta********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
@@ -286,7 +282,7 @@ class notaCreditoController extends Controller
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
                     /*******************************************************************/
-                }
+                
             }else{
                 $rangoDocumentoRetencion=Rango_Documento::PuntoRango($facturaAux->rangoDocumento->punto_id, 'Anticipo de Cliente')->first();
                 if($rangoDocumentoRetencion){
@@ -324,12 +320,12 @@ class notaCreditoController extends Controller
                 $anticipoCliente->cliente_id = $facturaAux->cliente_id;
                 $anticipoCliente->rango_id = $rangoDocumentoRetencion->rango_id;
                 $anticipoCliente->anticipo_estado = 1; 
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $anticipoCliente->diario()->associate($diario);
-                }
+                
                 $anticipoCliente->save();
                 $general->registrarAuditoria('Registro de Anticipo de Cliente -> '.$request->get('nombreCliente'),'0','Con motivo: Nota de Crédito');
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     /********************detalle de diario de venta********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
@@ -349,7 +345,7 @@ class notaCreditoController extends Controller
                     }
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
-                }
+                
                 /*******************************************************************/
                 /********************Pago por Nota de Credito***************************/
                 $pago = new Pago_CXC();
@@ -358,9 +354,9 @@ class notaCreditoController extends Controller
                 $pago->pago_tipo = 'NOTA DE CRÉDITO';
                 $pago->pago_valor = $cxcAux->cuenta_saldo;
                 $pago->pago_estado = '1';
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $pago->diario()->associate($diario);
-                }
+                
                 $pago->save();
 
                 $general->registrarAuditoria('Registro de pago a Cliente -> '.$request->get('nombreCliente'),'0','Pago de factura No. '.$facturaAux->factura_numero.' con motivo: Nota de Crédito').' No. '.$nc->nc_numero; 
@@ -386,7 +382,7 @@ class notaCreditoController extends Controller
                 /*Inicio de registro de auditoria*/
                 $general->registrarAuditoria('Actualizacion de cuenta por cobrar de cliente -> '.$request->get('nombreCliente'),'0','Actualizacion de cuenta por cobrar de cliente -> '.$request->get('nombreCliente').' con factura -> '.$facturaAux->factura_numero);
                 /*Fin de registro de auditoria*/ 
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     /********************detalle de diario de venta********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
@@ -407,7 +403,7 @@ class notaCreditoController extends Controller
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
                     /*******************************************************************/
-                }
+                
             }
             /****************************************************************/
             
@@ -450,7 +446,7 @@ class notaCreditoController extends Controller
                 $nc->detalles()->save($detalleNC);
                 $general->registrarAuditoria('Registro de detalle de nota de crédito de venta numero -> '.$nc->nc_numero,$nc->nc_numero,'Registro de detalle de nota de crédito de venta numero -> '.$nc->nc_numero.' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' a un precio unitario de -> '.$pu[$i]);
                 /*******************************************************************/
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     /********************detalle de diario de venta********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = $total[$i];
@@ -465,10 +461,10 @@ class notaCreditoController extends Controller
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$producto->cuentaVenta->cuenta_numero.' en el haber por un valor de -> '.$total[$i]);
                     /*******************************************************************/
-                }
+                
                 if($banderaP and $nc->nc_comentario == 'DEVOLUCION'){
                     if($producto->producto_tipo == '1'){
-                        if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                        
                             $detalleDiario = new Detalle_Diario();
                             $detalleDiario->detalle_debe = $movimientoProducto->movimiento_costo_promedio;
                             $detalleDiario->detalle_haber = 0.00;
@@ -495,13 +491,13 @@ class notaCreditoController extends Controller
                             $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
                             $diarioC->detalles()->save($detalleDiario);
                             $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diarioC->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diarioC->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el haber por un valor de -> '.$detalleDiario->detalle_haber);
-                        }
+                        
                     }
                 }
             }
             /********************detalle de diario de venta********************/
             if ($request->get('idIva') > 0){
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = $request->get('idIva');
                     $detalleDiario->detalle_haber = 0.00;
@@ -514,7 +510,7 @@ class notaCreditoController extends Controller
                     $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el haber por un valor de -> '.$request->get('idIva'));
-                }
+                
             }
             $url ='';
             /****************************************************************/
@@ -592,7 +588,7 @@ class notaCreditoController extends Controller
             $nc->bodega_id = $request->get('bodega_id');
             $nc->rango_id = $request->get('rango_id');
 
-            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+           
                 /**********************asiento diario****************************/
                 $diario = new Diario();
                 $diario->diario_codigo = $general->generarCodigoDiario($request->get('nc_fecha'),'CNCE');
@@ -637,15 +633,11 @@ class notaCreditoController extends Controller
                     $nc->diarioCosto()->associate($diarioC);
                 }            
                 $nc->diario()->associate($diario);
-            }
+            
             $nc->save();
-            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+            
                 $general->registrarAuditoria('Registro de nota de crédito de venta numero -> '.$nc->nc_numero,$nc->nc_numero,'Registro de nota de crédito de venta numero -> '.$nc->nc_numero.' con cliente -> '.$request->get('nombreCliente').' con un total de -> '.$request->get('idTotal').' con clave de acceso -> '.$nc->nc_autorizacion.' y con codigo de diario -> '.$diario->diario_codigo);
-            }
-            else{
-                $general->registrarAuditoria('Registro de nota de crédito de venta numero -> '.$nc->nc_numero,$nc->nc_numero,'Registro de nota de crédito de venta numero -> '.$nc->nc_numero.' con cliente -> '.$request->get('nombreCliente').' con un total de -> '.$request->get('idTotal').' con clave de acceso -> '.$nc->nc_autorizacion);
-           
-            }
+            
             /*******************************************************************/
             /********************Pago por Nota de Credito***************************/
             $facturaAux = Factura_Venta::Factura($request->get('factura_id'))->first(); 
@@ -687,12 +679,12 @@ class notaCreditoController extends Controller
                 $anticipoCliente->cliente_id = $facturaAux->cliente_id;
                 $anticipoCliente->rango_id = $rangoDocumentoRetencion->rango_id;
                 $anticipoCliente->anticipo_estado = 1; 
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $anticipoCliente->diario()->associate($diario);
-                }
+                
                 $anticipoCliente->save();
                 $general->registrarAuditoria('Registro de Anticipo de Cliente -> '.$request->get('idCliente'),'0','Con motivo: Nota de Crédito');
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     /********************detalle de diario de venta********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
@@ -713,7 +705,7 @@ class notaCreditoController extends Controller
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
                     /*******************************************************************/
-                }
+                
             }else if($cxcAux->cuenta_saldo >= $nc->nc_total){
                 /********************Pago por Nota de Credito***************************/
                 $pago = new Pago_CXC();
@@ -722,9 +714,9 @@ class notaCreditoController extends Controller
                 $pago->pago_tipo = 'NOTA DE CRÉDITO';
                 $pago->pago_valor = $request->get('idTotal');
                 $pago->pago_estado = '1';
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $pago->diario()->associate($diario);
-                }
+                
                 $pago->save();
 
                 $general->registrarAuditoria('Registro de pago a Cliente -> '.$request->get('nombreCliente'),'0','Pago de factura No. '.$facturaAux->factura_numero.' con motivo: Nota de Crédito').' No. '.$nc->nc_numero; 
@@ -750,7 +742,7 @@ class notaCreditoController extends Controller
                 /*Inicio de registro de auditoria*/
                 $general->registrarAuditoria('Actualizacion de cuenta por cobrar de cliente -> '.$request->get('nombreCliente'),'0','Actualizacion de cuenta por cobrar de cliente -> '.$request->get('nombreCliente').' con factura -> '.$facturaAux->factura_numero);
                 /*Fin de registro de auditoria*/ 
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                 /********************detalle de diario de venta********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
@@ -771,7 +763,7 @@ class notaCreditoController extends Controller
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
                     /*******************************************************************/
-                }
+                
             }else{
                 $rangoDocumentoRetencion=Rango_Documento::PuntoRango($facturaAux->rangoDocumento->punto_id, 'Anticipo de Cliente')->first();
                 if($rangoDocumentoRetencion){
@@ -809,12 +801,12 @@ class notaCreditoController extends Controller
                 $anticipoCliente->cliente_id = $facturaAux->cliente_id;
                 $anticipoCliente->rango_id = $rangoDocumentoRetencion->rango_id;
                 $anticipoCliente->anticipo_estado = 1; 
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $anticipoCliente->diario()->associate($diario);
-                }
+                
                 $anticipoCliente->save();
                 $general->registrarAuditoria('Registro de Anticipo de Cliente -> '.$request->get('nombreCliente'),'0','Con motivo: Nota de Crédito');
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     /********************detalle de diario de venta********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
@@ -834,7 +826,7 @@ class notaCreditoController extends Controller
                     }
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
-                }
+                
                 /*******************************************************************/
                 /********************Pago por Nota de Credito***************************/
                 $pago = new Pago_CXC();
@@ -843,9 +835,9 @@ class notaCreditoController extends Controller
                 $pago->pago_tipo = 'NOTA DE CRÉDITO';
                 $pago->pago_valor = $cxcAux->cuenta_saldo;
                 $pago->pago_estado = '1';
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $pago->diario()->associate($diario);
-                }
+                
                 $pago->save();
 
                 $general->registrarAuditoria('Registro de pago a Cliente -> '.$request->get('nombreCliente'),'0','Pago de factura No. '.$facturaAux->factura_numero.' con motivo: Nota de Crédito').' No. '.$nc->nc_numero; 
@@ -871,7 +863,7 @@ class notaCreditoController extends Controller
                 /*Inicio de registro de auditoria*/
                 $general->registrarAuditoria('Actualizacion de cuenta por cobrar de cliente -> '.$request->get('nombreCliente'),'0','Actualizacion de cuenta por cobrar de cliente -> '.$request->get('nombreCliente').' con factura -> '.$facturaAux->factura_numero);
                 /*Fin de registro de auditoria*/ 
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+               
                     /********************detalle de diario de venta********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
@@ -892,7 +884,7 @@ class notaCreditoController extends Controller
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
                     /*******************************************************************/
-                }
+                
             }
             /****************************************************************/
             
@@ -935,7 +927,7 @@ class notaCreditoController extends Controller
                 $nc->detalles()->save($detalleNC);
                 $general->registrarAuditoria('Registro de detalle de nota de crédito de venta numero -> '.$nc->nc_numero,$nc->nc_numero,'Registro de detalle de nota de crédito de venta numero -> '.$nc->nc_numero.' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' a un precio unitario de -> '.$pu[$i]);
                 /*******************************************************************/
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     /********************detalle de diario de venta********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = $total[$i];
@@ -950,10 +942,10 @@ class notaCreditoController extends Controller
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$producto->cuentaVenta->cuenta_numero.' en el haber por un valor de -> '.$total[$i]);
                     /*******************************************************************/
-                }
+                
                 if($nc->nc_comentario == 'DEVOLUCION'){
                     if($producto->producto_tipo == '1'){
-                        if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                        
                             $detalleDiario = new Detalle_Diario();
                             $detalleDiario->detalle_debe = $movimientoProducto->movimiento_costo_promedio;
                             $detalleDiario->detalle_haber = 0.00;
@@ -980,13 +972,13 @@ class notaCreditoController extends Controller
                             $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
                             $diarioC->detalles()->save($detalleDiario);
                             $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diarioC->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diarioC->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el haber por un valor de -> '.$detalleDiario->detalle_haber);
-                        }
+                        
                     }
                 }
             }
             /********************detalle de diario de venta********************/
             if ($request->get('idIva') > 0){
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = $request->get('idIva');
                     $detalleDiario->detalle_haber = 0.00;
@@ -999,7 +991,7 @@ class notaCreditoController extends Controller
                     $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el haber por un valor de -> '.$request->get('idIva'));
-                }
+                
             }
             $url ='';
             /****************************************************************/
@@ -1019,13 +1011,16 @@ class notaCreditoController extends Controller
                 }
                 $nc->update();
             }
-            if($ncAux->nc_xml_estado == 'AUTORIZADO'){
-                return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada y autorizada exitosamente')->with('diario',$url)->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $request->get('nc_fecha'))->format('d-m-Y').'/'.$nc->nc_xml_nombre.'.pdf');
-            }if($nc->nc_emision == 'ELECTRONICA'){
-                return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada exitosamente')->with('diario',$url);
-            }else{
-                return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada exitosamente')->with('diario',$url)->with('error2','ERROR SRI--> '.$ncAux->nc_xml_estado.' : '.$ncAux->nc_xml_mensaje);
-            }
+           
+                if($ncAux->nc_xml_estado == 'AUTORIZADO'){
+                    return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada y autorizada exitosamente')->with('diario',$url)->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $request->get('nc_fecha'))->format('d-m-Y').'/'.$nc->nc_xml_nombre.'.pdf');
+                }if($nc->nc_emision == 'ELECTRONICA'){
+                    return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada exitosamente')->with('diario',$url);
+                }else{
+                    return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('success','NOTA DE CRÉDITO registrada exitosamente')->with('diario',$url)->with('error2','ERROR SRI--> '.$ncAux->nc_xml_estado.' : '.$ncAux->nc_xml_mensaje);
+                }
+            
+           
         }catch(\Exception $ex){
             DB::rollBack();
             return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('error2','Oucrrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');

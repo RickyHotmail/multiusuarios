@@ -75,6 +75,7 @@ class productoController extends Controller
      */
     public function store(Request $request)
     {
+        
        try{
             DB::beginTransaction();
             $producto = new Producto();
@@ -101,10 +102,12 @@ class productoController extends Controller
                 $producto->producto_tiene_serie ="1";
             }else{
                 $producto->producto_tiene_serie ="0";
-            }         
+            }   
+              
             $producto->producto_compra_venta = $request->get('idCompraventa');
             $producto->producto_precio1 = $request->get('producto_precio1');
             $producto->producto_estado = 1;
+           
             if(Auth::user()->empresa->empresa_llevaContabilidad == '1'){
                 $producto->producto_cuenta_inventario = $request->get('producto_cuenta_inventario');
                 $producto->producto_cuenta_venta = $request->get('producto_cuenta_venta');
@@ -120,7 +123,8 @@ class productoController extends Controller
             if($request->get('sucursal_id') != '0'){
                 $producto->sucursal_id  = $request->get('sucursal_id');
             }else{
-                $producto->sucursal_id  = null;
+                $sucursal=Sucursal::Sucursales()->first();
+                $producto->sucursal_id=$sucursal->sucursal_id;    
             }
 
             if(Auth::user()->empresa->camaronera){

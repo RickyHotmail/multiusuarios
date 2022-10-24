@@ -169,9 +169,9 @@ class notaDebitoController extends Controller
                 $pago->pago_tipo = 'PAGO EN EFECTIVO';
                 $pago->pago_valor = $cxc->cuenta_monto;
                 $pago->pago_estado = '1';
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+          
                     $pago->diario()->associate($diario);
-                }
+                
                 $pago->save();
 
                 $detallePago = new Detalle_Pago_CXC();
@@ -184,7 +184,7 @@ class notaDebitoController extends Controller
                 $detallePago->save();
                 /****************************************************************/
             }
-            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+            
                 /********************detalle de diario de nota de debito********************/
                 $detalleDiario = new Detalle_Diario();
                 $detalleDiario->detalle_debe = $request->get('idTotal');
@@ -212,7 +212,7 @@ class notaDebitoController extends Controller
                 $diario->detalles()->save($detalleDiario);
                 $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nd->nd_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$request->get('idTotal'));
                 /*******************************************************************/
-            }
+            
             for ($i = 1; $i < count($cantidad); ++$i){
                 $producto = Producto::findOrFail($isProducto[$i]);
                 /********************detalle de nota de debito********************/
@@ -294,9 +294,9 @@ class notaDebitoController extends Controller
                 $movimientoCaja->movimiento_numero_documento= $nd->nd_numero;
                 $movimientoCaja->movimiento_estado = 1;
                 $movimientoCaja->arqueo_id = $arqueoCaja->arqueo_id;
-                if(Auth::user()->empresa->empresa_contabilidad== '1'){
+                
                     $movimientoCaja->diario()->associate($diario);
-                }
+                
                 $movimientoCaja->save();
                 /*********************************************************************/
             }

@@ -36,7 +36,7 @@
                                     <div class="form-group">
                                         <div class="form-line">
                                             <input id="punto_id" name="punto_id"
-                                                value="{{ $rangoDocumento->puntoEmision->punto_id }}" type="hidden">
+                                                value="{{ $rangoDocumento->punto_id }}" type="hidden">
                                             <input id="rango_id" name="rango_id" value="{{ $rangoDocumento->rango_id }}"
                                                 type="hidden">
                                             <input type="text" id="nd_serie" name="nd_serie"
