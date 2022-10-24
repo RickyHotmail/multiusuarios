@@ -21,7 +21,7 @@ class Provincia extends Model
     protected $guarded =[
     ];
     public function scopeProvincias($query){
-        return $query->join('pais','pais.pais_id','=','provincia.pais_id')->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('provincia_estado','=','1')->orderBy('provincia_nombre','asc');
+        return $query->join('pais','pais.pais_id','=','provincia.pais_id')->where('provincia_estado','=','1')->whereNull('empresa_id')->orderBy('provincia_nombre','asc');
     }
     public function scopeExiste($query, $id){
         return $query->join('pais','pais.pais_id','=','provincia.pais_id')->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('provincia_nombre','=',$id);

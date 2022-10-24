@@ -21,13 +21,13 @@ class Pais extends Model
     protected $guarded =[
     ];
     public function scopePaises($query){
-        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('pais_estado','=','1')->orderBy('pais_nombre','asc');
+        return $query->whereNull('empresa_id')->where('pais_estado','=','1')->orderBy('pais_nombre','asc');
     }
     public function scopePais($query, $id){
-        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('pais_id','=',$id);
+        return $query->orwhere('empresa_id','=',Auth::user()->empresa_id)->where('pais_id','=',$id);
     }
     public function scopePaisNombre($query, $nombre){
-        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('pais_nombre','=',$nombre);
+        return $query->whereNull('empresa_id')->where('pais_nombre','=',$nombre);
     }
     public function empresa()
     {
