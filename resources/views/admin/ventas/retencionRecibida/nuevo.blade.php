@@ -722,6 +722,12 @@ function cargarDetalle(idFactura) {
                 document.getElementById("retencion_fecha").value = data[2][i].retencion_fecha;
                 document.getElementById("retencion_serie").value = data[2][i].retencion_serie;
                 document.getElementById("retencion_secuencial").value = data[2][i].retencion_secuencial;
+                if(data[2][i].retencion_emision=='FISICA'){
+                    document.getElementById("check2").checked = true;
+                }
+                else{
+                    document.getElementById("check1").checked = true;
+                }
             }
             for (var i = 0; i < data[1].length; i++) {
                 document.getElementById("guardarID").classList.add('invisible');
@@ -729,6 +735,12 @@ function cargarDetalle(idFactura) {
                 document.getElementById("retencion_fecha").value = data[1][i].retencion_fecha;
                 document.getElementById("retencion_serie").value = data[1][i].retencion_serie;
                 document.getElementById("retencion_secuencial").value = data[1][i].retencion_secuencial;
+                if(data[1][i].retencion_emision=='FISICA'){
+                    document.getElementById("check2").checked = true;
+                }
+                else{
+                    document.getElementById("check1").checked = true;
+                }
                 if(data[1][i].detalle_tipo == 'IVA'){
                     agregarItemRIAux(data[1][i].detalle_base, data[1][i].concepto_id, 
                     data[1][i].concepto_codigo+' - '+Number(data[1][i].detalle_porcentaje).toFixed(2)+'% - '+data[1][i].concepto_nombre,
@@ -778,6 +790,12 @@ function cargarDetalle(idFactura) {
                 document.getElementById("retencion_fecha").value = data[2][i].retencion_fecha;
                 document.getElementById("retencion_serie").value = data[2][i].retencion_serie;
                 document.getElementById("retencion_secuencial").value = data[2][i].retencion_secuencial;
+                if(data[2][i].retencion_emision=='FISICA'){
+                    document.getElementById("check2").checked = true;
+                }
+                else{
+                    document.getElementById("check1").checked = true;
+                }
             }
             for (var i = 0; i < data[1].length; i++) {
                 document.getElementById("guardarID").classList.add('invisible');
@@ -785,6 +803,12 @@ function cargarDetalle(idFactura) {
                 document.getElementById("retencion_fecha").value = data[1][i].retencion_fecha;
                 document.getElementById("retencion_serie").value = data[1][i].retencion_serie;
                 document.getElementById("retencion_secuencial").value = data[1][i].retencion_secuencial;
+                if(data[1][i].retencion_emision=='FISICA'){
+                    document.getElementById("check2").checked = true;
+                }
+                else{
+                    document.getElementById("check1").checked = true;
+                }
                 if(data[1][i].detalle_tipo == 'IVA'){
                     agregarItemRIAux(data[1][i].detalle_base, data[1][i].concepto_id, 
                     data[1][i].concepto_codigo+' - '+Number(data[1][i].detalle_porcentaje).toFixed(2)+'% - '+data[1][i].concepto_nombre,
