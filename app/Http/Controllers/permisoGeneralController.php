@@ -100,15 +100,47 @@ class permisoGeneralController extends Controller{
 
     }
 
-    public function actualizarPermisosAdministrador($id){
+    public function actualizarPermisosAdministrador(){
         $parmetrizacionesP=Parametrizacion_Permiso::parametrizacionesPermiso()->get();
-        $rol=Rol::findOrFail($id);
 
+        $roles=DB::select(DB::raw("select * from rol where rol_nombre='Administrador' and empresa_id>1"));
+
+        foreach($roles as $rol){
+            $result=DB::select(DB::raw("delete from rol_permiso where rol_id=$rol->rol_id"));
+
+            foreach($parmetrizacionesP as $param){
+                if($param->parametrizacionp_facturacion==1){
+                    $rolPermiso=new Rol_Permiso();
+                    $rolPermiso->permiso_id=$param->permiso_id;
+                    $rolPermiso->rol_id=$rol->rol_id;
+                    $rolPermiso->save();
+                }
+            }
+        }
+
+        return 'ok';
+    }
+    
+    public function actualizarPermisosMedico($ruc){
+        $rol=DB::select(DB::raw("
+            select * 
+            from 
+                rol inner join empresa on empresa.empresa_id=rol.empresa_id
+            where 
+                empresa_ruc='$ruc' 
+                and rol_nombre='Administrador'
+        "));
+        
+        $result=DB::select(DB::raw("delete from rol_permiso where rol_id=".$rol[0]->rol_id));
+        
+
+
+        $parmetrizacionesP=Parametrizacion_Permiso::parametrizacionesPermiso()->get();
         foreach($parmetrizacionesP as $param){
-            if($param->parametrizacionp_facturacion==1){
+            if($param->parametrizacionp_medico==1){
                 $rolPermiso=new Rol_Permiso();
                 $rolPermiso->permiso_id=$param->permiso_id;
-                $rolPermiso->rol_id=$rol->rol_id;
+                $rolPermiso->rol_id=$rol[0]->rol_id;
                 $rolPermiso->save();
             }
         }
