@@ -25,6 +25,11 @@ class Sustento_Tributario extends Model
     ];
     protected $guarded =[
     ];  
+    public function scopeByEmpresa($query, $empresa_id){
+        return $query->where('empresa_id','=',$empresa_id)
+                     ->where('sustento_estado','=','1')
+                     ->orderBy('sustento_codigo','asc');
+    }
     public function scopeSustentos($query){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('sustento_estado','=','1')->orderBy('sustento_codigo','asc');
     }
