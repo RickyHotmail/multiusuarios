@@ -318,9 +318,9 @@
                                     @if($guia->gr_emision == 'ELECTRONICA')
                                         <?php $fecha = date('d-m-Y', strtotime($guia->gr_fecha)); ?>
                                         <a href="{{ url("respuesSRIGR/{$guia->gr_id}") }}" style="color: #6c757d;" class=""  data-toggle="tooltip" data-placement="top" title="Respuesta SRI" target="_blank"><i class="fas fa-2x fa-file " aria-hidden="true"></i></a>&nbsp;&nbsp;
-                                        <a href="{{ url("documentosElectronicos/{$guia->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$guia->gr_xml_nombre}.xml") }}" style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        <a href="{{ url("documentosElectronicos/{$guia->Transportista->empresa->empresa_ruc}/{$fecha}/{$guia->gr_xml_nombre}.xml") }}" style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
                                         @if($guia->gr_xml_estado == 'AUTORIZADO')
-                                        <a href="{{ url("documentosElectronicos/{$guia->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$guia->gr_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        <a href="{{ url("documentosElectronicos/{$guia->Transportista->empresa->empresa_ruc}/{$fecha}/{$guia->gr_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
                                             @if($guia->gr_estado != 0)
                                             <a href="{{ url("emailGR/{$guia->gr_id}") }}" style="color: #1B6BB2;" class=""  data-toggle="tooltip" data-placement="top" title="Enviar por Email"><i class="fas fa-2x fa-file-export " aria-hidden="true"></i></a>
                                             @endif
