@@ -646,7 +646,7 @@ class SuscripcionController extends Controller{
             return redirect('login')->with('success','Éxito, Revisa tu bandeja de entrada para activar tu Cuenta, correo: '.$request->idEmail);
         }catch(\Exception $ex){
             DB::rollBack();
-            return redirect('/registro')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+            return redirect('/registro')->with('error','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
 
