@@ -103,7 +103,7 @@ class Nota_Entrega extends Model
     }
     public function cliente()
     {
-        return $this->belongsTo(cliente::class, 'cliente_id', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id', 'cliente_id');
     }
     public function diariocosto(){
         return $this->belongsTo(Diario::class, 'diario_costo_id', 'diario_id');
