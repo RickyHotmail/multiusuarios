@@ -30,7 +30,7 @@ class Cuenta_Pagar extends Model
     ];
     public function transaccionCompra()
     {
-        return $this->hasOne(transaccion_compra::class, 'cuenta_id', 'cuenta_id');
+        return $this->hasOne(Transaccion_Compra::class, 'cuenta_id', 'cuenta_id');
     }
     public function liquidacionCompra()
     {
