@@ -641,78 +641,11 @@ class SuscripcionController extends Controller{
                 $categoriaProv->categoria_proveedor_estado = 1;
             $categoriaProv->save();
 
-            /* $Pais = new Pais();
-                $Pais->pais_nombre = "ECUADOR";
-                $Pais->pais_codigo = "+593";
-                $Pais->pais_estado = 1;
-                $Pais->empresa_id = $empresa->empresa_id;
-            $Pais->save();
-
-            $provincia = new Provincia();
-                $provincia->provincia_nombre = 'AZUAY';
-                $provincia->provincia_codigo = '1';
-                $provincia->pais_id = $Pais->pais_id;
-                $provincia->provincia_estado = 1;
-            $provincia->save();
-
-            $provincia = new Provincia();
-                $provincia->provincia_nombre = 'BOLIVAR';
-                $provincia->provincia_codigo = '2';
-                $provincia->pais_id = $Pais->pais_id;
-                $provincia->provincia_estado = 1;
-            $provincia->save();
-
-            $provincia = new Provincia();
-                $provincia->provincia_nombre = 'CAÑAR';
-                $provincia->provincia_codigo = '3';
-                $provincia->pais_id = $Pais->pais_id;
-                $provincia->provincia_estado = 1;
-            $provincia->save();
-
-            $provincia = new Provincia();
-                $provincia->provincia_nombre = 'CARCHI';
-                $provincia->provincia_codigo = '4';
-                $provincia->pais_id = $Pais->pais_id;
-                $provincia->provincia_estado = 1;
-            $provincia->save();
-
-            $provincia = new Provincia();
-                $provincia->provincia_nombre = 'COTOPAXI';
-                $provincia->provincia_codigo = '5';
-                $provincia->pais_id = $Pais->pais_id;
-                $provincia->provincia_estado = 1;
-            $provincia->save();
-
-            $provincia = new Provincia();
-                $provincia->provincia_nombre = 'CHIMBORAZO';
-                $provincia->provincia_codigo = '6';
-                $provincia->pais_id = $Pais->pais_id;
-                $provincia->provincia_estado = 1;
-            $provincia->save();
-
-            $provincia = new Provincia();
-                $provincia->provincia_nombre = 'EL ORO';
-                $provincia->provincia_codigo = '7';
-                $provincia->pais_id = $Pais->pais_id;
-                $provincia->provincia_estado = 1;
-            $provincia->save();
-
-            $ciudad = new Ciudad();
-                $ciudad->ciudad_nombre = 'MACHALA';
-                $ciudad->ciudad_codigo = '070202';
-                $ciudad->provincia_id = $provincia->provincia_id;
-                $ciudad->ciudad_estado = 1;
-            $ciudad->save(); */
-
-            
-
 
             DB::commit();
             return redirect('login')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
             DB::rollBack();
-
-            return $ex->getMessage();
             return redirect('/registro')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }

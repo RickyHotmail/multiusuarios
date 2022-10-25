@@ -58,6 +58,6 @@ class Empresa extends Model
     }
 
     public function suscripcion(){
-        return $this->hasOne(Suscripcion::class, 'empresa_id', 'empresa_id');
+        return $this->belongsTo(Suscripcion::class, 'empresa_id', 'empresa_id');
     }
 }

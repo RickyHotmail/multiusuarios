@@ -31,6 +31,7 @@ use App\Models\Provincia;
 use App\Models\Punto_Emision;
 use App\Models\Rol_Consolidado;
 use App\Models\Rubro;
+use App\Models\Servidor_Correo;
 use DateTime;
 use PDF;
 use Illuminate\Http\Request;
@@ -704,7 +705,7 @@ class generalController extends Controller
                             </style>
                         </head>";
             $cuerpo .= "<body style='text-align: center'>";
-            $cuerpo .= "<table style='width: 80%>";
+            $cuerpo .= "<table style='min-width: 1000px>";
             $cuerpo .= "<tr style='text-align: center'>
                             <td width: '20%'>
                             <img src='cid:logo'  width='100px'>
@@ -734,26 +735,27 @@ class generalController extends Controller
                         
 
             require '../vendor/autoload.php';
+
+
+            $servidor=Servidor_Correo::servidorCorreo()->first();
+
             $mail = new PHPMailer();
             $mail->isSMTP();
             $mail->SMTPAuth   = true;
-            $mail->SMTPSecure = "ssl";
-            //$mail->Port = 587;
-            $mail->Port = 465;
-
-            //$mail->Timeout=40;
+            $mail->SMTPSecure = $servidor->servidor_secure;
+            $mail->Port = $servidor->servidor_port;
             $mail->SMTPKeepAlive = true;
             
-            $mail->Host = 'neopagupa-com.correoseguro.dinaserver.com';
-            $mail->Username = 'neopagupa@neopagupa.com';
-            $mail->Password = 'ELWc0X]3:96{';
+            $mail->Host = $servidor->servidor_host;
+            $mail->Username = $servidor->servidor_username;
+            $mail->Password = $servidor->servidor_password;
 
-            $mail->setFrom('neopagupa@neopagupa.com', 'PAGUPA SOFT | NEOPAGUPA');
-            $mail->AddEmbeddedImage(public_path().'/logos/0702932179001.jpg', 'logo');
+            $mail->setFrom($servidor->servidor_username, $servidor->servidor_from);
+            $mail->AddEmbeddedImage(public_path().'/'.$servidor->servidor_embeddedImage, 'logo');
             $mail->Body    = utf8_decode($cuerpo);
             $mail->AltBody = utf8_decode($plain);
             $mail->addAddress(trim($correo), utf8_decode($nombre));
-            $mail->addAddress('neopagupa@neopagupa.com', 'Yo');
+            $mail->addAddress($servidor->servidor_username, 'Yo');
             $mail->Subject = utf8_decode($asunto);
             $mail->WordWrap = 50;
 

@@ -24,7 +24,16 @@ class Concepto_Retencion extends Model
         'empresa_id',        
     ];
     protected $guarded =[
-    ];   
+    ];
+
+    public function scopeByEmpresa($query, $empresa_id){
+        return $query->where('empresa_id','=', $empresa_id)
+                     ->where('concepto_estado','=','1')
+                     ->orderBy('concepto_nombre','asc');
+    }
+
+
+
     public function scopeConceptoRetenciones($query){
         return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('concepto_estado','=','1')->orderBy('concepto_nombre','asc');
     }

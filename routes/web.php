@@ -337,10 +337,8 @@ Route::get('/pagos', [SuscripcionController::class,'pago'])->middleware('auth');
 Route::get('/suscri', [SuscripcionController::class,'pago'])->middleware('auth');
 Route::get('/gestionPermisos', [permisoGeneralController::class,'index'])->middleware('auth');
 Route::post('/gestionPermisos/guardar', [permisoGeneralController::class,'store'])->middleware('auth');
-Route::get('/permisosAdministrador/{id}/actualizar', [permisoGeneralController::class,'actualizarPermisosAdministrador'])->middleware('auth');
-
-
-
+Route::get('/permisosAdministrador/actualizar', [permisoGeneralController::class,'actualizarPermisosAdministrador'])->middleware('auth');
+Route::get('/permisosAdministrador/{id}/actualizarMedico', [permisoGeneralController::class,'actualizarPermisosMedico'])->middleware('auth');
 
 
 Route::get('/buscarimpuestorenta/searchN/', [impuestoRentaRolController::class, 'buscarBy'])->middleware('auth');

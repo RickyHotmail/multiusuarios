@@ -35,7 +35,13 @@
     </div>
 </noscript>
 <body class="hold-transition login-page">
-    
+    @if(session('success'))
+        <div class="mensajeria1 alert alert-success alert-dismissible" style="width: 100%; position: absolute; left:100%; top: 0px; transform:translateX(-100%)">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h5><i class="icon fas fa-check"></i>{{ session('success') }}</h5>
+        </div>
+    @endif
+
     <div class="login-box">
         <!-- /.login-logo -->
         <div class="card card-outline card-info">

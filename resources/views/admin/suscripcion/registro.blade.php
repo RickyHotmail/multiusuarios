@@ -116,6 +116,12 @@
         </aside>
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
+            @if(session('error'))
+                <div class="mensajeria2 alert alert-warning alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h5><i class="icon fas fa-check"></i>{{ session('error') }}</h5>
+                </div>
+            @endif
             <div id="pageloader">
                     <img src="{{ asset('admin/imagenes/cargando.gif') }}" alt="processing..." />
                 </div>
