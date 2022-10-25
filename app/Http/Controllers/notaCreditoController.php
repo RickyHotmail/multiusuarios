@@ -459,7 +459,7 @@ class notaCreditoController extends Controller
                     $detalleDiario->movimientoProducto()->associate($movimientoProducto);
                     $parametrizacionContable=Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'VENTAS')->first();
                     if ($parametrizacionContable->parametrizacion_cuenta_general == '1') {
-                        $detalleDiario->cuenta_id = $producto->cuenta_id;
+                        $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
                     }
                     else{
                         $detalleDiario->cuenta_id = $producto->producto_cuenta_venta;
