@@ -36,6 +36,7 @@ use App\Models\Tamano_Producto;
 use App\Models\Tarifa_Iva;
 use App\Models\Tipo_Cliente;
 use App\Models\Tipo_Identificacion;
+use App\Models\Tipo_MI;
 use App\Models\Unidad_Medida_Producto;
 use App\Models\User;
 use App\Models\Usuario_PuntoE;
@@ -300,6 +301,7 @@ class SuscripcionController extends Controller{
                 $rango->tipo_comprobante_id=53;
                 $rango->punto_id=$puntoEmision->punto_id;
             $rango->save();
+            
 
             $rango=new Rango_Documento();
                 $rango->rango_descripcion='DOC FISICO';
@@ -465,6 +467,13 @@ class SuscripcionController extends Controller{
                 }
             }
 
+            $movimiento=new Tipo_MI();
+                $movimiento->tipo_nombre='SIN MOVIMIENTO';
+                $movimiento->tipo_estado='1';
+                $movimiento->empresa_id=$empresa->empresa_id;
+                $movimiento->cuenta_id=1152;
+                $movimiento->sucursal_id=$sucursal->sucursal_id;
+            $movimiento->save();
 
             $zona = new Zona();
                 $zona->zona_nombre = 'Sin zona';
