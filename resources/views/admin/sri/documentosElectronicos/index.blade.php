@@ -163,9 +163,9 @@
                                     @if($nc->nc_emision == 'ELECTRONICA')
                                         <?php $fecha = date('d-m-Y', strtotime($nc->nc_fecha)); ?>
                                         <a href="{{ url("respuesSRINC/{$nc->nc_id}") }}" style="color: #6c757d;" class=""  data-toggle="tooltip" data-placement="top" title="Respuesta SRI" target="_blank"><i class="fas fa-2x fa-file " aria-hidden="true"></i></a>&nbsp;&nbsp;
-                                        <a href="{{ url("documentosElectronicos/{$nc->rangoDocumento->empresa->empresa_ruc}/{$fecha}/{$nc->nc_xml_nombre}.xml") }}" style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        <a href="{{ url("documentosElectronicos/{$nc->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$nc->nc_xml_nombre}.xml") }}" style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
                                         @if($nc->nc_xml_estado == 'AUTORIZADO')                                        
-                                        <a href="{{ url("documentosElectronicos/{$nc->rangoDocumento->empresa->empresa_ruc}/{$fecha}/{$nc->nc_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        <a href="{{ url("documentosElectronicos/{$nc->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$nc->nc_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
                                             @if($nc->nc_estado == 1)
                                             <a href="{{ url("emailNC/{$nc->nc_id}") }}" style="color: #1B6BB2;" data-toggle="tooltip" data-placement="top" title="Enviar por Email"><i class="fas fa-2x fa-file-export " aria-hidden="true"></i></a>
                                             @endif
@@ -199,9 +199,9 @@
                                     @if($nd->nd_emision == 'ELECTRONICA')
                                         <?php $fecha = date('d-m-Y', strtotime($nd->nd_fecha)); ?>
                                         <a href="{{ url("respuesSRIND/{$nd->nd_id}") }}" style="color: #6c757d;" class=""  data-toggle="tooltip" data-placement="top" title="Respuesta SRI" target="_blank"><i class="fas fa-2x fa-file " aria-hidden="true"></i></a>&nbsp;&nbsp;
-                                        <a href="{{ url("documentosElectronicos/{$nd->rangoDocumento->empresa->empresa_ruc}/{$fecha}/{$nd->nd_xml_nombre}.xml") }}" style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        <a href="{{ url("documentosElectronicos/{$nd->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$nd->nd_xml_nombre}.xml") }}" style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
                                         @if($nd->nd_xml_estado == 'AUTORIZADO')
-                                        <a href="{{ url("documentosElectronicos/{$nd->rangoDocumento->empresa->empresa_ruc}/{$fecha}/{$nd->nd_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        <a href="{{ url("documentosElectronicos/{$nd->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$nd->nd_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
                                             @if($nd->nd_estado == 1)
                                             <a href="{{ url("emailND/{$nd->nd_id}") }}" style="color: #1B6BB2;" class=""  data-toggle="tooltip" data-placement="top" title="Enviar por Email"><i class="fas fa-2x fa-file-export " aria-hidden="true"></i></a>
                                             @endif
@@ -235,9 +235,20 @@
                                     @if($ret->retencion_emision == 'ELECTRONICA')
                                         <?php $fecha = date('d-m-Y', strtotime($ret->retencion_fecha)); ?>
                                         <a href="{{ url("respuesSRIRet/{$ret->retencion_id}") }}" style="color: #6c757d;" class=""  data-toggle="tooltip" data-placement="top" title="Respuesta SRI" target="_blank"><i class="fas fa-2x fa-file " aria-hidden="true"></i></a>&nbsp;&nbsp;
-                                        <a href="{{ url("documentosElectronicos/{$ret->rangoDocumento->empresa->empresa_ruc}/{$fecha}/{$ret->retencion_xml_nombre}.xml") }}" style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        @if($ret->liquidacionCompra)
+                                        <a href="{{ url("documentosElectronicos/{$ret->liquidacionCompra->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$ret->retencion_xml_nombre}.xml") }}" style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        @endif
+                                        @if($ret->transaccionCompra)
+                                        <a href="{{ url("documentosElectronicos/{$ret->transaccionCompra->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$ret->retencion_xml_nombre}.xml") }}" style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        @endif
                                         @if($ret->retencion_xml_estado == 'AUTORIZADO')
-                                        <a href="{{ url("documentosElectronicos/{$ret->rangoDocumento->empresa->empresa_ruc}/{$fecha}/{$ret->retencion_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        @if($ret->liquidacionCompra)
+                                         <a href="{{ url("documentosElectronicos/{$ret->liquidacionCompra->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$ret->retencion_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        
+                                        @endif
+                                        @if($ret->transaccionCompra)
+                                        <a href="{{ url("documentosElectronicos/{$ret->transaccionCompra->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$ret->retencion_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;                   
+                                        @endif
                                             @if($ret->retencion_estado == 1)
                                             <a href="{{ url("emailRet/{$ret->retencion_id}") }}" style="color: #1B6BB2;" class=""  data-toggle="tooltip" data-placement="top" title="Enviar por Email"><i class="fas fa-2x fa-file-export " aria-hidden="true"></i></a>
                                             @endif
@@ -271,9 +282,9 @@
                                     @if($lc->lc_emision == 'ELECTRONICA')
                                         <?php $fecha = date('d-m-Y', strtotime($lc->lc_fecha)); ?>
                                         <a href="{{ url("respuesSRILC/{$lc->lc_id}") }}" style="color: #6c757d;" class=""  data-toggle="tooltip" data-placement="top" title="Respuesta SRI" target="_blank"><i class="fas fa-2x fa-file " aria-hidden="true"></i></a>&nbsp;&nbsp;
-                                        <a href="{{ url("documentosElectronicos/{$lc->rangoDocumento->empresa->empresa_ruc}/{$fecha}/{$lc->lc_xml_nombre}.xml") }}"style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        <a href="{{ url("documentosElectronicos/{$lc->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$lc->lc_xml_nombre}.xml") }}"style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
                                         @if($lc->lc_xml_estado == 'AUTORIZADO')
-                                        <a href="{{ url("documentosElectronicos/{$lc->rangoDocumento->empresa->empresa_ruc}/{$fecha}/{$lc->lc_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        <a href="{{ url("documentosElectronicos/{$lc->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$lc->lc_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
                                             @if($lc->lc_estado == 1)
                                             <a href="{{ url("emailLC/{$lc->lc_id}") }}" style="color: #1B6BB2;" class=""  data-toggle="tooltip" data-placement="top" title="Enviar por Email"><i class="fas fa-2x fa-file-export " aria-hidden="true"></i></a>
                                             @endif
@@ -307,9 +318,9 @@
                                     @if($guia->gr_emision == 'ELECTRONICA')
                                         <?php $fecha = date('d-m-Y', strtotime($guia->gr_fecha)); ?>
                                         <a href="{{ url("respuesSRIGR/{$guia->gr_id}") }}" style="color: #6c757d;" class=""  data-toggle="tooltip" data-placement="top" title="Respuesta SRI" target="_blank"><i class="fas fa-2x fa-file " aria-hidden="true"></i></a>&nbsp;&nbsp;
-                                        <a href="{{ url("documentosElectronicos/{$guia->rangoDocumento->empresa->empresa_ruc}/{$fecha}/{$guia->gr_xml_nombre}.xml") }}" style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        <a href="{{ url("documentosElectronicos/{$guia->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$guia->gr_xml_nombre}.xml") }}" style="color: #49A42C;" class=""  data-toggle="tooltip" data-placement="top" title="XML" target="_blank"><i class="fas fa-2x fa-file-alt " aria-hidden="true"></i></a>&nbsp;&nbsp;
                                         @if($guia->gr_xml_estado == 'AUTORIZADO')
-                                        <a href="{{ url("documentosElectronicos/{$guia->rangoDocumento->empresa->empresa_ruc}/{$fecha}/{$guia->gr_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                        <a href="{{ url("documentosElectronicos/{$guia->diario->sucursal->empresa->empresa_ruc}/{$fecha}/{$guia->gr_xml_nombre}.pdf") }}" style="color: #BF2929;" class=""  data-toggle="tooltip" data-placement="top" title="PDF" target="_blank"><i class="fas fa-2x fa-file-pdf " aria-hidden="true"></i></a>&nbsp;&nbsp;
                                             @if($guia->gr_estado != 0)
                                             <a href="{{ url("emailGR/{$guia->gr_id}") }}" style="color: #1B6BB2;" class=""  data-toggle="tooltip" data-placement="top" title="Enviar por Email"><i class="fas fa-2x fa-file-export " aria-hidden="true"></i></a>
                                             @endif
