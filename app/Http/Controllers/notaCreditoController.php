@@ -457,7 +457,13 @@ class notaCreditoController extends Controller
                     $detalleDiario->detalle_conciliacion = '0';
                     $detalleDiario->detalle_estado = '1';
                     $detalleDiario->movimientoProducto()->associate($movimientoProducto);
-                    $detalleDiario->cuenta_id = $producto->producto_cuenta_venta;
+                    $parametrizacionContable=Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'VENTAS')->first();
+                    if ($parametrizacionContable->parametrizacion_cuenta_general == '1') {
+                        $detalleDiario->cuenta_id = $producto->cuenta_id;
+                    }
+                    else{
+                        $detalleDiario->cuenta_id = $producto->producto_cuenta_venta;
+                    }
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$producto->cuentaVenta->cuenta_numero.' en el haber por un valor de -> '.$total[$i]);
                     /*******************************************************************/
@@ -473,7 +479,13 @@ class notaCreditoController extends Controller
                             $detalleDiario->detalle_numero_documento = $diario->diario_numero_documento;
                             $detalleDiario->detalle_conciliacion = '0';
                             $detalleDiario->detalle_estado = '1';
-                            $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;
+                            $parametrizacionContable=Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'INVENTARIO')->first();
+                            if ($parametrizacionContable->parametrizacion_cuenta_general == '1') {
+                                $detalleDiario->cuenta_id = $producto->cuenta_id;
+                            }
+                            else{
+                                $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;
+                            }
                             $detalleDiario->movimientoProducto()->associate($movimientoProducto);
                             $diarioC->detalles()->save($detalleDiario);
                             $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diarioC->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diarioC->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el debe por un valor de -> '.$detalleDiario->detalle_debe);
