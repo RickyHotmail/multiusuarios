@@ -465,7 +465,7 @@ class notaCreditoController extends Controller
                         $detalleDiario->cuenta_id = $producto->producto_cuenta_venta;
                     }
                     $diario->detalles()->save($detalleDiario);
-                    $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$producto->cuentaVenta->cuenta_numero.' en el haber por un valor de -> '.$total[$i]);
+                    $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nc->nc_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el haber por un valor de -> '.$total[$i]);
                     /*******************************************************************/
                 
                 if($banderaP and $nc->nc_comentario == 'DEVOLUCION'){

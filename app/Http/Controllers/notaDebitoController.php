@@ -265,7 +265,7 @@ class notaDebitoController extends Controller
                     }
  
                     $diario->detalles()->save($detalleDiario);
-                    $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nd->nd_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$producto->cuentaVenta->cuenta_numero.' en el haber por un valor de -> '.$total[$i]);
+                    $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nd->nd_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el haber por un valor de -> '.$total[$i]);
                     /*******************************************************************/
                 
             }
