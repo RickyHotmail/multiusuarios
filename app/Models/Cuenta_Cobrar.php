@@ -33,7 +33,7 @@ class Cuenta_Cobrar extends Model
 
     public function facturaVenta()
     {
-        return $this->hasOne(factura_venta::class, 'cuenta_id', 'cuenta_id');
+        return $this->hasOne(Factura_Venta::class, 'cuenta_id', 'cuenta_id');
     }
     public function notaEntrega()
     {
