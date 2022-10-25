@@ -127,7 +127,7 @@ class notaDebitoController extends Controller
                 $general->registrarAuditoria('Registro de cuenta por cobrar de nota de debito -> '.$nd->nd_numero,$nd->nd_numero,'Registro de cuenta por cobrar de nota de debito -> '.$nd->nd_numero.' con cliente -> '.$request->get('nombreCliente').' con un total de -> '.$request->get('idTotal').' con clave de acceso -> '.$nd->nd_autorizacion);
                 /****************************************************************/
             $nd->cuentaCobrar()->associate($cxc);
-            if(Auth::user()->empresa->empresa_contabilidad== '1'){
+
                 /**********************asiento diario****************************/
                 $diario = new Diario();
                 $diario->diario_codigo = $general->generarCodigoDiario($request->get('nd_fecha'),'CNDE');
@@ -149,17 +149,14 @@ class notaDebitoController extends Controller
                 $general->registrarAuditoria('Registro de diario de venta de nota de debito -> '.$nd->nd_numero,$nd->nd_numero,'Registro de diario de venta de nota de debito -> '.$nd->nd_numero.' con cliente -> '.$request->get('nombreCliente').' con un total de -> '.$request->get('idTotal').' y con codigo de diario -> '.$diario->diario_codigo);
                 /*******************************************************************/
                 $nd->diario()->associate($diario);
-            }
+          
             if($arqueoCaja){
                 $nd->arqueo_id = $arqueoCaja->arqueo_id;
             }
             $nd->save();
-            if (Auth::user()->empresa->empresa_contabilidad == '1') {
+           
                 $general->registrarAuditoria('Registro de nota de debito de venta numero -> '.$nd->nd_numero, $nd->nd_numero, 'Registro de nota de debito de venta numero -> '.$nd->nd_numero.' con cliente -> '.$request->get('nombreCliente').' con un total de -> '.$request->get('idTotal').' con clave de acceso -> '.$nd->nd_autorizacion.' y con codigo de diario -> '.$diario->diario_codigo);
-            }
-            else{
-                $general->registrarAuditoria('Registro de nota de debito de venta numero -> '.$nd->nd_numero, $nd->nd_numero, 'Registro de nota de debito de venta numero -> '.$nd->nd_numero.' con cliente -> '.$request->get('nombreCliente').' con un total de -> '.$request->get('idTotal').' con clave de acceso -> '.$nd->nd_autorizacion);
-            }
+            
             /*******************************************************************/
             if($cxc->cuenta_estado == '2'){
                 /********************Pago por Venta de Contado***************************/
@@ -248,7 +245,7 @@ class notaDebitoController extends Controller
                 $nd->detalles()->save($detalleND);
                 $general->registrarAuditoria('Registro de detalle de nota de debito de venta numero -> '.$nd->nd_numero,$nd->nd_numero,'Registro de detalle de nota de debito de venta numero -> '.$nd->nd_numero.' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' a un precio unitario de -> '.$pu[$i]);
                 /*******************************************************************/
-                if (Auth::user()->empresa->empresa_contabilidad == '1') {
+               
                     /********************detalle de diario de nota de debito********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
@@ -270,11 +267,11 @@ class notaDebitoController extends Controller
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nd->nd_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$producto->cuentaVenta->cuenta_numero.' en el haber por un valor de -> '.$total[$i]);
                     /*******************************************************************/
-                }
+                
             }
             /********************detalle de diario de nota de debito********************/
             if ($request->get('idIva') > 0){
-                if (Auth::user()->empresa->empresa_contabilidad == '1') {
+              
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = 0.00;
                     $detalleDiario->detalle_haber = $request->get('idIva') ;
@@ -287,7 +284,7 @@ class notaDebitoController extends Controller
                     $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$nd->nd_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el haber por un valor de -> '.$request->get('idIva'));
-                }
+                
             }
             if($request->get('nd_tipo_pago') == 'EN EFECTIVO'){
                 /**********************movimiento caja****************************/
