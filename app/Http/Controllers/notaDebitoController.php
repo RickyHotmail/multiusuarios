@@ -309,7 +309,7 @@ class notaDebitoController extends Controller
             if(Auth::user()->empresa->empresa_llevaContabilidad== '1'){
                 $url = $general->pdfDiario($diario);
             }
-            DB::commit();
+           
             if($nd->nd_emision == 'ELECTRONICA'){
                 $ndAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlNotaDebito($nd),'ND');
                 $nd->nd_xml_estado = $ndAux->nd_xml_estado;
@@ -322,9 +322,10 @@ class notaDebitoController extends Controller
                 }
                 $nd->update();
             }
+            DB::commit();
             if($ndAux->nd_xml_estado == 'AUTORIZADO'){
                 return redirect('/notaDebito/new/'.$request->get('punto_id'))->with('success','NOTA DE DÉBITO registrada y autorizada exitosamente')->with('diario',$url)->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $request->get('nd_fecha'))->format('d-m-Y').'/'.$nd->nd_xml_nombre.'.pdf');
-            }elseif($nd->nd_emision == 'ELECTRONICA'){
+            }elseif($nd->nd_emision != 'ELECTRONICA'){
                 return redirect('/notaDebito/new/'.$request->get('punto_id'))->with('success','NOTA DE DÉBITO registrada exitosamente')->with('diario',$url);
             }else{
                 return redirect('/notaDebito/new/'.$request->get('punto_id'))->with('success','NOTA DE DÉBITO registrada exitosamente')->with('diario',$url)->with('error2','ERROR SRI--> '.$ndAux->nd_xml_estado.' : '.$ndAux->nd_xml_mensaje);
