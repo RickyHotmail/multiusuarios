@@ -66,12 +66,14 @@ class guiaremisionController extends Controller
      */
     public function store(Request $request)
     {
+        $isProducto = $request->get('DprodcutoID');
+            return(count($isProducto));
         try{            
             DB::beginTransaction();
             
             $cantidad = $request->get('Dcantidad');
             
-            $isProducto = $request->get('DprodcutoID');
+            
             $nombre = $request->get('Dnombre');
             $transportist=Transportista::Transportista($request->get('transportistas'))->first();
             /********************cabecera de proforma de venta ********************/
