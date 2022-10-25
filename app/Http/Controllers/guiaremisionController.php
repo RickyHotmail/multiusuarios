@@ -116,7 +116,7 @@ class guiaremisionController extends Controller
             $general->registrarAuditoria('Registro de Guia de Remision numero -> '.$guia->gr_numero,$guia->gr_numero,'Registro de Guia de Remision numero -> '.$guia->gr_numero.' con cliente -> '.$request->get('buscarCliente').' con transportistas -> '.$request->get('transportistas'));
             /*******************************************************************/
             /********************detalle de factura de venta********************/
-            for ($i = 1; $i < count($cantidad); ++$i){
+            for ($i = 1; $i <= count($cantidad); ++$i){
                 $detalleGR = new Detalle_GR();
                 $detalleGR->detalle_cantidad = $cantidad[$i];               
                 $detalleGR->detalle_estado = '1';
