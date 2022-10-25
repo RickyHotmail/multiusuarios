@@ -495,7 +495,7 @@ class notaDebitoController extends Controller
                 $secuencial=$rangoDocumento->rango_inicio;
                 $secuencialAux=Nota_Debito::secuencial($rangoDocumento->rango_id)->max('nd_secuencial');
                 if($secuencialAux){$secuencial=$secuencialAux+1;}
-                return view('admin.ventas.notasdebito.nuevo',['tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(),'formasPago'=>Forma_Pago::formaPagos()->get(),'cajaAbierta'=>$cajaAbierta, 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+                return view('admin.ventas.notasDebito.nuevo',['tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(),'formasPago'=>Forma_Pago::formaPagos()->get(),'cajaAbierta'=>$cajaAbierta, 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
             }else{
                 return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir Notas de débito, configueros y vuelva a intentar');
             }
