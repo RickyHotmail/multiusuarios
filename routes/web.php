@@ -333,6 +333,8 @@ Route::post('/sesion', [loginController::class,'authenticate']);
 //Suscripcion y Planes de Clientes
 Route::resource('/suscripcion', SuscripcionController::class);
 Route::get('/registro', [SuscripcionController::class,'registro']);
+Route::get('/recuperarClave', [usuarioController::class,'recuperarCuenta']);
+Route::post('/recuperarClave', [usuarioController::class,'enviarNuevaClave']);
 Route::get('/pagos', [SuscripcionController::class,'pago'])->middleware('auth');
 Route::get('/suscri', [SuscripcionController::class,'pago'])->middleware('auth');
 Route::get('/gestionPermisos', [permisoGeneralController::class,'index'])->middleware('auth');

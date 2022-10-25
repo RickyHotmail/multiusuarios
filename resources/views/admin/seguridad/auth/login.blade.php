@@ -108,14 +108,14 @@
                 <hr>
 
                 <div class="row">
-                    <!--div class="col-6">
+                    <div class="col-5 p-0">
                         <p class="mb-1 text-center">
-                            <a href="forgot-password.html">Olvidé mi Clave</a>
+                            <a href="{{url('/recuperarClave')}}">Olvidé mi Clave</a>
                         </p>
-                    </div-->
-                    <div class="col-12">
+                    </div>
+                    <div class="col-7 p-0">
                         <p class="mb-1 text-center">
-                            No tienes Cuenta, <a href="{{url('/registro')}}">Registrarme</a>
+                            Eres nuevo, <a href="{{url('/registro')}}">Regístrate</a>
                         </p>
                     </div>
                 </div>

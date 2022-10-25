@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use App\Libraries\verifyEmail;
+use App\Models\Servidor_Correo;
 use PHPMailer\PHPMailer\SMTP;
 
 class usuarioController extends Controller
@@ -96,6 +97,8 @@ class usuarioController extends Controller
     }
 
     public function restablecePass($id){
+        $servidor=Servidor_Correo::servidorCorreo()->first();
+
         try{
             $usuario=User::usuario($id)->first();
             if(!$usuario){
@@ -140,6 +143,63 @@ class usuarioController extends Controller
             return redirect('usuario')->with('success','Contraseña restablecida, revisa tu correo electrónico');
         } catch(\Exception $ex){
             DB::rollBack();
+            return redirect('usuario')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
+    }
+
+    public function enviarNuevaClave(Request $request){
+        try{
+            $usuarios=DB::select(DB::raw("
+                select users.* 
+                from users join empresa on users.empresa_id=empresa.empresa_id
+                where users.user_correo='$request->idCorreo' and empresa.empresa_ruc='$request->idRuc'
+            "));
+
+            
+
+            if(!$usuarios) return redirect('/recuperarClave')->with("error", "La información que ingreso es incorrecta");
+            $usuario=$usuarios[0];
+
+            DB::beginTransaction();
+            $usuario= User::findOrFail($usuario->user_id);
+            $password=$this->generarPass();
+            $usuario->user_cambio_clave=1;
+            $usuario->password  = bcrypt($password);
+            $usuario->save();
+
+            DB::afterCommit(function () use($usuario, $password){
+                $generalController=new generalController();
+
+                $html  = "<p style='text-align: justify'>";
+                $html .= "Estimado <strong>$usuario->user_nombre</strong>,<br><br>";
+                $html .= "Tu clave de ingreso al Sistema NeoPagupa fué restablecida, la clave temporal es: <br><strong>$password</strong><br><br><br>";
+                $html .= "Se te pedirá que la cambies en el siguiente inicio de sesión.<br><br><br>";
+                $html .= "Atentamente,<br><br><br>";
+                $html .= "__________________________________________<br>";
+                $html .= "<strong>PAGUPA SOFT</strong>";
+                $html .= "</p>";
+
+
+                $textoPlano = "Estimado $usuario->user_nombre,\n\n";
+                $textoPlano .= "Tu clave de ingreso al Sistema NeoPagupa fué restablecida, la clave temporal es:<br> $password \n\n\n";
+                $textoPlano .= "Se te pedirá que la cambies en el siguiente inicio de sesión,\n\n\n";
+                $textoPlano .= "Atentamente,\n\n\n";
+                $textoPlano .= "__________________________________________\n";
+                $textoPlano .= "PAGUPA SOFT";
+
+                $generalController->enviarCorreo($usuario->user_correo, $usuario->user_nombre, 'Restablecer Password', $html, $textoPlano, []);
+            });
+            
+            
+            /*Inicio de registro de auditoria */
+            $auditoria = new generalController();
+            $auditoria->registrarAuditoria('Restablecer contraseña de usuario -> '.$usuario->user_username,'0','');
+            /*Fin de registro de auditoria */
+            DB::commit();
+            return redirect('login')->with('success','Contraseña restablecida, revisa tu correo electrónico');
+        } catch(\Exception $ex){
+            DB::rollBack();
+            //return $ex->getMessage();
             return redirect('usuario')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
@@ -220,6 +280,11 @@ class usuarioController extends Controller
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
+    }
+
+    public function recuperarCuenta()
+    {
+        return view('admin.seguridad.usuario.recuperarClave');
     }
 
     public function updatePassword(Request $request)
