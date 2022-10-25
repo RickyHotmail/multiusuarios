@@ -1854,7 +1854,7 @@ class transaccionCompraController extends Controller
                 }
                 /******************************************************************/
             }
-            $url = " ";
+            $url="";
             if (Auth::user()->empresa->empresa_contabilidad == '1') {
                 $url = $general->pdfDiario($diario);
             }
@@ -1869,7 +1869,9 @@ class transaccionCompraController extends Controller
                 }
             }
             else{
-                return redirect('listatransaccionCompra')->with('success', 'Transaccion registrada exitosamente')->with('diario',$url);
+                
+                    return redirect('listatransaccionCompra')->with('success', 'Transaccion registrada exitosamente')->with('pdf',$url);
+                
             }
 
         }catch(\Exception $ex){

@@ -12,6 +12,7 @@ use App\Models\Detalle_EB;
 use App\Models\Movimiento_Producto;
 use App\Models\Diario;
 use App\Models\Detalle_Diario;
+use App\Models\Parametrizacion_Contable;
 use App\Models\Producto;
 use App\Models\Tipo_MI;
 use DateTime;
@@ -102,7 +103,7 @@ class egresoBodegaController extends Controller
             $egreso->user_id = Auth::user()->user_id;
             $egreso->rango_id = $request->get('rango_id');
             /**********************asiento diario****************************/
-            if(Auth::user()->empresa->empresa_contabilidad == '1'){
+            
                 $diario = new Diario();
                 $diario->diario_codigo = $general->generarCodigoDiario($request->get('egreso_fecha'),'CEBP');
                 $diario->diario_fecha = $request->get('egreso_fecha');
@@ -122,13 +123,11 @@ class egresoBodegaController extends Controller
                 $diario->save();
                 $general->registrarAuditoria('Registro de diario de egreso de bodega de producto -> '.$egreso->cabecera_egreso_numero,$egreso->cabecera_egreso_numero,'Registro de de egreso de bodega de producto  -> '.$egreso->cabecera_egreso_numero.' con bodega -> '.$request->get('bodega_nombre').' con un total de -> '.$request->get('idTotal').' y con codigo de diario -> '.$diario->diario_codigo);
                 $egreso->diario()->associate($diario);
-            }
+            
             $egreso->save();
-            if(Auth::user()->empresa->empresa_contabilidad == '1'){
+            
                 $general->registrarAuditoria('Registro de egreso de bodega de producto numero -> '.$egreso->cabecera_egreso_numero,$egreso->cabecera_egreso_numero,'Registro de egreso de bodega de producto numero -> '.$egreso->cabecera_egreso_numero.' con bodega -> '.$request->get('bodega_nombre').' con un total de -> '.$request->get('idTotal').'  y con codigo de diario -> '.$diario->diario_codigo);
-            }else{
-                $general->registrarAuditoria('Registro de egreso de bodega de producto numero -> '.$egreso->cabecera_egreso_numero,$egreso->cabecera_egreso_numero,'Registro de egreso de bodega de producto numero -> '.$egreso->cabecera_egreso_numero.' con bodega -> '.$request->get('bodega_nombre').' con un total de -> '.$request->get('idTotal'));
-            }
+            
             /********************detalle de factura de venta********************/
             for ($i = 1; $i < count($cantidad); ++$i){
                 $detalleEB = new Detalle_EB();
@@ -162,7 +161,7 @@ class egresoBodegaController extends Controller
                     $general->registrarAuditoria('Registro de movimiento de producto por egreso de bodega numero -> '.$egreso->cabecera_egreso_numero,$egreso->cabecera_egreso_numero,'Registro de movimiento de producto por factura de venta numero -> '.$egreso->cabecera_egreso_numero.' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' con un stock actual de -> '.$movimientoProducto->movimiento_stock_actual);
                     /*********************************************************************/
                     $detalleEB->movimiento()->associate($movimientoProducto);
-                    if(Auth::user()->empresa->empresa_contabilidad == '1'){
+                
                         /********************detalle de diario de venta********************/
                         $producto = Producto::findOrFail($isProducto[$i]);
                         $detalleDiario = new Detalle_Diario();
@@ -173,16 +172,23 @@ class egresoBodegaController extends Controller
                         $detalleDiario->detalle_numero_documento = $diario->diario_numero_documento;
                         $detalleDiario->detalle_conciliacion = '0';
                         $detalleDiario->detalle_estado = '1'; 
-                        $detalleDiario->movimientoProducto()->associate($movimientoProducto);    
-                        $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;
+                        $detalleDiario->movimientoProducto()->associate($movimientoProducto);   
+                        $parametrizacionContable  = Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'INVENTARIO')->first();
+                        if($parametrizacionContable->parametrizacion_cuenta_general=='1'){
+                            $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
+                        }else{
+                            
+                            $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;
+                        }
                         $diario->detalles()->save($detalleDiario);
                         $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$egreso->cabecera_egreso_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' en el haber por un valor de -> '.$total[$i]);
-                    }
+                    
                     $egreso->detalles()->save($detalleEB);
                     $general->registrarAuditoria('Registro de detalle de egreso de venta numero -> '.$egreso->cabecera_egreso_numero,$egreso->cabecera_egreso_numero,'Registro de detalle de egreso de venta numero -> '.$egreso->cabecera_egreso_numero.' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' a un precio unitario de -> '.$pu[$i]);            
             }     
             $url = '';
-            if(Auth::user()->empresa->empresa_contabilidad == '1'){               
+            $url2 = '';
+           
                 $detalleDiario = new Detalle_Diario();
                 $detalleDiario->detalle_debe = $request->get('idTotal');
                 $detalleDiario->detalle_haber =  0.00;
@@ -195,9 +201,11 @@ class egresoBodegaController extends Controller
                 $detalleDiario->detalle_comentario = 'P/R EGRESO DE PRODUCTOS CON DESTINO '.$request->get('egreso_destino');  
                 $diario->detalles()->save($detalleDiario);
                 $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$egreso->cabecera_egreso_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$tipo->cuenta->cuenta_numero.' en el haber por un valor de -> '.$request->get('idTotal'));                
+            if(Auth::user()->empresa->empresa_contabilidad == '1'){               
                 $url = $general->pdfDiario($diario);
-                $url2 = $general->pdfComprobanteEgresoBodega($egreso);
+               
             }
+            $url2 = $general->pdfComprobanteEgresoBodega($egreso);
             DB::commit();
             return redirect('/egresoBodega/new/'.$request->get('punto_id'))->with('success','Egreso de bodega se registrada exitosamente')->with('diario',$url)->with('pdf2', $url2);
         }catch(\Exception $ex){
@@ -259,7 +267,7 @@ class egresoBodegaController extends Controller
             $diario=$egreso->diario;
             $egreso->diario_id=null;
             $egreso->save();
-            if(Auth::user()->empresa->empresa_contabilidad == '1'){
+          
                 $auditoria->registrarAuditoria('Actualizacion del Id a null para la eliminacion del Diario  N°'.$diario->diario_codigo.'  relacionado al Egreso de Bodega N°-> '.$egreso->cabecera_egreso_numero,$egreso->cabecera_egreso_numero,'Permiso con id -> '.$id);
                 foreach ($diario->detalles as $diariodetalle) {
                     
@@ -268,7 +276,7 @@ class egresoBodegaController extends Controller
                 }
                 $diario->delete();   
                 $auditoria->registrarAuditoria('Eliminacion del  diario  N°'.$diario->diario_codigo .'relacionado al Egreso de Bodega N°-> '.$egreso->cabecera_egreso_numero,$egreso->cabecera_egreso_numero,'Permiso con id -> '.$id);   
-            }
+            
 
             foreach($egreso->detalles as $detalle){
                 $movimiento=$detalle->movimiento;

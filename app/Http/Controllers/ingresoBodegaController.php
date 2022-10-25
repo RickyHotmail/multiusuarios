@@ -127,7 +127,7 @@ class ingresoBodegaController extends Controller
             /****************************************************************/
             $ingreso->cuentaPagar()->associate($cxp);
 
-            if(Auth::user()->empresa->empresa_contabilidad == '1'){
+            
                 /**********************asiento diario****************************/
                 $diario = new Diario();
                 $diario->diario_codigo = $general->generarCodigoDiario($request->get('ingreso_fecha'),'CIBP');
@@ -148,7 +148,7 @@ class ingresoBodegaController extends Controller
                 $diario->save();
                 $general->registrarAuditoria('Registro de diario de ingreso de bodega de producto -> '.$ingreso->cabecera_ingreso_numero,$ingreso->cabecera_ingreso_numero,'Registro de diario de ingreso de bodega de producto -> '.$ingreso->cabecera_ingreso_numero.' con proveedor -> '.$request->get('buscarProveedor').' con un total de -> '.$request->get('idTotal').' y con codigo de diario -> '.$diario->diario_codigo);
                 $ingreso->diario()->associate($diario);
-            }
+            
             $ingreso->save();
             $general->registrarAuditoria('Registro de ingreso de bodega de producto numero -> '.$ingreso->cabecera_ingreso_numero,$ingreso->cabecera_ingreso_numero,'Registro de ingreso de bodega de producto numero -> '.$ingreso->cabecera_ingreso_numero.' con bodega -> '.$request->get('bodega_nombre').' con un total de -> '.$request->get('idTotal')); 
             /********************detalle de factura de venta********************/
@@ -184,7 +184,7 @@ class ingresoBodegaController extends Controller
                 $general->registrarAuditoria('Registro de movimiento de producto por ingreso de bodega numero -> '.$ingreso->cabecera_ingreso_numero,$ingreso->cabecera_ingreso_numero,'Registro de movimiento de producto por factura de venta numero -> '.$ingreso->cabecera_ingreso_numero.' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' con un stock actual de -> '.$movimientoProducto->movimiento_stock_actual);
                 /*********************************************************************/
                 $detalleIB->movimiento()->associate($movimientoProducto);
-                if(Auth::user()->empresa->empresa_contabilidad == '1'){
+               
                     /********************detalle de diario de compra********************/
                     $detalleDiario = new Detalle_Diario();
                     $detalleDiario->detalle_debe = $total[$i];
@@ -195,16 +195,22 @@ class ingresoBodegaController extends Controller
                     $detalleDiario->detalle_conciliacion = '0';
                     $detalleDiario->detalle_estado = '1';
                     $detalleDiario->movimientoProducto()->associate($movimientoProducto);       
-                    $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;           
+                    $parametrizacionContable  = Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'INVENTARIO')->first();
+                    if($parametrizacionContable->parametrizacion_cuenta_general=='1'){
+                        $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
+                    }else{
+                        
+                        $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;
+                    }        
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo, $ingreso->cabecera_ingreso_numero, 'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' por un valor de -> '.$total[$i]);
                     /**********************************************************************/
-                }
+                
                 $ingreso->detalles()->save($detalleIB);
                 $general->registrarAuditoria('Registro de detalle de ingreso de bodega -> '.$ingreso->cabecera_ingreso_numero,$ingreso->cabecera_ingreso_numero,'Registro de detalle de ingreso de bodega -> '.$ingreso->cabecera_ingreso_numero.' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' a un precio unitario de -> '.$pu[$i]);         
             }  
             
-            if(Auth::user()->empresa->empresa_contabilidad == '1'){
+            
                 $detalleDiario = new Detalle_Diario();
                 $detalleDiario->detalle_debe =0.00;
                 $detalleDiario->detalle_haber = $request->get('idTotal');
@@ -229,7 +235,7 @@ class ingresoBodegaController extends Controller
                 $detalleDiario->proveedor_id=$request->get('proveedorID');
                 $diario->detalles()->save($detalleDiario);
                 $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$ingreso->cabecera_ingreso_numero, 'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta->cuenta_numero.' por un valor de -> '.$request->get('idTotal'));
-            }
+            
             $url = '';
             if(Auth::user()->empresa->empresa_llevaContabilidad == '1'){
                 $url = $general->pdfDiario($diario);
@@ -306,7 +312,7 @@ class ingresoBodegaController extends Controller
                 $diario=$ingreso->diario;
                 $ingreso->diario_id=null;
                 $ingreso->save();
-                if (Auth::user()->empresa->empresa_contabilidad == '1') {
+               
                     $auditoria->registrarAuditoria('Actualizacion del Id a null para la eliminacion del Diario  N°'.$diario->diario_codigo.'  relacionado al ingreso de Bodega N°-> '.$ingreso->cabecera_ingreso_numero, $ingreso->cabecera_ingreso_numero, 'Permiso con id -> '.$id);
                     foreach ($diario->detalles as $diariodetalle) {
                         $diariodetalle->delete();
@@ -314,7 +320,7 @@ class ingresoBodegaController extends Controller
                     }
                     $diario->delete();
                     $auditoria->registrarAuditoria('Eliminacion del  diario  N°'.$diario->diario_codigo .'relacionado al ingreso de Bodega N°-> '.$ingreso->cabecera_ingreso_numero, $ingreso->cabecera_ingreso_numero, 'Permiso con id -> '.$id);
-                }
+                
             }
             $movimiento->delete();
             $auditoria->registrarAuditoria('Eliminacion del Movimiento  motivo'.$movimiento->movimiento_motivo.' y tipo '.$movimiento->movimiento_tipo.'  relacionado al ingreso de Bodega N°-> '.$ingreso->cabecera_ingreso_numero,$ingreso->cabecera_ingreso_numero,'Permiso con id -> '.$id);   

@@ -333,7 +333,7 @@ class generalController extends Controller
             mkdir($ruta, 0777, true);
         }
         $nombreArchivo = 'NT-'.$nota->nt_numero. ".pdf";
-        $view =  \View::make('admin.formatosPDF.notaEntrega', ['nt'=>$nota,'empresa'=>$empresa]);
+        $view =  \View::make('admin.formatosPDF.notaentrega', ['nt'=>$nota,'empresa'=>$empresa]);
         if($url == 0){
             return PDF::loadHTML($view)->save($ruta.'/'.$nombreArchivo)->stream('notaEntrega.pdf');
         }else{
