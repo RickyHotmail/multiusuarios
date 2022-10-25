@@ -469,7 +469,7 @@ class cobrosClientesController extends Controller
                     $datos[$count]['sal'] = ''; 
                     $datos[$count]['val'] = $pago->detalle_pago_valor; 
                     $datos[$count]['fep'] = DateTime::createFromFormat('Y-m-d', $pago->pagoCXC->pago_fecha)->format('d/m/Y');  
-                    $datos[$count]['dip'] = $pago->pagoCXC->diario->diario_codigo; 
+                    $datos[$count]['dip'] = ''; 
                     $datos[$count]['ref'] = $pago->detalle_pago_descripcion; 
                     $datos[$count]['chk'] = '1';
                     if($pago->pagoCXC->pago_tipo == 'NOTA DE CRÉDITO' or $pago->pagoCXC->pago_tipo == 'COMPROBANTE DE RETENCION DE VENTA'){
