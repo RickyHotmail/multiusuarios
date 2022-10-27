@@ -174,7 +174,7 @@
                                     <option value="" selected disabled hidden>Selecione una opcion</option>
                                     <option value="EN EFECTIVO">EN EFECTIVO</option>
                                     <option value="CONTADO">CONTADO</option>
-                                    <option value="CREDITO" selected>CREDITO</option>                                   
+                                    <option value="CREDITO">CREDITO</option>                                   
                                 </select>
                             </div>
                         </div>
