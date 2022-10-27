@@ -219,12 +219,11 @@ class cargarXMLController extends Controller
                                 $datos[$count]['numero'] = $data[$i][1];
                                 $datos[$count]['clave'] = $data[$i][9];
                                 $datos[$count]['doc'] = $data[$i][0];       
-                                             
+                                $data[$i]=explode("\t", $registros[$i+1]);   
+                                $datos[$count]['total'] = $data[$i][0];          
                                 $count ++;
                             }
                         }   
-                    }else{
-                        $datos[$count-1]['total'] = $data[$i][0];    
                     }                    
                 }       
                // return $datos;     
