@@ -173,7 +173,8 @@
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" style="margin-bottom : 0px;">
                             <div class="form-group">
                                 <select id="transaccion_tipo_pago" name="transaccion_tipo_pago"
-                                    class="form-control custom-select" data-live-search="true" onchange="cambioPago();">
+                                    class="form-control custom-select" data-live-search="true" onchange="cambioPago();" required>
+                                    <option value="" selected disabled hidden>Selecione una opcion</option>
                                     <option value="EN EFECTIVO">EN EFECTIVO</option>
                                     <option value="CONTADO">CONTADO</option>
                                     <option value="CREDITO" selected>CREDITO</option>
