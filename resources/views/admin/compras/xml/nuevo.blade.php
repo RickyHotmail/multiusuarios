@@ -895,7 +895,7 @@
                                     </tr>
                                     <tr>
                                         <td class="letra-blanca fondo-verde-claro negrita">Total Factura XML</td>
-                                        <td id="totalxml" name="totalxml" class="derecha-texto negrita">0.00</td>
+                                        <td id="idtotalxml" name="idtotalxml" class="derecha-texto negrita">0.00</td>
                                        
                                     </tr>
 
@@ -941,7 +941,7 @@ porcentajeIva = parseFloat(porcentajeIva) / 100;
 
 function cargarmetodo(){
     
-    document.getElementById("totalxml").innerHTML=Number(<?php echo $totalxml;?>).toFixed(2);
+    document.getElementById("idtotalxml").innerHTML=round(<?php echo $totalxml;?>);
     
     $('#transaccion_porcentaje_iva').css('pointer-events', 'none');
      id_item =<?php echo $count;?>;
@@ -1355,7 +1355,7 @@ function validarForm(){
         return false
     }
    
-    if (Number(document.getElementById("total").innerHTML) != Number(document.getElementById("totalxml").innerHTML)) {
+    if (Number(document.getElementById("total").innerHTML) != Number(document.getElementById("idtotalxml").innerHTML)) {
         let text = "EL TOTAL DEL XML ES DIFERENTE A LA FACTURA INGRESADA DESEA GUARDAR LA FACTURA";
         if (confirm(text) == true) {
             return true;

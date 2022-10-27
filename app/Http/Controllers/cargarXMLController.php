@@ -98,10 +98,15 @@ class cargarXMLController extends Controller
                     $codigos = Codigo_Producto::buscarproductoproveedor($poveedorXML->proveedor_id)->get();
                     $coun=1;
                     
-                            $totalxml=$request->get('total');
+                           
                             
                     foreach($xmlEnvio->detalles->detalle as $adicional){ 
-                        
+                        if($xmlEnvio->infoTributaria->codDoc=='04'){
+                            $totalxml=$totalxml+$adicional->precioTotalSinImpuesto+$adicional->impuestos->impuesto->valor-$adicional->descuento;
+                        }
+                        else{
+                            $totalxml=$request->get('total');
+                        }
                         $activador=false;
                         $vari=trim(strval($adicional->codigoPrincipal));
                           
@@ -218,9 +223,14 @@ class cargarXMLController extends Controller
                                 $datos[$count]['fecha'] = $data[$i][4];
                                 $datos[$count]['numero'] = $data[$i][1];
                                 $datos[$count]['clave'] = $data[$i][9];
-                                $datos[$count]['doc'] = $data[$i][0];       
-                                $data[$i]=explode("\t", $registros[$i+1]);   
-                                $datos[$count]['total'] = $data[$i][0];          
+                                $datos[$count]['doc'] = $data[$i][0];                   
+                                if($data[$i][0] == 'Notas de Crédito'){
+                                    $datos[$count]['total'] ='0';
+                                }    
+                                else{
+                                    $data[$i]=explode("\t", $registros[$i+1]);  
+                                    $datos[$count]['total'] = $data[$i][0];  
+                                }      
                                 $count ++;
                             }
                         }   
@@ -361,13 +371,18 @@ class cargarXMLController extends Controller
                     $coun=1;
                    
                         
-                    $totalxml=$total;
+             
                            
                     
                     
                     foreach($xmlEnvio->detalles->detalle as $adicional){ 
-                        
-                        
+                        if($xmlEnvio->infoTributaria->codDoc=='04'){
+                            $totalxml=$totalxml+$adicional->precioTotalSinImpuesto+$adicional->impuestos->impuesto->valor-$adicional->descuento;
+                        }
+                        else{
+                            $totalxml=$total;
+                        }
+                       
                         $activador=false;
                         $vari=trim(strval($adicional->codigoPrincipal));
                         foreach ($codigos as $codigo) {
