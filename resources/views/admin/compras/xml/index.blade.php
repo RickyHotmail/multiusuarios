@@ -43,8 +43,8 @@
                         <td>{{ $datos[$i]['fecha'] }}</td>
                         <td>{{ $datos[$i]['doc'] }}</td>
                         <td>{{ $datos[$i]['numero'] }}</td>
-                        <td>{{ $datos[$i]['clave'] }}</td>
-                        <td>{{ $datos[$i]['total'] }}</td>
+                        <td>'{{ $datos[$i]['clave'] }}'</td>
+                        <td> {{ number_format($datos[$i]['total'],2) }}</td>
                     </tr>   
                     @endfor
                 @endif
