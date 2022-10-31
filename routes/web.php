@@ -1568,6 +1568,10 @@ Route::get('/ordenRecepecion/{id}/imprimir',  [ordenRecepcionController::class, 
 //cargar Compras XML
 Route::get('/compras/xml/{punto}',  [cargarXMLController::class, 'nuevo'])->middleware('auth');
 Route::post('/compras/xml',  [cargarXMLController::class, 'cargar'])->middleware('auth');
+
+Route::get('/reporte/xml',  [cargarXMLController::class, 'nuevoxml'])->middleware('auth');
+Route::post('/reporte/xml',  [cargarXMLController::class, 'cargarxml'])->middleware('auth');
+
 Route::get('/compras/xmlProcesar/{clave}/{punto}/{total}',  [cargarXMLController::class, 'procesar'])->middleware('auth');
 
 //cargar Compras XML
