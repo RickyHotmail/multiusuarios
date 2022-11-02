@@ -121,6 +121,7 @@
                         <option value="Agente de Retención" @if($empresa->empresa_tipo == 'Agente de Retención') selected @endif>Agente de Retención</option>
                         <option value="Contribuyente Especial" @if($empresa->empresa_tipo == 'Contribuyente Especial') selected @endif>Contribuyente Especial</option>
                         <option value="Contribuyente Régimen Rimpe" @if($empresa->empresa_tipo == 'Contribuyente Régimen Rimpe') selected @endif>Contribuyente Régimen Rimpe</option>
+                        <option value="Contribuyente Regimen General" @if($empresa->empresa_tipo == 'Contribuyente Regimen General') selected @endif>Contribuyente Regimen General</option>
                     </select>
                 </div>
             </div>

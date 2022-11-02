@@ -171,10 +171,11 @@
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" style="margin-bottom : 0px;">
                             <div class="form-group">
                                 <select id="transaccion_tipo_pago" name="transaccion_tipo_pago"
-                                    class="form-control custom-select" data-live-search="true" onchange="cambioPago();">
+                                    class="form-control custom-select" data-live-search="true" onchange="cambioPago();"required>
+                                    <option value="" selected disabled hidden>Selecione una opcion</option>
                                     <option value="EN EFECTIVO">EN EFECTIVO</option>
                                     <option value="CONTADO">CONTADO</option>
-                                    <option value="CREDITO" selected>CREDITO</option>
+                                    <option value="CREDITO" >CREDITO</option>
                                 </select>
                             </div>
                         </div>
@@ -895,7 +896,7 @@
                                     </tr>
                                     <tr>
                                         <td class="letra-blanca fondo-verde-claro negrita">Total Factura XML</td>
-                                        <td id="totalXML" class="derecha-texto negrita">{{$totalxml}}</td>
+                                        <td id="idtotalxml" name="idtotalxml" class="derecha-texto negrita">0.00</td>
                                        
                                     </tr>
 
@@ -940,6 +941,9 @@ var porcentajeIva = combo.options[combo.selectedIndex].text;
 porcentajeIva = parseFloat(porcentajeIva) / 100;
 
 function cargarmetodo(){
+    
+    document.getElementById("idtotalxml").innerHTML=round(<?php echo $totalxml;?>);
+    
     $('#transaccion_porcentaje_iva').css('pointer-events', 'none');
      id_item =<?php echo $count;?>;
     document.getElementById("subtotal").innerHTML = (<?php echo $subtotal;?>).toFixed(2);
@@ -1352,7 +1356,7 @@ function validarForm(){
         return false
     }
    
-    if (Number(document.getElementById("total").innerHTML) != Number(document.getElementById("totalXML").innerHTML)) {
+    if (Number(document.getElementById("total").innerHTML) != Number(document.getElementById("idtotalxml").innerHTML)) {
         let text = "EL TOTAL DEL XML ES DIFERENTE A LA FACTURA INGRESADA DESEA GUARDAR LA FACTURA";
         if (confirm(text) == true) {
             return true;

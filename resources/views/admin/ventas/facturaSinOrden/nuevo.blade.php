@@ -169,11 +169,12 @@
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" style="margin-bottom : 0px;">
                             <div class="form-group">
-                                <select id="factura_tipo_pago" name="factura_tipo_pago" class="form-control show-tick "
-                                    data-live-search="true" onchange="cambioPago(); eliminarTodo();credito();">
+                            <select id="factura_tipo_pago" name="factura_tipo_pago" class="form-control show-tick "
+                                    data-live-search="true" onchange="cambioPago(); eliminarTodo();credito();" required>
+                                    <option value="" selected disabled hidden>Selecione una opcion</option>
                                     <option value="EN EFECTIVO">EN EFECTIVO</option>
                                     <option value="CONTADO">CONTADO</option>
-                                    <option value="CREDITO" selected>CREDITO</option>                                   
+                                    <option value="CREDITO">CREDITO</option>                                   
                                 </select>
                             </div>
                         </div>

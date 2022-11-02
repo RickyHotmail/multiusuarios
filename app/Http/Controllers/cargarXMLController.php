@@ -32,8 +32,20 @@ class cargarXMLController extends Controller
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
             return view('admin.compras.xml.index',['punto'=>$punto,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+        }
+        catch(\Exception $ex){      
+            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
+    }
+    public function nuevoxml()
+    {
+        try{
+            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
+            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
+    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            return view('admin.compras.xml.cargarxml',['PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
         }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
@@ -69,7 +81,7 @@ class cargarXMLController extends Controller
             $datos=null;
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();        
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();        
             $rangoDocumento=Rango_Documento::PuntoRango($request->get('punto'),'Comprobante de Retención')->first();
             $cajaAbierta=Arqueo_Caja::arqueoCajaxuser(Auth::user()->user_id)->first();
             $secuencial=1;
@@ -97,15 +109,15 @@ class cargarXMLController extends Controller
                     }
                     $codigos = Codigo_Producto::buscarproductoproveedor($poveedorXML->proveedor_id)->get();
                     $coun=1;
-                    if($xmlEnvio->infoTributaria->codDoc=='01'){
-                        if (isset($xmlEnvio->infoFactura->pagos)) {
-                            $totalxml=$xmlEnvio->infoFactura->pagos->pago->total;
-                            $activacion=true;
-                        }
-                    }
+                    
+                           
+                            
                     foreach($xmlEnvio->detalles->detalle as $adicional){ 
-                        if($activacion==false){
+                        if($xmlEnvio->infoTributaria->codDoc=='04'){
                             $totalxml=$totalxml+$adicional->precioTotalSinImpuesto+$adicional->impuestos->impuesto->valor-$adicional->descuento;
+                        }
+                        else{
+                            $totalxml=$request->get('total');
                         }
                         $activador=false;
                         $vari=trim(strval($adicional->codigoPrincipal));
@@ -203,7 +215,7 @@ class cargarXMLController extends Controller
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
             $datos = null;
             $count = 1;
             if($request->file('file_sri')->isValid()){
@@ -223,7 +235,14 @@ class cargarXMLController extends Controller
                                 $datos[$count]['fecha'] = $data[$i][4];
                                 $datos[$count]['numero'] = $data[$i][1];
                                 $datos[$count]['clave'] = $data[$i][9];
-                                $datos[$count]['doc'] = $data[$i][0];                      
+                                $datos[$count]['doc'] = $data[$i][0];                   
+                                if($data[$i][0] == 'Notas de Crédito'){
+                                    $datos[$count]['total'] ='0';
+                                }    
+                                else{
+                                    $data[$i]=explode("\t", $registros[$i+1]);  
+                                    $datos[$count]['total'] = $data[$i][0];  
+                                }      
                                 $count ++;
                             }
                         }   
@@ -231,13 +250,91 @@ class cargarXMLController extends Controller
                 }       
                // return $datos;     
             }
-            return view('admin.compras.xml.index',['datos'=>$datos,'punto'=>$request->get('puntoID'),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+            return view('admin.compras.xml.index',['datos'=>$datos,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
         }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
-    public function procesarproducto($clave,$punto)
+    public function cargarxml(Request $request)
+    {
+        try{
+            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
+            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            $datos = null;
+            $count = 1;
+
+            if($request->file('file_sri')->isValid()){
+                $empresa = Empresa::empresa()->first();
+                $name = $empresa->empresa_ruc. '-SRI.' .$request->file('file_sri')->getClientOriginalExtension();
+                $path = $request->file('file_sri')->move(public_path().'\temp', $name); 
+                $contenido = file_get_contents ($path);
+                $contenido = utf8_encode($contenido);
+                $registros = explode ( "\n", $contenido);
+                for ($i = 2; $i < sizeof($registros); $i ++) {
+                    $data[$i] = explode("\t", $registros[$i]);
+                    if(count($data[$i])>1){
+                        $transaccion = Transaccion_Compra::TransaccionByAutorizacion($data[$i][9])->first();
+                        if(isset($transaccion->transaccion_id) == false){
+                            if($data[$i][0] == 'Factura' or $data[$i][0] == 'Notas de Crédito' or $data[$i][0] == 'Notas de Débito'){
+                                $datos[$count]['proveedor'] = $data[$i][3];
+                                $datos[$count]['fecha'] = $data[$i][4];
+                                $datos[$count]['numero'] = $data[$i][1];
+                                $datos[$count]['clave'] = $data[$i][9];
+                                $descuento = 0;
+                                $impuesto = 0;
+                                $subtotal = 0;
+                                $total = 0;
+                                $impuesto0 = 0;
+                                $impuesto12 = 0;
+
+                                $electrocnico = new facturacionElectronicaController();
+                                $consultaDoc = $electrocnico->consultarDOC($data[$i][9]);
+                                if ($consultaDoc['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['estado'] == 'AUTORIZADO') {
+                                    $xmlEnvio = simplexml_load_string($consultaDoc['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['comprobante']);
+                                    foreach($xmlEnvio->detalles->detalle as $adicional){ 
+                                        
+                                       
+                                        $descuento=$descuento+$adicional->descuento;
+                                        $subtotal=$subtotal+$adicional->precioTotalSinImpuesto;
+                                        if($adicional->impuestos->impuesto->tarifa=='0'){
+                                            $impuesto0=$impuesto0+$adicional->impuestos->impuesto->baseImponible;
+                                        }
+                                        else{
+                                            $impuesto12=$impuesto12+$adicional->impuestos->impuesto->baseImponible;
+                                            $impuesto=$impuesto+$adicional->impuestos->impuesto->valor;
+                                        }
+                                    }
+                                }
+                                $datos[$count]['descuento'] = $descuento;        
+                                $datos[$count]['impuesto'] = $impuesto;        
+                                $datos[$count]['subtotal'] = $subtotal;        
+                                $datos[$count]['impuesto0'] = $impuesto0;        
+                                $datos[$count]['impuesto12'] = $impuesto12;        
+
+                                $datos[$count]['doc'] = $data[$i][0];                   
+                                if($data[$i][0] == 'Notas de Crédito'){
+                                    $datos[$count]['total'] =$subtotal+$impuesto;
+                                }    
+                                else{
+                                    $data[$i]=explode("\t", $registros[$i+1]);  
+                                    $datos[$count]['total'] = $data[$i][0];  
+                                }      
+                                $count ++;
+                            }
+                        }   
+                    }                    
+                }       
+               // return $datos;     
+            }
+            return view('admin.compras.xml.cargarxml',['datos'=>$datos,'punto'=>$request->get('puntoID'),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+        }
+        catch(\Exception $ex){      
+            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
+    }
+    public function procesarproducto($clave,$punto,$total)
     {
         try{
             $firmaElectronica = Firma_Electronica::firma()->first();
@@ -246,7 +343,7 @@ class cargarXMLController extends Controller
             $datos=null;
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();        
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();        
             $rangoDocumento=Rango_Documento::PuntoRango($punto,'Comprobante de Retención')->first();
             $cajaAbierta=Arqueo_Caja::arqueoCajaxuser(Auth::user()->user_id)->first();
             $secuencial=1;
@@ -304,14 +401,14 @@ class cargarXMLController extends Controller
                     }
                    
                    
-                        return view('admin.compras.xml.productos',['clave'=>$clave,'punto'=>$punto,'productos'=>$productos,'datos'=>$datos,'poveedorXML'=>$poveedorXML,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+                        return view('admin.compras.xml.productos',['total'=>$total,'clave'=>$clave,'punto'=>$punto,'productos'=>$productos,'datos'=>$datos,'poveedorXML'=>$poveedorXML,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
                     
                     
                     
                    
                 }
                
-                return view('admin.compras.xml.productos',['clave'=>$clave,'punto'=>$punto,'productos'=>$productos,'datos'=>$datos,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+                return view('admin.compras.xml.productos',['total'=>$total,'clave'=>$clave,'punto'=>$punto,'productos'=>$productos,'datos'=>$datos,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
                     
             }else{
                 return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir retenciones, configueros y vuelva a intentar');
@@ -321,7 +418,7 @@ class cargarXMLController extends Controller
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
-    public function procesar($clave,$punto)
+    public function procesar($clave,$punto,$total)
     {
         try{
             $firmaElectronica = Firma_Electronica::firma()->first();
@@ -362,18 +459,20 @@ class cargarXMLController extends Controller
                     }
                     $codigos = Codigo_Producto::buscarproductoproveedor($poveedorXML->proveedor_id)->get();
                     $coun=1;
-                    if($xmlEnvio->infoTributaria->codDoc=='01'){
-                        if (isset($xmlEnvio->infoFactura->pagos)) {
-                            $totalxml=$xmlEnvio->infoFactura->pagos->pago->total;
-                            $activacion=true;
-                        }
-                    }
+                   
+                        
+             
+                           
+                    
                     
                     foreach($xmlEnvio->detalles->detalle as $adicional){ 
-                        if($activacion==false){
+                        if($xmlEnvio->infoTributaria->codDoc=='04'){
                             $totalxml=$totalxml+$adicional->precioTotalSinImpuesto+$adicional->impuestos->impuesto->valor-$adicional->descuento;
                         }
-                        
+                        else{
+                            $totalxml=$total;
+                        }
+                       
                         $activador=false;
                         $vari=trim(strval($adicional->codigoPrincipal));
                         foreach ($codigos as $codigo) {

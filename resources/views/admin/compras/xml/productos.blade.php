@@ -17,6 +17,7 @@
                     <input type="hidden" id="idproveedor" name="idproveedor" value="{{$poveedorXML->proveedor_id}}" required>
                     <input type="hidden" id="punto" name="punto" value="{{$punto}}" required>
                     <input type="hidden" id="clave" name="clave" value="{{$clave}}" required>
+                    <input type="hidden" id="total" name="total" value="{{$total}}" required>
                     <label for="dias" class="col-form-label">{{$poveedorXML->proveedor_nombre}} </label>
                 </div>
             </div>  

@@ -1568,7 +1568,11 @@ Route::get('/ordenRecepecion/{id}/imprimir',  [ordenRecepcionController::class, 
 //cargar Compras XML
 Route::get('/compras/xml/{punto}',  [cargarXMLController::class, 'nuevo'])->middleware('auth');
 Route::post('/compras/xml',  [cargarXMLController::class, 'cargar'])->middleware('auth');
-Route::get('/compras/xmlProcesar/{clave}/{punto}',  [cargarXMLController::class, 'procesar'])->middleware('auth');
+
+Route::get('/reporte/xml',  [cargarXMLController::class, 'nuevoxml'])->middleware('auth');
+Route::post('/reporte/xml',  [cargarXMLController::class, 'cargarxml'])->middleware('auth');
+
+Route::get('/compras/xmlProcesar/{clave}/{punto}/{total}',  [cargarXMLController::class, 'procesar'])->middleware('auth');
 
 //cargar Compras XML
 Route::get('/comprasactivofijo/xml/{punto}',  [cargaractivofijoXMLController::class, 'nuevo'])->middleware('auth');
@@ -1588,7 +1592,7 @@ Route::post('/utilidadProducto',  [reporteUtilidadController::class, 'consultar'
 Route::get('/retencionRecibidaXML',  [cargarRetencionXMLController::class, 'nuevo'])->middleware('auth');
 Route::post('/retencionRecibidaXML',  [cargarRetencionXMLController::class, 'consultar'])->middleware('auth');
 
-Route::get('/compras/xmlProducto/{clave}/{punto}',  [cargarXMLController::class, 'procesarproducto'])->middleware('auth');
+Route::get('/compras/xmlProducto/{clave}/{punto}/{total}',  [cargarXMLController::class, 'procesarproducto'])->middleware('auth');
 Route::get('/comprasactivofijo/xmlProducto/{clave}/{punto}',  [cargaractivofijoXMLController::class, 'procesarproducto'])->middleware('auth');
 
 Route::post('/producto/compra',  [cargarXMLController::class, 'cargarproducto'])->middleware('auth');
