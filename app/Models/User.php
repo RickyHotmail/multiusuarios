@@ -62,6 +62,10 @@ class User extends Authenticatable
         return $query->where('user_correo','=',$mail);
     }
 
+    public function scopeFindByEmpresa($query, $empresa_id){
+        return $query->where('empresa_id','=', $empresa_id)->where('user_username','<>','SuperAdministrador')->where('user_estado','=','1')->orderBy('user_username','asc');
+    }
+
     public function roles(){
         return $this->hasManyThrough(Rol::class, Usuario_Rol::class, 'user_id', 'rol_id', 'user_id', 'rol_id');
     }

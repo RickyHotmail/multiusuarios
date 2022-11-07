@@ -337,10 +337,22 @@ Route::get('/recuperarClave', [usuarioController::class,'recuperarCuenta']);
 Route::post('/recuperarClave', [usuarioController::class,'enviarNuevaClave']);
 Route::get('/pagos', [SuscripcionController::class,'pago'])->middleware('auth');
 Route::get('/suscri', [SuscripcionController::class,'pago'])->middleware('auth');
+Route::post('/pagos', [SuscripcionController::class,'registrarPago'])->middleware('auth');
 Route::get('/gestionPermisos', [permisoGeneralController::class,'index'])->middleware('auth');
 Route::post('/gestionPermisos/guardar', [permisoGeneralController::class,'store'])->middleware('auth');
 Route::get('/permisosAdministrador/actualizar', [permisoGeneralController::class,'actualizarPermisosAdministrador'])->middleware('auth');
 Route::get('/permisosAdministrador/{id}/actualizarMedico', [permisoGeneralController::class,'actualizarPermisosMedico'])->middleware('auth');
+
+//Administracion
+Route::get('/administracion', [administracionGeneralController::class,'index'])->middleware('auth');
+Route::get('/administracion/empresa/{id}/verusuarios', [administracionGeneralController::class,'verUsuarios'])->middleware('auth');
+Route::post('/administracion/usuarios/{id}/restablecerclaveusuario', [administracionGeneralController::class,'restablecerClaveUsuario'])->middleware('auth');
+
+Route::get('/administracion/empresa/{id}/verpermisos', [administracionGeneralController::class,'verPermisos'])->middleware('auth');
+Route::get('/administracion/empresa/{id}/actualizarPermisos', [administracionGeneralController::class,'actualizarPermisos'])->middleware('auth');
+
+Route::get('/administracion/pagos/{id}', [administracionGeneralController::class,'verPagos'])->middleware('auth');
+Route::post('/administracion/verificarPago', [administracionGeneralController::class,'activarPago'])->middleware('auth');
 
 
 Route::get('/buscarimpuestorenta/searchN/', [impuestoRentaRolController::class, 'buscarBy'])->middleware('auth');
@@ -1065,6 +1077,7 @@ Route::post('/producto/precio', [productoController::class, 'guardarPrecio'])->m
 /*CODIGO PRODUCTO PROVEEDOR*/
 Route::get('/producto/codigo/{id}', [productoController::class, 'nuevoCodigo'])->middleware('auth');
 Route::post('/producto/codigo', [productoController::class, 'guardarCodigo'])->middleware('auth');
+Route::post('/producto/quickStore', [productoController::class, 'storeQuick'])->middleware('auth');
 /*ANEXO TRANSACCIONAL SIMPLIFICADO*/
 Route::get('/atsSRI', [AtsController::class, 'nuevo'])->middleware('auth');
 Route::post('/atsSRI', [AtsController::class, 'consultar'])->middleware('auth');
@@ -1535,6 +1548,11 @@ Route::get('/factura/{id}/ordenDespacho',  [listaFacturaController::class, 'orde
 Route::get('/factura/{id}/eliminar',  [listaFacturaController::class, 'eliminar'])->middleware('auth');
 Route::get('/factura/{id}/imprimir',  [listaFacturaController::class, 'imprimir'])->middleware('auth');
 Route::get('/factura/{id}/imprimirRecibo    ',  [listaFacturaController::class, 'imprimirRecibo'])->middleware('auth');
+
+Route::get('/configurarImpresion',  [empresaController::class, 'configurarImpresion'])->middleware('auth');
+Route::post('/configurarImpresion',  [empresaController::class, 'guardarConfiguracionImpresion'])->middleware('auth');
+
+
 
 Route::post('/verificarEstadoCompra',  [verificarComprasSriController::class, 'verificarCompra'])->middleware('auth');
 

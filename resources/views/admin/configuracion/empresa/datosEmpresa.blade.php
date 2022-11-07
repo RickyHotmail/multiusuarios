@@ -88,6 +88,19 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label for="idContabilidad" class="col-sm-2 col-form-label">Lleva Inventario</label>
+                <div class="col-sm-10">
+                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                        @if($empresa->empresa_control_inventario=="1")    
+                            <input type="checkbox" class="custom-control-input" id="idInventario" name="idInventario" checked>
+                        @else
+                            <input type="checkbox" class="custom-control-input" id="idInventario" name="idInventario">
+                        @endif
+                        <label class="custom-control-label" for="idInventario"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="idContabilidad" class="col-sm-2 col-form-label">Lleva Contabilidad</label>
                 <div class="col-sm-10">
                     <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">

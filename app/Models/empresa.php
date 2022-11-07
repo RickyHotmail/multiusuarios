@@ -34,14 +34,16 @@ class Empresa extends Model
         'empresa_electronica',
         'empresa_nomina',
         'empresa_medico',
-        'empresa_estado_cambiar_precio', 
+        'empresa_estado_cambiar_precio',
+        'empresa_control_inventario',
         'empresa_estado', 
 
     ];
     protected $guarded =[
     ];
     public function scopeEmpresas($query){
-        return $query->where('empresa_estado','=','1')->orderBy('empresa_razonSocial','asc');
+        return $query->orderBy('created_at','asc')
+                     ->orderBy('empresa_razonSocial','asc');
     }
     public function scopeEmpresa($query){
         return $query->where('empresa_id','=',Auth::user()->empresa_id);

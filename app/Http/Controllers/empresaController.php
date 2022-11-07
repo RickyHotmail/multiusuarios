@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Empresa;
 use App\Models\GrupoPer;
+use App\Models\Parametrizacion_Impresion;
 use App\Models\Permiso;
 use App\Models\Punto_Emision;
 use App\Models\Rol;
@@ -178,6 +179,35 @@ class empresaController extends Controller
         }
     }
 
+    public function configurarImpresion(){
+        $parametrizacionImpresion=Parametrizacion_Impresion::parametrizacionImpresion()->first();
+
+        return view('admin.ventas.facturas.impresion', [
+            'impresion'=>$parametrizacionImpresion
+        ]);
+    }
+
+    public function guardarConfiguracionImpresion(Request $request){
+        try {
+            DB::beginTransaction();
+            $parametrizacionImpresion=Parametrizacion_Impresion::parametrizacionImpresion()->first();
+
+            if(!$parametrizacionImpresion){
+                $parametrizacionImpresion=new Parametrizacion_Impresion();
+                $parametrizacionImpresion->user_id=Auth::user()->user_id;
+            }
+
+            $parametrizacionImpresion->parametrizacioni_tipo=$request->idTipo;
+            $parametrizacionImpresion->save();
+
+            DB::commit();
+            return redirect('/configurarImpresion')->with('success','Actualizado Correctamente');
+        }catch(\Exception $ex){
+            DB::rollBack();
+            return redirect('configurarImpresion')->with('error','Ocurrió un error: '.$ex->getMessage());
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -234,6 +264,11 @@ class empresaController extends Controller
             }else{
                 $empresa->empresa_estado_cambiar_precio ="0";
             }
+            if ($request->get('idInventario') == "on"){
+                $empresa->empresa_control_inventario ="1";
+            }else{
+                $empresa->empresa_control_inventario ="0";
+            }
             $empresa->empresa_tipo =$request->get('idTipo');
             $empresa->empresa_contribuyenteEspecial =$request->get('idContribuyente');
             if ($request->get('idEstado') == "on"){
@@ -272,6 +307,11 @@ class empresaController extends Controller
             $empresa->empresa_cedula_contador =$request->get('idcedulacontador');
             $empresa->empresa_contador =$request->get('idcontador');
             $empresa->empresa_email =$request->get('idEmail');
+            if ($request->get('idInventario') == "on"){
+                $empresa->empresa_control_inventario ="1";
+            }else{
+                $empresa->empresa_control_inventario ="0";
+            }
             if ($request->get('idContabilidad') == "on"){
                 $empresa->empresa_llevaContabilidad ="1";
             }else{

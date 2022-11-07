@@ -89,6 +89,16 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label for="idEstado" class="col-sm-2 col-form-label">Lleva Inventario</label>
+                <div class="col-sm-10">
+                    @if($empresa->empresa_control_inventario=="1")
+                    <i class="fa fa-check-circle neo-verde"></i>
+                    @else
+                    <i class="fa fa-times-circle neo-rojo"></i>
+                    @endif
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="idEstado" class="col-sm-2 col-form-label">Lleva Contabilidad</label>
                 <div class="col-sm-10">
                     @if($empresa->empresa_llevaContabilidad=="1")

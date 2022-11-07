@@ -37,6 +37,7 @@ class CreateEmpresaTable extends Migration
             $table->string('empresa_nomina');
             $table->string('empresa_medico');
             $table->string('empresa_estado_cambiar_precio');
+            $table->string('empresa_control_inventario');
             $table->string('empresa_estado');
             $table->timestamps();
         });
