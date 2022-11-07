@@ -289,7 +289,7 @@
                    
                     <hr>
                     <div class="row">
-                        <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5" style="margin-bottom: 0px;">
+                        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="margin-bottom: 0px;">
                             <label>Nombre de Producto</label>
                             <div class="form-group">
                                 <div class="form-line">
@@ -303,6 +303,10 @@
                                         disponible.</span>
                                 </div>
                             </div>
+                        </div>
+                        <div id="btnAgregar" class="col-xs-1 col-sm-1 col-md-1 col-lg-1" style="display: none"> 
+                            <a id="btnMostarProductoNuevo" onclick="setearDatos()" data-toggle="modal" data-target="#modal-nuevo-producto" class="btn btn-primary btn-venta">
+                            <i class="fas fa-save"></i></a>
                         </div>
                         <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" style="margin-bottom: 0px;">
                             <center>
@@ -543,13 +547,252 @@
         </div>
     </form>
 </div>
-<!-- /.card -->
+<div class="modal fade" id="modal-nuevo-producto">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary">
+                <h4 class="modal-title">Nuevo Producto</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="formProducto" onsubmit="return guardarProducto()" class="form-horizontal" method="POST" action="{{ url("producto") }}">
+                @csrf
+                <div class="modal-body">
+                    <div class="card-body">                        
+                        <div class="form-group row">
+                            <label for="producto_codigo" class="col-sm-3 col-form-label">Codigo</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="producto_codigo" name="producto_codigo" placeholder="Codigo" maxlength="25" required>
+                            </div>
+                            <div class=" col-sm-1">
+                                <div class="icheck-success d-inline">
+                                    <input type="checkbox" id="idCodigo" name="idCodigo" onchange="codigo();">
+                                    <label for="idCodigo"></label>
+                                </div>
+                            </div>
+                            <label for="idCodigo" class="col-sm-3 col-form-label">Codigo Automatico</label>
+                        </div>
+                        <div class="form-group row">
+                            <label for="producto_nombre" class="col-sm-3 col-form-label">Porducto/Servicio</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="producto_nombre" name="producto_nombre" placeholder="Nombre" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="producto_codigo_barras" class="col-sm-3 col-form-label">Codigo Barras</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" maxlength="12" id="producto_codigo_barras" name="producto_codigo_barras" placeholder="Codigo Barras" onkeyup="codigoBarras();" value="0" required>
+                            </div>
+                            <div class="col-sm-4"><img id="IdBarras" style="padding-top: 4px;"/></div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="producto_tipo" class="col-sm-3 col-form-label">Tipo</label>
+                            <div class="col-sm-9">
+                                <select class="custom-select" id="producto_tipo" name="producto_tipo" onchange="tipoProdcuto()" required>
+                                    <option value="1">Articulo</option>
+                                    <option value="2">Servicio</option>                                    
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="producto_precio_costo" class="col-sm-3 col-form-label">Costo</label>
+                            <div class="col-sm-9">
+                                <input type="number" class="form-control" id="producto_precio_costo" name="producto_precio_costo" placeholder="0.00" value="0.00" step="any" required>
+                            </div>
+                        </div>                 
+                        <div class="form-group row">
+                            <label for="producto_stock_minimo" class="col-sm-3 col-form-label">Stock Minimo</label>
+                            <div class="col-sm-9">
+                                <input type="number" class="form-control" id="producto_stock_minimo" name="producto_stock_minimo" placeholder="0" value="0" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="producto_stock_maximo" class="col-sm-3 col-form-label">Stock Maximo</label>
+                            <div class="col-sm-9">
+                                <input type="number" class="form-control" id="producto_stock_maximo" name="producto_stock_maximo" placeholder="0" value="0" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="producto_fecha_ingreso" class="col-sm-3 col-form-label">Fecha Ingreso</label>
+                            <div class="col-sm-9">
+                                <input type="date" class="form-control" id="producto_fecha_ingreso" name="producto_fecha_ingreso" value="<?php echo date('Y-m-d'); ?>" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="producto_tiene_iva" class="col-sm-3 col-form-label">Tine Iva</label>
+                            <div class="col-sm-9">
+                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="producto_tiene_iva" name="producto_tiene_iva">
+                                    <label class="custom-control-label" for="producto_tiene_iva"></label>
+                                </div>
+                            </div>                
+                        </div>
+                        <div class="form-group row">
+                            <label for="producto_tiene_iva" class="col-sm-3 col-form-label">Tiene Descuento</label>
+                            <div class="col-sm-9">
+                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="producto_tiene_descuento" name="producto_tiene_descuento">
+                                    <label class="custom-control-label" for="producto_tiene_descuento"></label>
+                                </div>
+                            </div>                
+                        </div>                       
+                        <div class="form-group row">
+                            <label for="producto_tiene_serie" class="col-sm-3 col-form-label">Tiene Serie</label>
+                            <div class="col-sm-3">
+                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">                                   
+                                    <input type="checkbox" class="custom-control-input" id="producto_tiene_serie" name="producto_tiene_serie">                                    
+                                    <label class="custom-control-label" for="producto_tiene_serie"></label>
+                               </div>
+                            </div> 
+                        </div>
+                        <div class="form-group row">
+                            <label for="idCompraventa" class="col-sm-3 col-form-label">Compra y Venta</label>
+                            <div class="col-sm-9">
+                                <select class="custom-select" id="idCompraventa" name="idCompraventa" onchange="tipoProdcuto()" require>
+                                    <option value="1">Compra</option>
+                                    <option value="2">Venta</option>
+                                    <option value="3" selected>Compra/Venta</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="grupo_id" class="col-sm-3 col-form-label">Grupo</label>
+                            <div class="col-sm-9">
+                                <select class="custom-select select2" id="grupo_id" name="grupo_id" require>
+                                    @foreach($grupos as $grupo)
+                                        <option value="{{$grupo->grupo_id}}">{{$grupo->grupo_nombre}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="categoria_id" class="col-sm-3 col-form-label">Categoria</label>
+                            <div class="col-sm-9">
+                                <select class="custom-select select2" id="categoria_id" name="categoria_id" onchange="codigo();" require>
+                                    @foreach($categorias as $categoria)
+                                        <option value="{{$categoria->categoria_id}}">{{$categoria->categoria_nombre}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="marca_id" class="col-sm-3 col-form-label">Marca</label>
+                            <div class="col-sm-9">
+                                <select class="custom-select select2" id="marca_id" name="marca_id" require>
+                                    @foreach($marcas as $marca)
+                                        <option value="{{$marca->marca_id}}">{{$marca->marca_nombre}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="unidad_medida_id" class="col-sm-3 col-form-label">Unidad Medida</label>
+                            <div class="col-sm-9">
+                                <select class="custom-select select2" id="unidad_medida_id" name="unidad_medida_id" require>
+                                    @foreach($unidadMedidas as $unidadMedida)
+                                        <option value="{{$unidadMedida->unidad_medida_id}}">{{$unidadMedida->unidad_medida_nombre}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="tamano_id" class="col-sm-3 col-form-label">Tamaño</label>
+                            <div class="col-sm-9">
+                                <select class="custom-select select2" id="tamano_id" name="tamano_id" require>
+                                    @foreach($tamanos as $tamano)
+                                        <option value="{{$tamano->tamano_id}}">{{$tamano->tamano_nombre}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        @if(Auth::user()->empresa->empresa_llevaContabilidad == '1')
+                        <div class="form-group row" id='divVentas'>
+                            <label for="producto_cuenta_venta" class="col-sm-3 col-form-label">Cuenta de Venta</label>
+                            <div class="col-sm-9">
+                                <select class="custom-select select2" id="producto_cuenta_venta" name="producto_cuenta_venta" >
+                                    <option value="" label>--Seleccione una opcion--</option>
+                                    @foreach($cuentas as $cuenta)
+                                        <option value="{{$cuenta->cuenta_id}}">{{$cuenta->cuenta_numero.' - '.$cuenta->cuenta_nombre}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" id='divInventario'>
+                            <label for="producto_cuenta_inventario" class="col-sm-3 col-form-label">Cuenta de Inventario</label>
+                            <div class="col-sm-9">
+                                <select class="custom-select select2" id="producto_cuenta_inventario" name="producto_cuenta_inventario" >
+                                    <option value="" label>--Seleccione una opcion--</option>
+                                    @foreach($cuentas as $cuenta)
+                                        <option value="{{$cuenta->cuenta_id}}">{{$cuenta->cuenta_numero.' - '.$cuenta->cuenta_nombre}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row" id='divGasto'>
+                            <label for="producto_cuenta_gasto" class="col-sm-3 col-form-label">Cuenta de Gasto o Costo</label>
+                            <div class="col-sm-9">
+                                <select class="custom-select select2" id="producto_cuenta_gasto" name="producto_cuenta_gasto">
+                                    <option value="" label>--Seleccione una opcion--</option>
+                                    @foreach($cuentas as $cuenta)
+                                        <option value="{{$cuenta->cuenta_id}}">{{$cuenta->cuenta_numero.' - '.$cuenta->cuenta_nombre}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        @endif
+                        <div class="form-group row">
+                            <label for="sucursal_id" class="col-sm-3 col-form-label">Sucursal</label>
+                            <div class="col-sm-9">
+                                <select class="custom-select select2" id="sucursal_id" name="sucursal_id" require>
+                                    <option value="0">Todas</option>
+                                    @foreach($sucursales as $sucursal)
+                                        <option value="{{$sucursal->sucursal_id}}">{{$sucursal->sucursal_nombre}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group row">
+                            <label for="producto_precio1" class="col-sm-3 col-form-label">Precio Venta</label>
+                            <div class="col-sm-9">
+                                <input type="number" class="form-control" id="producto_precio1" name="producto_precio1" placeholder="0.000" step="any" min="0" value="0.000" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="sucursal_id" class="col-sm-3 col-form-label">Producto Camronera</label>
+                            <div class="col-sm-9">
+                                <div class="custom-control custom-radio">
+                                    <input class="custom-control-input" type="radio" id="customRadio1" name="producto_camaronero" value="1">
+                                    <label for="customRadio1" class="custom-control-label">Directo</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input class="custom-control-input" type="radio" id="customRadio2" name="producto_camaronero" value="2">
+                                    <label for="customRadio2" class="custom-control-label">Indirecto</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
 @section('scriptAjax')
 <script src="{{ asset('admin/js/ajax/autocompleteCliente.js') }}"></script>
 <script src="{{ asset('admin/js/ajax/autocompleteProducto.js') }}"></script>
 @endsection
 <script type="text/javascript">
 var id_item = 1;
+var lleva_inventario=@if($sucursal->empresa->empresa_control_inventario) true @else false @endif;
+
 document.getElementById("idTarifa0").value = 0;
 document.getElementById("idTarifa12").value = 0;
 var combo = document.getElementById("factura_porcentaje_iva");
@@ -576,6 +819,67 @@ function nuevo() {
     document.getElementById("buscarProducto").disabled = false;
     //document.getElementById("factura_porcentaje_iva").disabled  = true;
     document.getElementById("buscarCliente").disabled = false;
+}
+
+function setearDatos(){
+    document.getElementById('producto_nombre').value=document.getElementById('buscarProducto').value
+}
+
+function guardarProducto(){
+    var formdata = jQuery("#formProducto").serialize();
+    var decoded = decodeURIComponent(formdata);
+    strip = decoded.replace(/[\[\]]/g, "_");
+
+    $.ajax({
+        async: false,
+        url: "{{url('/producto/quickStore')}}",
+        dataType: "json",
+        type: "POST",
+        data: strip,
+        success: function(data){
+            console.log(data)
+            $('#modal-nuevo-producto').modal('hide');
+
+
+            if(data.result=="OK"){
+                jQuery("#formProducto")[0].reset()
+                document.getElementById('btnAgregar').style.display='none'
+                console.log("0")
+                if(!lleva_inventario){
+                    console.log("1")
+
+                    document.getElementById("id_pu").readOnly = false;
+                    if(data.producto.producto_tipo == "1") document.getElementById("id_pu").readOnly = true;
+                       
+                    
+					
+
+
+                    $("#codigoProducto").val(data.producto.producto_codigo);
+                    $("#idProductoID").val(data.producto.producto_id);
+                    $("#buscarProducto").val(data.producto.producto_nombre)
+                    $("#id_disponible").val(data.producto.producto_stock);
+                    $("#idtipoProducto").val(data.producto.producto_tipo);
+                    $("#idCV").val(data.producto.producto_compra_venta);
+                    if(data.producto.producto_tipo == '2'){
+                        $("#id_disponible").val(0);
+                    }
+                    if(data.producto.producto_tiene_iva == "1"){ 
+                        document.getElementById("tieneIva").checked = true;
+                    }else{
+                        document.getElementById("tieneIva").checked = false;
+                    }
+
+                    $("#id_pu").val(parseFloat(data.producto.producto_precio1).toFixed(2));
+                    calcularTotal();
+                }
+            }
+            else
+                alert('Ocurrió un error \n\n'+data.message)
+        },
+    });
+
+    return false;
 }
 
 function agregarItem() {
@@ -705,13 +1009,17 @@ function calcularTotal() {
     document.getElementById("buscarProducto").classList.remove('is-invalid');
     document.getElementById("errorStock").classList.add('invisible');
     if(document.getElementById("idtipoProducto").value  == '1' && document.getElementById("idCV").value  == '3'){
-        if (parseFloat(document.getElementById("id_cantidad").value) > parseFloat(document.getElementById("id_disponible")
-            .value)) {
+        if (parseFloat(document.getElementById("id_cantidad").value) > parseFloat(document.getElementById("id_disponible").value) && lleva_inventario) {
             document.getElementById("id_cantidad").value = 1;
-            document.getElementById("buscarProducto").classList.add('is-invalid');
-            document.getElementById("errorStock").classList.remove('invisible');
+
+            if(lleva_inventario){
+                document.getElementById("buscarProducto").classList.add('is-invalid');
+                document.getElementById("errorStock").classList.remove('invisible');
+            }
         }
     }
+
+    
     document.getElementById("id_total").value = Number(document.getElementById("id_cantidad").value * document
         .getElementById("id_pu").value).toFixed(2);
 }

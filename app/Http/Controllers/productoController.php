@@ -159,6 +159,90 @@ class productoController extends Controller
         }
     }
 
+    public function storeQuick(Request $request){
+       try{
+            DB::beginTransaction();
+            $producto = new Producto();
+            $producto->producto_codigo = $request->get('producto_codigo');
+            $producto->producto_nombre = $request->get('producto_nombre');
+            $producto->producto_codigo_barras = $request->get('producto_codigo_barras');
+            $producto->producto_tipo = $request->get('producto_tipo');
+            $producto->producto_precio_costo = $request->get('producto_precio_costo');           
+            $producto->producto_stock = "0";
+            $producto->producto_stock_minimo = $request->get('producto_stock_minimo');
+            $producto->producto_stock_maximo = $request->get('producto_stock_maximo');
+            $producto->producto_fecha_ingreso = $request->get('producto_fecha_ingreso');
+            if ($request->get('producto_tiene_iva') == "on"){
+                $producto->producto_tiene_iva ="1";
+            }else{
+                $producto->producto_tiene_iva ="0";
+            }
+            if ($request->get('producto_tiene_descuento') == "on"){
+                $producto->producto_tiene_descuento ="1";
+            }else{
+                $producto->producto_tiene_descuento ="0";
+            }
+            if ($request->get('producto_tiene_serie') == "on"){
+                $producto->producto_tiene_serie ="1";
+            }else{
+                $producto->producto_tiene_serie ="0";
+            }   
+              
+            $producto->producto_compra_venta = $request->get('idCompraventa');
+            $producto->producto_precio1 = $request->get('producto_precio1');
+            $producto->producto_estado = 1;
+           
+            if(Auth::user()->empresa->empresa_llevaContabilidad == '1'){
+                $producto->producto_cuenta_inventario = $request->get('producto_cuenta_inventario');
+                $producto->producto_cuenta_venta = $request->get('producto_cuenta_venta');
+                $producto->producto_cuenta_gasto = $request->get('producto_cuenta_gasto');
+            }
+            $producto->categoria_id = $request->get('categoria_id');
+            $producto->marca_id = $request->get('marca_id');
+            $producto->unidad_medida_id = $request->get('unidad_medida_id');
+            $producto->empresa_id = Auth::user()->empresa_id;
+            $producto->tamano_id  = $request->get('tamano_id');
+            $producto->grupo_id  = $request->get('grupo_id');
+
+            if($request->get('sucursal_id') != '0'){
+                $producto->sucursal_id  = $request->get('sucursal_id');
+            }else{
+                $sucursal=Sucursal::Sucursales()->first();
+                $producto->sucursal_id=$sucursal->sucursal_id;    
+            }
+
+            if(Auth::user()->empresa->camaronera){
+                if($request->get('producto_camaronero')){
+                    $producto->producto_camaronero  = $request->get('producto_camaronero');
+                }
+            }
+            $producto->save();
+
+            $grupo=Grupo_Producto::findOrFail($request->get('grupo_id'));
+
+            if($grupo->grupo_nombre=="Laboratorio"){
+                $examen=Examen::examenByIdProducto($producto->producto_id)->first();
+
+                if(empty($examen))  $examen= new Examen;
+
+                $examen->examen_estado = 1;
+                $examen->producto_id = $producto->producto_id;
+                $examen->save();
+            }
+
+            
+            /*Inicio de registro de auditoria */
+            $auditoria = new generalController();
+            $auditoria->registrarAuditoria('Registro de producto -> '.$request->get('producto_nombre').'con codigo de ->'.$request->get('producto_codigo'),'0','');
+            /*Fin de registro de auditoria */
+            DB::commit();
+            return json_encode(array('result' => 'OK', 'producto'=>$producto));
+        }catch(\Exception $ex){
+            DB::rollBack();
+            return json_encode(array('respuesta' => 'FAIL', 'message'=>$ex->getMessage()));
+        }
+    }
+
     /**
      * Display the specified resource.
      *

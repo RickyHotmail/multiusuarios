@@ -19,6 +19,12 @@
 							buscar: request.term,
 						},
 						success: function(data){
+							if(data.length==0){
+								console.log("mostrando")
+								btnAgregar=document.getElementById('btnAgregar')
+
+								if (typeof objectName == 'object') btnAgregar.style.display='block'
+							}
 							response($.map(data, function(producto){
 								return {
 									nombre: producto.producto_nombre,
@@ -43,7 +49,8 @@
 				}
 			},
 			select: function(event, ui){
-				if(parseFloat(ui.item.stock) > 0 || ui.item.tipop == '2'|| ui.item.cv == '2'){
+				if(!lleva_inventario || parseFloat(ui.item.stock) > 0 || ui.item.tipop == '2'|| ui.item.cv == '2'){
+
 					var localObj = window.location;
 					var contextPath = localObj.pathname.split("/")[1];
 					if(contextPath=='public'){

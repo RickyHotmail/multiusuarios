@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Arqueo_Caja;
 use App\Models\Bodega;
 use App\Models\Caja;
+use App\Models\Categoria_Producto;
 use App\Models\Cliente;
+use App\Models\Cuenta;
 use App\Models\Cuenta_Cobrar;
 use App\Models\Detalle_Diario;
 use App\Models\Detalle_FV;
@@ -15,14 +17,20 @@ use App\Models\Diario;
 use App\Models\Empresa;
 use App\Models\Factura_Venta;
 use App\Models\Forma_Pago;
+use App\Models\Grupo_Producto;
+use App\Models\Marca_Producto;
 use App\Models\Movimiento_Caja;
 use App\Models\Movimiento_Producto;
 use App\Models\Pago_CXC;
 use App\Models\Parametrizacion_Contable;
+use App\Models\Parametrizacion_Impresion;
 use App\Models\Producto;
 use App\Models\Punto_Emision;
 use App\Models\Rango_Documento;
+use App\Models\sucursal;
+use App\Models\Tamano_Producto;
 use App\Models\Tarifa_Iva;
+use App\Models\Unidad_Medida_Producto;
 use App\Models\Vendedor;
 use DateTime;
 use Exception;
@@ -45,15 +53,43 @@ class facturasinOrdenController extends Controller
         try{  
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
             $rangoDocumento=Rango_Documento::PuntoRango($id, 'Factura')->first();
             $cajaAbierta=Arqueo_Caja::arqueoCajaxuser(Auth::user()->user_id)->first();
             $secuencial=1;    
+
+            $productosGastos=Producto::productos()->where('producto_compra_venta','=','1')->get();
+            $cuentas=Cuenta::CuentasMovimiento()->get();
+            $categorias=Categoria_Producto::categorias()->get();
+            $marcas=Marca_Producto::marcas()->get();
+            $unidadMedidas=Unidad_Medida_Producto::unidadMedidas()->get();
+            $tamanos=Tamano_Producto::tamanos()->get();
+            $grupos=Grupo_Producto::grupos()->get();
+
+
             if($rangoDocumento){
                 $secuencial=$rangoDocumento->rango_inicio;
                 $secuencialAux=Factura_Venta::secuencial($rangoDocumento->rango_id)->max('factura_secuencial');
                 if($secuencialAux){$secuencial=$secuencialAux+1;}
-                return view('admin.ventas.facturaSinOrden.nuevo',['vendedores'=>Vendedor::Vendedores()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(),'formasPago'=>Forma_Pago::formaPagos()->get(), 'cajaAbierta'=>$cajaAbierta, 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+                return view('admin.ventas.facturaSinOrden.nuevo',[
+                    'vendedores'=>Vendedor::Vendedores()->get(),
+                    'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),
+                    'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9),
+                    'bodegas'=>Bodega::bodegasSucursal($id)->get(),
+                    'formasPago'=>Forma_Pago::formaPagos()->get(),
+                    'cajaAbierta'=>$cajaAbierta,
+                    'rangoDocumento'=>$rangoDocumento,
+                    'PE'=>Punto_Emision::puntos()->get(),
+                    'tipoPermiso'=>$tipoPermiso,
+                    'gruposPermiso'=>$gruposPermiso,
+                    'permisosAdmin'=>$permisosAdmin,
+                    'categorias'=>$categorias,
+                    'marcas'=>$marcas,
+                    'unidadMedidas'=>$unidadMedidas,
+                    'tamanos'=>$tamanos,
+                    'grupos'=>$grupos,
+                    'sucursales'=>sucursal::sucursales()->get()
+                ]);
             }else{
                 return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir facturas de venta, configueros y vuelva a intentar');
             }
@@ -341,7 +377,7 @@ class facturasinOrdenController extends Controller
             for ($i = 1; $i < count($cantidad); ++$i){
                 $producto = Producto::findOrFail($isProducto[$i]);
                 if($producto->producto_tipo == '1' and $producto->producto_compra_venta == '3'){
-                    if($producto->producto_stock < $cantidad[$i]){
+                    if($producto->producto_stock < $cantidad[$i] && Auth::user()->empresa->empresa_control_inventario){
                         throw new Exception('Stock insuficiente de productos');
                     }
                 }
@@ -479,7 +515,20 @@ class facturasinOrdenController extends Controller
                 $factura->update();
             }
             if($facturaAux->factura_xml_estado == 'AUTORIZADO'){
-                return redirect('/facturacionsinOrden/new/'.$request->get('punto_id'))->with('success','Factura registrada y autorizada exitosamente')->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $request->get('factura_fecha'))->format('d-m-Y').'/'.$factura->factura_xml_nombre.'.pdf')->with('pdf2',$urlRecibo)->with('diario',$url);
+                $parametrizacionImpresion=Parametrizacion_Impresion::ParametrizacionImpresion()->first();
+
+                $urlPdf='documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $request->get('factura_fecha'))->format('d-m-Y').'/'.$factura->factura_xml_nombre.'.pdf';
+
+                if($parametrizacionImpresion){
+                    if($parametrizacionImpresion->parametrizacioni_tipo==1) 
+                        return redirect('/facturacionsinOrden/new/'.$request->get('punto_id'))->with('success','Factura registrada y autorizada exitosamente')->with('pdf',$urlPdf)->with('diario',$url);
+
+                    if($parametrizacionImpresion->parametrizacioni_tipo==2) 
+                        return redirect('/facturacionsinOrden/new/'.$request->get('punto_id'))->with('success','Factura registrada y autorizada exitosamente')->with('pdf2',$urlRecibo)->with('diario',$url);
+                }
+                
+                return redirect('/facturacionsinOrden/new/'.$request->get('punto_id'))->with('success','Factura registrada y autorizada exitosamente')->with('pdf',$urlPdf)->with('pdf2',$urlRecibo)->with('diario',$url);
+
             }elseif($factura->factura_emision != 'ELECTRONICA'){
                 return redirect('/facturacionsinOrden/new/'.$request->get('punto_id'))->with('success','Factura registrada exitosamente')->with('pdf2',$urlRecibo)->with('diario',$url);
             }else{
