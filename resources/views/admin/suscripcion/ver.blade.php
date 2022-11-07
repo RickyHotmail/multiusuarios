@@ -4,7 +4,7 @@
     <div class="card-header">
         <h3 class="card-title">Suscripcion</h3>
         @if('caducado')
-            <a href="{{url('/pago')}}" class="btn btn-primary btn-sm float-right"><i class="fa fa-cart-plus"></i>&nbsp;Hacer un Pago</a>
+            <a href="{{url('/pagos')}}" class="btn btn-primary btn-sm float-right"><i class="fa fa-cart-plus"></i>&nbsp;Hacer un Pago</a>
         @endif
     </div>
     <div class="card-body">
@@ -17,6 +17,7 @@
                     <label class="form-control">{{$suscripcion->empresa->empresa_ruc}}</label>
                 </div>
             </div>
+            
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Nombre Comercial</label>
                 <div class="col-sm-10">

@@ -82,7 +82,7 @@ class SuscripcionController extends Controller{
             DB::beginTransaction();
             $empresa = new Empresa();
                 $empresa->empresa_ruc =$request->get('Ruc');
-                $empresa->empresa_nombreComercial =$request->get('idNombre');
+                $empresa->empresa_nombreComercial =$request->get('idNombreCom');
                 $empresa->empresa_razonSocial =$request->get('idRazon');
                 $empresa->empresa_direccion =$request->get('idDireccion');
                 $empresa->empresa_telefono =$request->get('idTelefono');
@@ -217,7 +217,7 @@ class SuscripcionController extends Controller{
                 $cr->save();
             }
 
-            $st2=Sustento_Tributario::byEmpresa(1)->get();
+            $st2=Sustento_Tributario::byEmpresa(9)->get();
             foreach($st2 as $st){
                 $sustentoTributario = new Sustento_Tributario();
                     $sustentoTributario->sustento_nombre = $st->sustento_nombre;
@@ -545,7 +545,7 @@ class SuscripcionController extends Controller{
                 $suscripcion->empresa_id=$empresa->empresa_id;
                 $suscripcion->plan_id=$plan->plan_id;
                 $suscripcion->suscripcion_fecha_inicio= date("Y-m-d");
-                $suscripcion->suscripcion_fecha_finalizacion= date("Y-m-d",strtotime(date("Y-m-d")."+ ".intval($plan->tiempo)));
+                $suscripcion->suscripcion_fecha_finalizacion= date("Y-m-d",strtotime(date("d-m-Y").'+ 30 days'));
                 $suscripcion->suscripcion_cantidad_generado=0;
                 $suscripcion->suscripcion_permiso='FACTURACION';
                 $suscripcion->estado=1;
@@ -572,9 +572,6 @@ class SuscripcionController extends Controller{
                 $credito->empresa_id = $empresa->empresa_id;
                 $credito->credito_estado = 1;
             $credito->save();
-
-
-            
 
             $medida = new Unidad_Medida_Producto();
                 $medida->unidad_medida_nombre = 'UNIDAD';           
@@ -701,7 +698,10 @@ class SuscripcionController extends Controller{
                 $pago->suscripcion_id=$suscripcion->suscripcion_id;
                 $pago->plan_id=$request->idPlan;
                 $pago->pago_fecha=$hoy;
+                $pago->pago_banco_nombre=$request->idBanco;
+                $pago->pago_banco_numero=$request->idCuenta;
                 $pago->pago_documento=$request->idDocumento;
+                $pago->pago_comprobante="";
                 $pago->pago_valor=Plan::findOrFail($request->idPlan)->plan_precio;
                 $pago->pago_estado=0;
                 $pago->save();

@@ -17,11 +17,16 @@ class Pago extends Model{
         'pago_fecha_validacion',
         'pago_documento',
         'pago_comprobante',
-        'pago_banco_id',
-        'pago_numero_cuenta',
+        'pago_banco_nombre',
+        'pago_banco_numero',
         'pago_valor',
         'pago_estado'
     ];
     protected $guarded=[
     ];
+
+    public function scopeFindByBancoNumero($query, $banco_id, $cuenta_numero){
+        return $query->where('pago_banco_nombre', '=', $banco_id)
+                     ->where('pago_banco_numero','=',$cuenta_numero);
+    }
 }

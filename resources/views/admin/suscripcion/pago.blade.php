@@ -15,6 +15,29 @@
         width: fit-content;
         text-align: center;
     }
+
+    .centrado-vertical{
+        display: flex;
+        align-items: center;
+    }
+
+    .tarjeta {
+        background: #ddd;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    .seleccionada{
+        background: #ffe089;
+        box-shadow:
+        inset 0 -3em 3em rgba(0,0,0,0.1),
+                0 0  0 2px rgb(255,255,255),
+                0.3em 0.3em 1em rgba(0,0,0,0.3);
+    }
+
+    .lbl-cuenta, .lbl-titular, .lbl-cedula, .lbl-correo{
+        font-weight: normal !important;
+    }
 </style>
 
 
@@ -38,25 +61,24 @@
             </thead>
             <tbody>
                 @foreach($suscripcion->pagos as $pago)
-                <tr class="text-center">
-                    <td></td>
-                    <td>{{ $pago->pago_fecha }}</td>
-                    <td>{{ $pago->pago_documento }}</td>
-                    <td>$ {{ number_format($pago->pago_valor,2) }}</td>
-                    
-                    <td>
-                        @if($pago->pago_estado==0)
-                            <i style="color: grey" class="fa fa-exclamation-circle"></i> Aún no verificado
-                        @elseif($pago->pago_estado==1)
-                            <i style="color: green" class="fa fa-check-circle"></i> Verificado el {{ $pago->pago_fecha_verificacion }}
-                        @else
-                            <i  style="color: red" class="fa fa-times"></i> Pago rechazado
-                        @endif
-                    </td>
-                    <td>
-                        <a target="_blank" href="{{url($pago->pago_comprobante)}}">ver comprobante</a>
-                    </td>
-                </tr>
+                    <tr class="text-center">
+                        <td></td>
+                        <td>{{ $pago->pago_fecha }}</td>
+                        <td>{{ $pago->pago_documento }}</td>
+                        <td>$ {{ number_format($pago->pago_valor,2) }}</td>
+                        <td>
+                            @if($pago->pago_estado==0)
+                                <i style="color: grey" class="fa fa-exclamation-circle"></i> Aún no verificado
+                            @elseif($pago->pago_estado==1)
+                                <i style="color: green" class="fa fa-check-circle"></i> Verificado el {{ $pago->pago_fecha_validacion }}
+                            @else
+                                <i  style="color: red" class="fa fa-times"></i> Pago rechazado
+                            @endif
+                        </td>
+                        <td>
+                            <a target="_blank" href="{{url($pago->pago_comprobante)}}">ver comprobante</a>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
@@ -75,7 +97,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form class="form-horizontal" method="POST" action="{{ url("pago") }}" enctype="multipart/form-data" onsubmit="return verificarFoto()">
+            <form class="form-horizontal" method="POST" action="{{ url("pagos") }}" enctype="multipart/form-data" onsubmit="return verificarFoto()">
                 @csrf
                 <div class="modal-body">
                     <div class="card-body">
@@ -84,7 +106,7 @@
                             <div class="col-sm-5">
                                 <select id="idPlan" name="idPlan" class="form-control select2" data-live-search="true" required onchange="cambiarPrecio()">
                                     @foreach($planes as $plan)
-                                        @if($plan->plan_nombre!="Gratuito")
+                                        @if($plan->plan_nombre!="GRATUITO")
                                             <option value={{$plan->plan_id}}>{{$plan->plan_nombre}} ({{$plan->plan_cantidad_documentos}} documentos)</option>
                                         @endif
                                     @endforeach
@@ -97,7 +119,7 @@
                             <div class="col-sm-3">
                                 <select id="idPrecio" class="form-control" data-live-search="true" disabled>
                                     @foreach($planes as $plan)
-                                        @if($plan->plan_nombre!="Gratuito")
+                                        @if($plan->plan_nombre!="GRATUITO")
                                             <option value={{$plan->plan_id}}>$ {{number_format($plan->plan_precio, 2)}}</option>
                                         @endif
                                     @endforeach
@@ -105,27 +127,56 @@
                             </div>
                         </div>
 
-                        @if(!$caducado)<label style="color: #66cc55">Tu plan actual todavía esta vigente, Al hacer este pago se aumentará el tiempo 1 año adicional</label>@endif
+                        @if(!$caducado)
+                            <label style="color: #66cc55">Una vez aprobado el Pago, inciará un nuevo periodo de Suscripción</label>
+                        @endif
                         <br>
-
                         <div class="form-group row">
-                            <label for="idBanco" class="col-sm-3 col-form-label">banco</label>
-                            <div class="col-sm-5">
-                                <select id="idBanco" name="idBanco" class="form-control select2" data-live-search="true" required>
-                                    <option value="" label>--Seleccione una opcion--</option>
-                                    @foreach($bancos as $banco)
-                                    <option value="{{$banco->banco_id}}">{{$banco->banco_lista_nombre}}</option>
-                                    @endforeach
-                                </select>
+                            <div onclick="cambiarCuenta(1,'Pichincha','123456789')" class="col-md-4 p-1">
+                                <div id="marco1" class="p-3 tarjeta seleccionada">
+                                    <div class="row centrado-vertical mb-3">
+                                        <img class="ml-1 mr-1" src="{{url('img')}}/banco_pichincha.png" width="35px">
+                                        <label class="lbl-banco m-0">Pichincha #123456789</label>
+                                    </div>
+
+                                    <label class="lbl-cuenta m-0">Cuenta Corriente</label>
+                                    <label class="lbl-titular m-0"><strong>Paúl Guzman Pazmiño</strong></label>
+                                    <label class="lbl-cedula m-0">C.I: <strong>0702932179</strong></label>
+                                    <label class="lbl-correo m-0">mail: <strong>pagos@neopagupa.com</strong></label>
+                                </div>
+                            </div>
+                            <div onclick="cambiarCuenta(2,'Machala', '123456789')" class="col-md-4 p-1">
+                                <div id="marco2" class="p-3 tarjeta">
+                                    <div class="row centrado-vertical mb-3">
+                                        <img class="ml-1 mr-1" src="{{url('img')}}/banco_machala.png" width="35px">
+                                        <label class="lbl-banco m-0">Machala #123456789</label>
+                                    </div>
+
+                                    <label class="lbl-cuenta m-0">Cuenta Ahorros</label>
+                                    <label class="lbl-titular m-0"><strong>Paúl Guzman Pazmiño</strong></label>
+                                    <label class="lbl-cedula m-0">C.I: <strong>0702932179</strong></label>
+                                    <label class="lbl-correo m-0">mail: <strong>pagos@neopagupa.com</strong></label>
+                                    </div>
+                                </div>
+                            <div onclick="cambiarCuenta(3,'Guayaquil', '123456789')" class="col-md-4 p-1">
+                                <div id="marco3" class="p-3 tarjeta">
+                                    <div class="row centrado-vertical mb-3">
+                                        <img class="ml-1 mr-1" src="{{url('img')}}/banco_pichincha.png" width="35px">
+                                        <label class="lbl-banco m-0">Pichincha #123456789</label>
+                                    </div>
+
+                                    <label class="lbl-cuenta m-0">Cuenta Corriente</label>
+                                    <label class="lbl-titular m-0"><strong>Paúl Guzman Pazmiño</strong></label>
+                                    <label class="lbl-cedula m-0">C.I: <strong>0702932179</strong></label>
+                                    <label class="lbl-correo m-0">mail: <strong>pagos@neopagupa.com</strong></label>
+                                </div>
                             </div>
                         </div>
+                        
+                        <input type="hidden" class="form-control" id="idBanco" name="idBanco" value="Pichincha">
+                        <input type="hidden" class="form-control" id="idNumero" name="idCuenta" value="123456789">
 
-                        <div class="form-group row">
-                            <label for="idCuenta" class="col-sm-3 col-form-label">Número de Cuenta</label>
-                            <div class="col-sm-3">
-                                <input type="text" class="form-control" id="idCuenta" name="idCuenta" placeholder="# de cuenta" required>
-                            </div>
-                        </div>
+                        
 
                         <div class="form-group row">
                             <label for="idDocumento" class="col-sm-3 col-form-label">Número de Documento</label>
@@ -190,5 +241,15 @@
         }
         else 
             return true;
+    }
+
+    function cambiarCuenta(id, banco, cuenta){
+        document.getElementById('marco1').classList.remove('seleccionada')
+        document.getElementById('marco2').classList.remove('seleccionada')
+        document.getElementById('marco3').classList.remove('seleccionada')
+
+        document.getElementById('marco'+id).classList.add('seleccionada')
+        document.getElementById('idBanco').value=banco
+        document.getElementById('idNumero').value=cuenta
     }
 </script>

@@ -12,6 +12,7 @@
                 <tr class="text-center neo-fondo-tabla">
                     <th></th>
                     <th>Fecha de Pago</th>
+                    <th>Cuenta</th>
                     <th>N° Documento</th>
                     <th>Valor</th>
                     <th>Estado</th>
@@ -24,8 +25,9 @@
                 <tr class="text-center">
                     <td></td>
                     <td>{{ $pago->pago_fecha }}</td>
+                    <td>{{ $pago->pago_banco_nombre }} #{{ $pago->pago_banco_numero }}</td>
                     <td>{{ $pago->pago_documento }}</td>
-                    <td>$ {{ number_format($pago->pago_valor,2) }}</td>
+                    <td>{{ number_format($pago->pago_valor,2) }}</td>
                     
                     <td>
                         @if($pago->pago_estado==0)
@@ -40,7 +42,8 @@
                         <a target="_blank" href="{{url($pago->pago_comprobante)}}">ver comprobante</a>
                     </td>
                     <td>
-                        <form method="post" action="{{url('verificarPago')}}" onsubmit="return confirm('Desea validar este Pago')">
+                        <form method="post" action="{{url('administracion/verificarPago')}}" onsubmit="return confirm('Desea validar este Pago')">
+                            @csrf
                             <input type="hidden" name="idPago" value="{{$pago->pago_id}}">
                             <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> </button>
                         </form>

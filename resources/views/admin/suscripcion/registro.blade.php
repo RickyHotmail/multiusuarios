@@ -178,9 +178,9 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label for="idNombre" class="col-sm-3 col-form-label">Nombre Comercial: *</label>
+                                            <label for="idNombreCom" class="col-sm-3 col-form-label">Nombre Comercial: *</label>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="idNombre" name="idNombre" placeholder="Nombre Comercial" required>
+                                                <input type="text" class="form-control" id="idNombreCom" name="idNombreCom" placeholder="Nombre Comercial" required>
                                             </div>
                                         </div>
                                         <div class="form-group row">

@@ -16,6 +16,8 @@ class CreatePagoTable extends Migration{
             $table->date('pago_fecha_validacion')->nullable();
             $table->string('pago_documento');
             $table->string('pago_comprobante');
+            $table->string('pago_banco_nombre');
+            $table->string('pago_banco_numero');
             $table->double('pago_valor');
             $table->integer('pago_estado')->default(0);
             $table->timestamps();
