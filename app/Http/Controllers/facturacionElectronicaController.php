@@ -973,9 +973,6 @@ class facturacionElectronicaController extends Controller
             }elseif($empresa->empresa_tipo == 'Contribuyente Régimen Rimpe'){
                 xmlwriter_start_element($xml, 'contribuyenteRimpe');
                 xmlwriter_text($xml, 'CONTRIBUYENTE RÉGIMEN RIMPE');
-                xmlwriter_start_element($xml, 'agenteRetencion');
-                xmlwriter_text($xml, '0');
-                xmlwriter_end_element($xml); 
             }
             /**********************/
         xmlwriter_end_element($xml); 
