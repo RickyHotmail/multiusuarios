@@ -203,7 +203,8 @@
                                     <option value="Contribuyente Régimen Rimpe">Contribuyente Régimen Rimpe</option>
                                     <option value="Contribuyente Rimpe y Agente de Retención">Contribuyente Rimpe y Agente de Retención</option>
                                     <option value="Contribuyente Negocio Popular - Régimen Rimpe">Contribuyente Negocio Popular - Régimen Rimpe</option>
-               
+                                    <option value="Contribuyente Régimen General" @if($empresa->empresa_tipo == 'Contribuyente Régimen General') selected @endif>Contribuyente Régimen General</option>
+                                    <option value="Contribuyente Régimen General y Agente de Retención" @if($empresa->empresa_tipo == 'Contribuyente Régimen General y Agente de Retención') selected @endif>Contribuyente Régimen General y Agente de Retención</option>
                                 </select>
                             </div>
                         </div>

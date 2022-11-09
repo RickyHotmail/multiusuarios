@@ -244,6 +244,12 @@
                                                     <option value="Microempresas">Microempresas</option>
                                                     <option value="Agente de Retención">Agente de Retención</option>
                                                     <option value="Contribuyente Especial">Contribuyente Especial</option>
+
+                                                    <option value="Contribuyente Régimen Rimpe">Contribuyente Régimen Rimpe</option>
+                                                    <option value="Contribuyente Rimpe y Agente de Retención">Contribuyente Rimpe y Agente de Retención</option>
+                                                    <option value="Contribuyente Negocio Popular - Régimen Rimpe">Contribuyente Negocio Popular - Régimen Rimpe</option>
+                                                    <option value="Contribuyente Régimen General">Contribuyente Régimen General</option>
+                                                    <option value="Contribuyente Régimen General y Agente de Retención">Contribuyente Régimen General y Agente de Retención</option>
                                                 </select>
                                             </div>
                                         </div>
