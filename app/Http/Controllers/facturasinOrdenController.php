@@ -37,6 +37,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class facturasinOrdenController extends Controller
 {
@@ -515,16 +516,18 @@ class facturasinOrdenController extends Controller
                 $factura->update();
             }
             if($facturaAux->factura_xml_estado == 'AUTORIZADO'){
-                $parametrizacionImpresion=Parametrizacion_Impresion::ParametrizacionImpresion()->first();
-
                 $urlPdf='documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $request->get('factura_fecha'))->format('d-m-Y').'/'.$factura->factura_xml_nombre.'.pdf';
 
-                if($parametrizacionImpresion){
-                    if($parametrizacionImpresion->parametrizacioni_tipo==1) 
-                        return redirect('/facturacionsinOrden/new/'.$request->get('punto_id'))->with('success','Factura registrada y autorizada exitosamente')->with('pdf',$urlPdf)->with('diario',$url);
+                if (!Schema::hasTable('parametrizacion_impresion_factura')) {
+                    $parametrizacionImpresion=Parametrizacion_Impresion::ParametrizacionImpresion()->first();
 
-                    if($parametrizacionImpresion->parametrizacioni_tipo==2) 
-                        return redirect('/facturacionsinOrden/new/'.$request->get('punto_id'))->with('success','Factura registrada y autorizada exitosamente')->with('pdf2',$urlRecibo)->with('diario',$url);
+                    if($parametrizacionImpresion){
+                        if($parametrizacionImpresion->parametrizacioni_tipo==1) 
+                            return redirect('/facturacionsinOrden/new/'.$request->get('punto_id'))->with('success','Factura registrada y autorizada exitosamente')->with('pdf',$urlPdf)->with('diario',$url);
+
+                        if($parametrizacionImpresion->parametrizacioni_tipo==2) 
+                            return redirect('/facturacionsinOrden/new/'.$request->get('punto_id'))->with('success','Factura registrada y autorizada exitosamente')->with('pdf2',$urlRecibo)->with('diario',$url);
+                    }
                 }
                 
                 return redirect('/facturacionsinOrden/new/'.$request->get('punto_id'))->with('success','Factura registrada y autorizada exitosamente')->with('pdf',$urlPdf)->with('pdf2',$urlRecibo)->with('diario',$url);
