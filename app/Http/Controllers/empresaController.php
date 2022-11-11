@@ -329,11 +329,14 @@ class empresaController extends Controller
             }else{
                 $empresa->empresa_estado_cambiar_precio ="0";
             }
+            if(file_exists(public_path().'/logos/'.$empresa->empresa_logo)){
+                unlink(public_path().'/logos/'.$empresa->empresa_logo);
+            }
             if($request->file('file-es')){
                 if($request->file('file-es')->isValid()){
-                    $name = $empresa->empresa_ruc. '.' .$request->file('file-es')->getClientOriginalExtension();
+                    $name = $empresa->empresa_ruc.'png';
                     $empresa->empresa_logo = $name;
-                    $path = $request->file('file-es')->move(public_path().'\logos', $name); 
+                    $path = $request->file('file-es')->move(public_path().'/logos', $name); 
                 }
             }
             $empresa->save();
