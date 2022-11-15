@@ -334,7 +334,7 @@ class empresaController extends Controller
             }
             if($request->file('file-es')){
                 if($request->file('file-es')->isValid()){
-                    $name = $empresa->empresa_ruc.'png';
+                    $name = $empresa->empresa_ruc.'.png';
                     $empresa->empresa_logo = $name;
                     $path = $request->file('file-es')->move(public_path().'/logos', $name); 
                 }
