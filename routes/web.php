@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\activoFijoController;
 use App\Http\Controllers\actualizarCostosController;
+use App\Http\Controllers\administracionGeneralController;
 use App\Http\Controllers\ajusteInventarioController;
 use App\Http\Controllers\alimentacionController;
 use App\Http\Controllers\amortizacionSegurosController;
@@ -329,28 +330,29 @@ Route::get('/login', [loginController::class,'index'])->name('login');
 Route::get('/logout', [loginController::class,'logout'])->name('logout');
 Route::post('/sesion', [loginController::class,'authenticate']);
 
-
 //Suscripcion y Planes de Clientes
 Route::resource('/suscripcion', SuscripcionController::class);
 Route::get('/registro', [SuscripcionController::class,'registro']);
 Route::get('/recuperarClave', [usuarioController::class,'recuperarCuenta']);
 Route::post('/recuperarClave', [usuarioController::class,'enviarNuevaClave']);
+
 Route::get('/pagos', [SuscripcionController::class,'pago'])->middleware('auth');
-Route::get('/suscri', [SuscripcionController::class,'pago'])->middleware('auth');
-Route::post('/pagos', [SuscripcionController::class,'registrarPago'])->middleware('auth');
+Route::post('/pago', [SuscripcionController::class,'registrarPago'])->middleware('auth');
+
 Route::get('/gestionPermisos', [permisoGeneralController::class,'index'])->middleware('auth');
-Route::post('/gestionPermisos/guardar', [permisoGeneralController::class,'store'])->middleware('auth');
-Route::get('/permisosAdministrador/actualizar', [permisoGeneralController::class,'actualizarPermisosAdministrador'])->middleware('auth');
-Route::get('/permisosAdministrador/{id}/actualizarMedico', [permisoGeneralController::class,'actualizarPermisosMedico'])->middleware('auth');
+Route::post('/gestionPermisos', [permisoGeneralController::class,'store'])->middleware('auth');
+Route::get('/gestionPermisos/{id}/editarGrupo', [permisoGeneralController::class,'editarGrupo'])->middleware('auth');
+Route::post('/gestionPermisos/guardarPermisosGrupo', [permisoGeneralController::class,'guardarPermisosGrupo'])->middleware('auth');
+Route::post('/gestionPermisos/guardarGrupo', [permisoGeneralController::class,'store'])->middleware('auth');
+/* Route::get('/gestionPermisos/actualizar', [permisoGeneralController::class,'actualizarPermisosAdministrador'])->middleware('auth'); */
+
 
 //Administracion
 Route::get('/administracion', [administracionGeneralController::class,'index'])->middleware('auth');
 Route::get('/administracion/empresa/{id}/verusuarios', [administracionGeneralController::class,'verUsuarios'])->middleware('auth');
 Route::post('/administracion/usuarios/{id}/restablecerclaveusuario', [administracionGeneralController::class,'restablecerClaveUsuario'])->middleware('auth');
-
 Route::get('/administracion/empresa/{id}/verpermisos', [administracionGeneralController::class,'verPermisos'])->middleware('auth');
-Route::get('/administracion/empresa/{id}/actualizarPermisos', [administracionGeneralController::class,'actualizarPermisos'])->middleware('auth');
-
+Route::post('/administracion/empresa/{id}/guardarPermisos', [administracionGeneralController::class,'actualizarPermisosAdministrador'])->middleware('auth');
 Route::get('/administracion/pagos/{id}', [administracionGeneralController::class,'verPagos'])->middleware('auth');
 Route::post('/administracion/verificarPago', [administracionGeneralController::class,'activarPago'])->middleware('auth');
 
