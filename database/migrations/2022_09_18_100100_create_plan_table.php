@@ -11,6 +11,7 @@ class CreatePlanTable extends Migration{
             $table->string('plan_nombre');
             $table->integer('plan_cantidad_documentos');
             $table->string('plan_tiempo');
+            $table->double('plan_precio');
             $table->integer('estado')->default(1);
             $table->timestamps();
         });
