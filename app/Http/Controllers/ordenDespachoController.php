@@ -758,6 +758,17 @@ class ordenDespachoController extends Controller
                 $secuencial=$secuencialAux+1;
 
             }
+            if($general->documentos()){
+                return view('admin.ventas.ordenesdespacho.Guiasordenes',['orden'=>$ordenes,
+                'guia'=>$guia,'datos'=>$datos,
+                'trasportistas'=>Transportista::Transportistas()->get(),
+                'bodegas'=>Bodega::bodegasSucursal($puntoemeision->punto_id)->get(),
+                'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 
+                'PE'=>Punto_Emision::puntos()->get(),
+                'rangoDocumento'=>$rangoDocumento,
+                'gruposPermiso'=>$gruposPermiso, 
+                'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+            }
                 return view('admin.ventas.ordenesdespacho.Guiasordenes',
                 ['orden'=>$ordenes,
                 'guia'=>$guia,'datos'=>$datos,
@@ -820,6 +831,18 @@ class ordenDespachoController extends Controller
                 $secuencial=$secuencialAux+1;
 
             }
+            $general = new generalController();
+                if($general->documentos()){
+                    return view('admin.ventas.ordenesdespacho.Guiasordenescm',['orden'=>$ordenes,
+                    'guia'=>$guia,'datos'=>$datos,
+                    'trasportistas'=>Transportista::Transportistas()->get(),
+                    'bodegas'=>Bodega::bodegasSucursal($puntoemeision->punto_id)->get(),
+                    'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 
+                    'PE'=>Punto_Emision::puntos()->get(),
+                    'rangoDocumento'=>$rangoDocumento,
+                    'gruposPermiso'=>$gruposPermiso, 
+                    'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                }
                 return view('admin.ventas.ordenesdespacho.Guiasordenescm',
                 ['orden'=>$ordenes,
                 'guia'=>$guia,'datos'=>$datos,

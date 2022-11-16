@@ -82,6 +82,9 @@ class guiaremisionController extends Controller
             if($cierre){
                 return redirect('/guiaRemision/new/'.$request->get('punto_id'))->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
             }
+            if($general->documentos()){
+                return redirect('/guiaRemision/new/'.$request->get('punto_id'))->with('error2','No puede generar documentos electronicos contrate un plan');
+            }
             $guia->gr_numero = $request->get('guia_serie').substr(str_repeat(0, 9).$request->get('guia_numero'), - 9);
             $guia->gr_serie = $request->get('guia_serie');
             $guia->gr_secuencial = $request->get('guia_numero');
@@ -165,6 +168,9 @@ class guiaremisionController extends Controller
             $cierre = $general->cierre($request->get('guia_fecha'),Rango_Documento::rango($request->get('rango_id'))->first()->puntoEmision->sucursal_id);                 
             if($cierre){
                 return redirect('listaOrdenes')->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
+            }
+            if($general->documentos()){
+                return redirect('listaOrdenes')->with('error2','No puede generar documentos electronicos contrate un plan');
             }
             $docElectronico = new facturacionElectronicaController();
             $guia = new Guia_Remision();
@@ -261,6 +267,9 @@ class guiaremisionController extends Controller
             
             if($cierre){
                 return redirect('listaOrdenes')->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
+            }
+            if($general->documentos()){
+                return redirect('listaOrdenes')->with('error2','No puede generar documentos electronicos contrate un plan');
             }
             $docElectronico = new facturacionElectronicaController();
             $guia = new Guia_Remision();
@@ -451,6 +460,18 @@ class guiaremisionController extends Controller
                 if($secuencialAux){
                     $secuencial=$secuencialAux+1;
                 }
+                $general = new generalController();
+                if($general->documentos()){
+                    return view('admin.ventas.guiaremision.nuevo',['clientes'=>Cliente::Clientes()->get(),
+                    'trasportistas'=>Transportista::Transportistas()->get(),
+                    'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 
+                    'bodegas'=>Bodega::bodegasSucursal($id)->get(),
+                    'PE'=>Punto_Emision::puntos()->get(),
+                    'rangoDocumento'=>$rangoDocumento,
+                    'gruposPermiso'=>$gruposPermiso, 
+                    'tipoPermiso'=>$tipoPermiso, 
+                    'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                }
                 return view('admin.ventas.guiaremision.nuevo',
                     ['clientes'=>Cliente::Clientes()->get(),
                     'trasportistas'=>Transportista::Transportistas()->get(),
@@ -482,6 +503,18 @@ class guiaremisionController extends Controller
                 if($secuencialAux){
                     $secuencial=$secuencialAux+1;
                 }
+                $general = new generalController();
+                    if($general->documentos()){
+                        return view('admin.ventas.guiaremision.nuevo',['clientes'=>Cliente::Clientes()->get(),
+                        'trasportistas'=>Transportista::Transportistas()->get(),
+                        'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 
+                        'bodegas'=>Bodega::bodegasSucursal($id)->get(),
+                        'PE'=>Punto_Emision::puntos()->get(),
+                        'rangoDocumento'=>$rangoDocumento,
+                        'tipoPermiso'=>$tipoPermiso, 
+                        'gruposPermiso'=>$gruposPermiso, 
+                        'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                    }
                 return view('admin.ventas.guiaremision.index',
                     ['clientes'=>Cliente::Clientes()->get(),
                     'trasportistas'=>Transportista::Transportistas()->get(),

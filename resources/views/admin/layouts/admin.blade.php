@@ -54,7 +54,7 @@
                     @if(!empty($error2Msg))
                     <div class="alert alert-warning alert-dismissible">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <h5><i class="icon fas fa-check"></i>{{ session('error2Msg') }}</h5>
+                        <h5><i class="icon fas fa-check"></i>{{ $error2Msg }}</h5>
                     </div>
                     @endif
                     @if(session('pdf'))

@@ -110,7 +110,9 @@ class facturaVentaController extends Controller
             if($cierre){
                 return redirect('/factura/new/'.$request->get('punto_id'))->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
             }
-
+            if($general->documentos()){
+                return redirect('/factura/new/'.$request->get('punto_id'))->with('error2','No puede generar documentos electronicos contrate un plan');
+            }
             $docElectronico = new facturacionElectronicaController();
             $arqueoCaja=Arqueo_Caja::arqueoCaja(Auth::user()->user_id)->first();
             $factura = new Factura_Venta();
@@ -563,6 +565,10 @@ class facturaVentaController extends Controller
                 $secuencial=$rangoDocumento->rango_inicio;
                 $secuencialAux=Factura_Venta::secuencial($rangoDocumento->rango_id)->max('factura_secuencial');
                 if($secuencialAux){$secuencial=$secuencialAux+1;}
+                $general = new generalController();
+                if($general->documentos()){
+                    return view('admin.ventas.facturas.nuevo',['vendedores'=>Vendedor::Vendedores()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(),'formasPago'=>Forma_Pago::formaPagos()->get(), 'cajaAbierta'=>$cajaAbierta, 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                }
                 return view('admin.ventas.facturas.nuevo',['vendedores'=>Vendedor::Vendedores()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(),'formasPago'=>Forma_Pago::formaPagos()->get(), 'cajaAbierta'=>$cajaAbierta, 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
             }else{
                 return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir facturas de venta, configueros y vuelva a intentar');
@@ -650,6 +656,9 @@ class facturaVentaController extends Controller
             $cierre = $general->cierre($request->get('factura_fecha'),Rango_Documento::rango($request->get('rango_id'))->first()->puntoEmision->sucursal_id);          
             if($cierre){
                 return redirect('/factura/new/'.$request->get('punto_id'))->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
+            }
+            if($general->documentos()){
+                return redirect('/factura/new/'.$request->get('punto_id'))->with('error2','No puede generar documentos electronicos contrate un plan');
             }
             $banderaP = false;
             for ($i = 1; $i < count($cantidad); ++$i){

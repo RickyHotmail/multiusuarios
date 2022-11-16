@@ -76,6 +76,9 @@ class notaDebitoController extends Controller
             if($cierre){
                 return redirect('/notaDebito/new/'.$request->get('punto_id'))->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
             }
+            if($general->documentos()){
+                return redirect('/notaDebito/new/'.$request->get('punto_id'))->with('error2','No puede generar documentos electronicos contrate un plan');
+            }
             $arqueoCaja=Arqueo_Caja::arqueoCaja(Auth::user()->user_id)->first();
             $nd->nd_numero = $request->get('nd_serie').substr(str_repeat(0, 9).$request->get('nd_numero'), - 9);
             $nd->nd_serie = $request->get('nd_serie');
@@ -493,6 +496,10 @@ class notaDebitoController extends Controller
                 $secuencial=$rangoDocumento->rango_inicio;
                 $secuencialAux=Nota_Debito::secuencial($rangoDocumento->rango_id)->max('nd_secuencial');
                 if($secuencialAux){$secuencial=$secuencialAux+1;}
+                $general = new generalController();
+                    if($general->documentos()){
+                        return view('admin.ventas.notasdebito.nuevo',['tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(),'formasPago'=>Forma_Pago::formaPagos()->get(),'cajaAbierta'=>$cajaAbierta, 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                    }
                 return view('admin.ventas.notasDebito.nuevo',['tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(),'formasPago'=>Forma_Pago::formaPagos()->get(),'cajaAbierta'=>$cajaAbierta, 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
             }else{
                 return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir Notas de débito, configueros y vuelva a intentar');

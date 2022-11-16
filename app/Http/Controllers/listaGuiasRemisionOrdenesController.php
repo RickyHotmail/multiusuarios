@@ -124,6 +124,23 @@ class listaGuiasRemisionOrdenesController extends Controller
                     $secuencial=$secuencialAux+1;
 
                 }
+                $general = new generalController();
+                if($general->documentos()){
+                    return view('admin.ventas.guiaremision.guiafactura',['guias'=>$guias,
+                    'banderaStock'=>$banderaStock,
+                    'datos'=>$datos,
+                    'guiadatos'=>$guiadatos,
+                    'vendedores'=>Vendedor::Vendedores()->get(),
+                    'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),
+                    'formasPago'=>Forma_Pago::formaPagos()->get(), 
+                    'bodegas'=>Bodega::bodegasSucursal($puntoemeision->punto_id)->get(),
+                    'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 
+                    'PE'=>Punto_Emision::puntos()->get(),
+                    'rangoDocumento'=>$rangoDocumento,
+                    'gruposPermiso'=>$gruposPermiso, 
+                    'tipoPermiso'=>$tipoPermiso,
+                    'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                }
                 return view('admin.ventas.guiaremision.guiafactura',
                 ['guias'=>$guias,
                 'banderaStock'=>$banderaStock,
@@ -153,6 +170,23 @@ class listaGuiasRemisionOrdenesController extends Controller
                     $secuencial=$rangoDocumento->rango_inicio;
                     $secuencialAux=Factura_Venta::secuencial($rangoDocumento->rango_id)->max('factura_secuencial');
                     if($secuencialAux){$secuencial=$secuencialAux+1;}
+                    $general = new generalController();
+                        if($general->documentos()){
+                            return view('admin.ventas.guiaremision.guiafactura',['guias'=>$guias,
+                            'banderaStock'=>$banderaStock,
+                            'datos'=>$datos,
+                            'guiadatos'=>$guiadatos,
+                            'vendedores'=>Vendedor::Vendedores()->get(),
+                            'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),
+                            'formasPago'=>Forma_Pago::formaPagos()->get(), 
+                            'bodegas'=>Bodega::bodegasSucursal($puntoemeision->punto_id)->get(),
+                            'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 
+                            'PE'=>Punto_Emision::puntos()->get(),
+                            'rangoDocumento'=>$rangoDocumento,
+                            'tipoPermiso'=>$tipoPermiso,
+                            'gruposPermiso'=>$gruposPermiso, 
+                            'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                        }
                     return view('admin.ventas.guiaremision.guiafactura',
                     ['guias'=>$guias,
                     'banderaStock'=>$banderaStock,

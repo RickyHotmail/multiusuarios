@@ -84,6 +84,9 @@ class notaCreditoController extends Controller
             if($cierre){
                 return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
             }
+            if($general->documentos()){
+                return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('error2','No puede generar documentos electronicos contrate un plan');
+            }
             $nc->nc_numero = $request->get('nc_serie').substr(str_repeat(0, 9).$request->get('nc_numero'), - 9);
             $nc->nc_serie = $request->get('nc_serie');
             $nc->nc_secuencial = $request->get('nc_numero');
@@ -576,6 +579,9 @@ class notaCreditoController extends Controller
             $cierre = $general->cierre($request->get('nc_fecha'),Rango_Documento::rango($request->get('rango_id'))->first()->puntoEmision->sucursal_id);          
             if($cierre){
                 return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
+            }
+            if($general->documentos()){
+                return redirect('/notaCredito/new/'.$request->get('punto_id'))->with('error2','No puede generar documentos electronicos contrate un plan');
             }
             $nc->nc_numero = $request->get('nc_serie').substr(str_repeat(0, 9).$request->get('nc_numero'), - 9);
             $nc->nc_serie = $request->get('nc_serie');
@@ -1201,6 +1207,10 @@ class notaCreditoController extends Controller
                 $secuencial=$rangoDocumento->rango_inicio;
                 $secuencialAux=Nota_Credito::secuencial($rangoDocumento->rango_id)->max('nc_secuencial');
                 if($secuencialAux){$secuencial=$secuencialAux+1;}
+                $general = new generalController();
+                    if($general->documentos()){
+                        return view('admin.ventas.notasCredito.nuevo',['secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(), 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                    }
                 return view('admin.ventas.notasCredito.nuevo',['secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(), 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
             }else{
                 return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir Notas de crédito, configueros y vuelva a intentar');
@@ -1221,6 +1231,10 @@ class notaCreditoController extends Controller
                 $secuencial=$rangoDocumento->rango_inicio;
                 $secuencialAux=Nota_Credito::secuencial($rangoDocumento->rango_id)->max('nc_secuencial');
                 if($secuencialAux){$secuencial=$secuencialAux+1;}
+                $general = new generalController();
+                if($general->documentos()){
+                    return view('admin.ventas.notasCredito.index',['vendedores'=>Vendedor::Vendedores()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'bodegas'=>Bodega::bodegasSucursal($id)->get(),'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(), 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                }
                 return view('admin.ventas.notasCredito.index',['vendedores'=>Vendedor::Vendedores()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'bodegas'=>Bodega::bodegasSucursal($id)->get(),'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(), 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
             }else{
                 return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir Notas de crédito, configueros y vuelva a intentar');

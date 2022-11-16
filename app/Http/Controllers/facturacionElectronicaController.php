@@ -988,6 +988,11 @@ class facturacionElectronicaController extends Controller
                 xmlwriter_text($xml, 'CONTRIBUYENTE NEGOCIO POPULAR - RÉGIMEN RIMPE');
                 xmlwriter_end_element($xml); 
             }
+            elseif($empresa->empresa_tipo == 'Contribuyente Régimen General y Agente de Retención'){
+                xmlwriter_start_element($xml, 'agenteRetencion');
+                xmlwriter_text($xml, '1');
+                xmlwriter_end_element($xml); 
+            }
             /**********************/
         xmlwriter_end_element($xml); 
         // final 'infoTributaria'

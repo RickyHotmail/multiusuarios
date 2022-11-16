@@ -125,7 +125,9 @@ class transaccionCompraController extends Controller
             if($request->get('manualID')=='on'){
                 $facManual = substr($request->get('serieFacManual'),0,3).'-'.substr($request->get('serieFacManual'),3,3).'-'.substr(str_repeat(0, 9).$request->get('scuencialFacManual'), - 9);
             }
-
+            if($general->documentos()){
+                return redirect('/transaccionCompra/new/'.$request->get('punto_id'))->with('error2','No puede generar documentos electronicos contrate un plan');
+            }
             /*VERIFICAR TOTAL DE IVA DE DETALLE CON EL TOTAL DE IVA DE LA FACTURA*/
             $totalDetalleIva = 0;
             for ($i = 1; $i < count($cantidad); ++$i){
@@ -953,6 +955,10 @@ class transaccionCompraController extends Controller
                 if(isset($compraAux->transaccion_id)){
                     throw new Exception('Ese documento ya se encuentra registrado en el sistema.');
                 }  
+            }
+            $general = new generalController();
+            if($general->documentos()){
+                return redirect('listatransaccionCompra')->with('error2','No puede generar documentos electronicos contrate un plan');
             }
             $tipoComprobante = Tipo_Comprobante::tipo($request->get('tipo_comprobante_id'))->first();
 
@@ -2098,6 +2104,10 @@ class transaccionCompraController extends Controller
                 $firmaElectronica = Firma_Electronica::firma()->first();
                 $pubKey =Crypt::decryptString($firmaElectronica->firma_pubKey);
                 $data=openssl_x509_parse($pubKey,true);
+                $general = new generalController();
+                if($general->documentos()){
+                    return view('admin.compras.transaccionCompra.nuevo',['empresa'=>$empresa,'cosechas'=>$cosechas,'caduca'=>$data['validTo_time_t'],'cajaAbierta'=>$cajaAbierta,'rangoDocumento'=>$rangoDocumento,'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'bodegas'=>Bodega::bodegasSucursal($id)->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'proveedores'=>Proveedor::proveedores()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                }
                 return view('admin.compras.transaccionCompra.nuevo',['empresa'=>$empresa,'cosechas'=>$cosechas,'caduca'=>$data['validTo_time_t'],'cajaAbierta'=>$cajaAbierta,'rangoDocumento'=>$rangoDocumento,'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'bodegas'=>Bodega::bodegasSucursal($id)->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'proveedores'=>Proveedor::proveedores()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
             }else{
                 return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir retenciones, configueros y vuelva a intentar');

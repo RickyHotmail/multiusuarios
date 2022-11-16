@@ -32,6 +32,7 @@ use App\Models\Punto_Emision;
 use App\Models\Rol_Consolidado;
 use App\Models\Rubro;
 use App\Models\Servidor_Correo;
+use App\Models\Suscripcion;
 use DateTime;
 use PDF;
 use Illuminate\Http\Request;
@@ -53,7 +54,36 @@ class generalController extends Controller
         if(substr($decimal, 2, 1)==5 && substr($decimal, 1, 1) % 2 ==0)  return bcdiv($numero, 1, 2);
         return number_format(round($numero, 2), 2,".","");
     }
-
+    public function documentos(){
+        $suscripcion=Suscripcion::suscripcion()->first();
+        $fechaactual=date('Y-m-d');
+        if($suscripcion->suscripcion_ilimitada == '1'){
+            return false;
+        }
+        if($suscripcion->suscripcion_estado=='0'){
+            return true;
+        }
+        if($suscripcion->suscripcion_fecha_finalizacion < $fechaactual){
+            return true;
+        }
+        $saldos=DB::select(DB::raw("SELECT SUM(T.Cantidad) FROM 
+        (
+        select count(factura_id) as Cantidad  from factura_venta,bodega,sucursal where factura_venta.bodega_id=bodega.bodega_id and bodega.sucursal_id=sucursal.sucursal_id and sucursal.empresa_id=".Auth::user()->empresa_id." and factura_venta.factura_estado<>'2' and factura_fecha>='".$suscripcion->suscripcion_fecha_inicio."'
+        UNION ALL 
+        select count(retencion_id) as Cantidad from retencion_compra,rango_documento,punto_emision,sucursal where retencion_compra.rango_id=rango_documento.rango_id and punto_emision.punto_id=rango_documento.punto_id and punto_emision.sucursal_id=sucursal.sucursal_id and sucursal.empresa_id=".Auth::user()->empresa_id." and retencion_fecha>='".$suscripcion->suscripcion_fecha_inicio."'
+        UNION ALL 
+        select count(nc_id) as Cantidad from nota_credito,rango_documento,punto_emision,sucursal where nota_credito.rango_id=rango_documento.rango_id and punto_emision.punto_id=rango_documento.punto_id and punto_emision.sucursal_id=sucursal.sucursal_id and sucursal.empresa_id=".Auth::user()->empresa_id." and nc_fecha>='".$suscripcion->suscripcion_fecha_inicio."'
+        UNION ALL 
+            select count(nd_id) as Cantidad from nota_debito,rango_documento,punto_emision,sucursal where nota_debito.rango_id=rango_documento.rango_id and punto_emision.punto_id=rango_documento.punto_id and punto_emision.sucursal_id=sucursal.sucursal_id and sucursal.empresa_id=".Auth::user()->empresa_id." and nd_fecha>='".$suscripcion->suscripcion_fecha_inicio."'
+        UNION ALL 
+            select count(lc_id) as Cantidad from liquidacion_compra,rango_documento,punto_emision,sucursal where liquidacion_compra.rango_id=rango_documento.rango_id and punto_emision.punto_id=rango_documento.punto_id and punto_emision.sucursal_id=sucursal.sucursal_id and sucursal.empresa_id=".Auth::user()->empresa_id." and lc_fecha>='".$suscripcion->suscripcion_fecha_inicio."'
+        )T"));
+        foreach($saldos as $as2){
+            if($as2->sum > $suscripcion->plan->plan_cantidad_documentos)
+            return(true);
+        }
+        return false;
+    }
     public function denegado()
     {
         try{

@@ -95,6 +95,9 @@ class liquidacionCompraController extends Controller
             if($cierre){
                 return redirect('/liquidacionCompra/new/'.$request->get('punto_id_lc'))->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
             }
+            if($general->documentos()){
+                return redirect('/liquidacionCompra/new/'.$request->get('punto_id_lc'))->with('error2','No puede generar documentos electronicos contrate un plan');
+            }
             $lc = new Liquidacion_Compra();
             $lc->lc_fecha = $request->get('lc_fecha');
             $lc->lc_numero = $request->get('lc_serie').substr(str_repeat(0, 9).$request->get('lc_secuencial'), - 9);
@@ -563,6 +566,10 @@ class liquidacionCompraController extends Controller
                     $secuencial=$rangoDocumento->rango_inicio;
                     $secuencialAux=Retencion_Compra::secuencial($rangoDocumento->rango_id)->max('retencion_secuencial');
                     if($secuencialAux){$secuencial=$secuencialAux+1;}
+                    $general = new generalController();
+                    if($general->documentos()){
+                        return view('admin.compras.liquidacionCompra.nuevo',['cosechas'=>$cosechas,'cajaAbierta'=>$cajaAbierta,'rangoDocumentoLC'=>$rangoDocumentoLC,'secuencialLC'=>substr(str_repeat(0, 9).$secuencialLC, - 9),'rangoDocumento'=>$rangoDocumento,'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'bodegas'=>Bodega::BodegasSucursal(Punto_Emision::Punto($id)->first()->sucursal_id)->get(),'cuentas'=>Cuenta::CuentasMovimiento()->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'formasPago'=>Forma_Pago::formaPagos()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'proveedores'=>Proveedor::proveedores()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                    }
                     return view('admin.compras.liquidacionCompra.nuevo',['cajaAbierta'=>$cajaAbierta,'rangoDocumentoLC'=>$rangoDocumentoLC,'secuencialLC'=>substr(str_repeat(0, 9).$secuencialLC, - 9),'rangoDocumento'=>$rangoDocumento,'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'bodegas'=>Bodega::BodegasSucursal(Punto_Emision::Punto($id)->first()->sucursal_id)->get(),'cuentas'=>Cuenta::CuentasMovimiento()->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'formasPago'=>Forma_Pago::formaPagos()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'proveedores'=>Proveedor::proveedores()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
                 }else{
                     return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir retenciones, configueros y vuelva a intentar');
