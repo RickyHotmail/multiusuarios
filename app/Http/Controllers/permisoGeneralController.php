@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Empresa;
 use App\Models\GrupoPer;
+use App\Models\Parametrizacion_Grupo_Permiso;
 use App\Models\Parametrizacion_Permiso;
+use App\Models\Permiso;
 use App\Models\Rol;
 use App\Models\Rol_Permiso;
 use App\Models\Tipo_Grupo;
@@ -13,81 +16,78 @@ use Illuminate\Support\Facades\DB;
 
 class permisoGeneralController extends Controller{
     public function index(){
-        ini_set('max_execution_time', 500);
+        $grupos=Parametrizacion_Grupo_Permiso::grupos()->get();
+        //return $grupos;
 
-        $permisos=Parametrizacion_Permiso::parametrizacionesPermiso()->get();
-        $grupos=GrupoPer::grupos()->get();
-        //$tipoGrupos=Tipo_Grupo::permisos()->get();
-
-        
-        return view('admin.seguridad.rol.permisosgenerales', [
-            'grupos'=>$grupos,
-            'permisos'=>$permisos
+        return view('admin.seguridad.rol.permisosGenerales.index', [
+            'grupos'=>$grupos
         ]);
     }
 
-    public function store(Request $request){
-        ini_set('max_execution_time', 500);
-        //return $request;
+    public function editarGrupo(Request $request, $id){
+        $grupoGeneral=Parametrizacion_Grupo_Permiso::findOrFail($id);
+        $permisos=Permiso::permisos()->orderBy('tipo_id')->get();
+        $permisosParametrizacion=Parametrizacion_Permiso::parametrizacionesPermiso($id)->get();
+        $grupos=GrupoPer::grupos()->get();
 
+        return view('admin.seguridad.rol.permisosgenerales.editar', [
+            'parmetrizacionGrupoId'=>$id,
+            'grupos'=>$grupos,
+            'permisos'=>$permisos,
+            'grupoGeneral'=>$grupoGeneral,
+            'permisosParam'=>$permisosParametrizacion
+        ]);
+    }
+
+    public function guardarPermisosGrupo(Request $request){
         try{
             DB::beginTransaction();
 
-            $permisos=Parametrizacion_Permiso::parametrizacionesPermiso()->get();
-
+            $permisos=Parametrizacion_Permiso::parametrizacionesPermiso($request->grupoId)->get();
             foreach($permisos as $permiso){
-                $permiso->parametrizacionp_general=0;
-                $permiso->parametrizacionp_medico=0;
-                $permiso->parametrizacionp_camaronero=0;
-                $permiso->parametrizacionp_facturacion=0;
-                $permiso->save();
+                $permiso->delete();
             }
+
+            $c=0;
+            if(isset($request->permiso)){
+                foreach($request->permiso as $perm){
+                    echo 'c: '.$c++.'<br>';
+                    $parametrizacionPermiso=new Parametrizacion_Permiso();
+                    $parametrizacionPermiso->permiso_id=$perm;
+                    $parametrizacionPermiso->parametrizaciong_id=$request->grupoId;
+                    $parametrizacionPermiso->save();
+                }
+            }
+
+            /* foreach($permisos as $permiso){
+                $empresas=Empresa::empresas()->get();
+                foreach($empresas as $e){
+
+                }
+            } */
 
             
 
-            if(isset($request->permiso_1)){
-                foreach($request->permiso_1 as $perm){
-                    $permiso1=Parametrizacion_Permiso::findOrFail($perm);
+            DB::commit();
+            return redirect('gestionPermisos')->with('success','Datos guardados exitosamente');
+        }
+        catch(\Exception $ex){
+            DB::rollback();
+            
+            return $ex->getMessage();
+        }
+    }
+    
 
-                    if($permiso1){
-                        $permiso1->parametrizacionp_general=1;
-                        $permiso1->save();
-                    }
-                }
-            }
+    public function store(Request $request){
+        ini_set('max_execution_time', 500);
 
-            if(isset($request->permiso_2)){
-                foreach($request->permiso_2 as $perm2){
-                    $permiso2=Parametrizacion_Permiso::findOrFail($perm2);
-
-                    if($permiso2){
-                        $permiso2->parametrizacionp_medico=1;
-                        $permiso2->save();
-                    }
-                }
-            }
-
-            if(isset($request->permiso_3)){
-                foreach($request->permiso_3 as $perm3){
-                    $permiso3=Parametrizacion_Permiso::findOrFail($perm3);
-
-                    if($permiso3){
-                        $permiso3->parametrizacionp_camaronero=1;
-                        $permiso3->save();
-                    }
-                }
-            }
-
-            if(isset($request->permiso_4)){
-                foreach($request->permiso_4 as $perm4){
-                    $permiso4=Parametrizacion_Permiso::findOrFail($perm4);
-
-                    if($permiso4){
-                        $permiso4->parametrizacionp_facturacion=1;
-                        $permiso4->save();
-                    }
-                }
-            }
+        try{
+            DB::beginTransaction();
+            $grupoPermiso=new Parametrizacion_Grupo_Permiso();
+            $grupoPermiso->parametrizaciong_nombre=$request->idNombre;
+            $grupoPermiso->save();
+            
 
             DB::commit();
             
@@ -97,7 +97,6 @@ class permisoGeneralController extends Controller{
             DB::rollback();
             return back()->with('error','Error: '.$ex->getMessage());
         }
-
     }
 
     public function actualizarPermisosAdministrador(){
@@ -115,33 +114,6 @@ class permisoGeneralController extends Controller{
                     $rolPermiso->rol_id=$rol->rol_id;
                     $rolPermiso->save();
                 }
-            }
-        }
-
-        return 'ok';
-    }
-    
-    public function actualizarPermisosMedico($ruc){
-        $rol=DB::select(DB::raw("
-            select * 
-            from 
-                rol inner join empresa on empresa.empresa_id=rol.empresa_id
-            where 
-                empresa_ruc='$ruc' 
-                and rol_nombre='Administrador'
-        "));
-        
-        $result=DB::select(DB::raw("delete from rol_permiso where rol_id=".$rol[0]->rol_id));
-        
-
-
-        $parmetrizacionesP=Parametrizacion_Permiso::parametrizacionesPermiso()->get();
-        foreach($parmetrizacionesP as $param){
-            if($param->parametrizacionp_medico==1){
-                $rolPermiso=new Rol_Permiso();
-                $rolPermiso->permiso_id=$param->permiso_id;
-                $rolPermiso->rol_id=$rol[0]->rol_id;
-                $rolPermiso->save();
             }
         }
 

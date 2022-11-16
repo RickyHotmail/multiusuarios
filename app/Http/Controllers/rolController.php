@@ -200,10 +200,11 @@ class rolController extends Controller
             $suscripcion=Auth::user()->empresa->suscripcion;
             $suscripcion2=Suscripcion::byEmpresa(Auth::user()->empresa->empresa_id)->first();
 
-            //return $suscripcion2;
+            if($suscripcion2) $permisos=Parametrizacion_Permiso::byTipo($suscripcion2->suscripcion_permiso)->get();
 
-            //if($suscripcion2) $permisos=Parametrizacion_Permiso::byTipo($suscripcion2->suscripcion_permiso)->get();
-            
+            foreach($grupos as $grupo){
+                $grupo->detalles;
+            }
 
             return view('admin.seguridad.rol.permisos',['grupos'=>$grupos,'rol'=>$rol, 'PE'=>Punto_Emision::puntos()->get(),'permisos'=>$permisos, 'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
         }
