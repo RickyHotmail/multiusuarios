@@ -15,10 +15,9 @@ class CreateSuscripcionTable extends Migration{
             $table->date('suscripcion_fecha_inicio');
             $table->date('suscripcion_fecha_finalizacion');
             $table->integer('suscripcion_cantidad_generado')->default(0);
-            $table->string('suscripcion_permiso')->default(1);
+            $table->string('suscripcion_permiso')->default('4');
             $table->integer('suscripcion_ilimitada')->default(0);
-            $table->integer('estado')->default(1);
-
+            $table->integer('suscripcion_estado')->default(1);
             $table->timestamps();
         });
     }

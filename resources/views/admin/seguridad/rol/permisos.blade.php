@@ -25,32 +25,34 @@
                         <table class="table table-hover">
                             <tbody>
                                 @foreach($grupos as $grupo)
-                                <tr data-widget="expandable-table" aria-expanded="false">
-                                    <td>
-                                        <i class="fas fa-angle-left right"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="nav-icon {{$grupo->grupo_icono}}"></i>&nbsp;&nbsp;{{$grupo->grupo_nombre}}
-                                    </td>
-                                </tr>
-                                
-                                <tr class="expandable-body">
-                                    <td>
-                                    <div class="p-0">
-                                    <table class="table table-hover">
+                                    @if($permisos->contains('grupo_id', $grupo->grupo_id))
+                                        <tr data-widget="expandable-table" aria-expanded="false">
+                                            <td>
+                                                <i class="fas fa-angle-left right"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="nav-icon {{$grupo->grupo_icono}}"></i>&nbsp;&nbsp;{{$grupo->grupo_nombre}}
+                                            </td>
+                                        </tr>
+                                        
+                                        
+                                        <tr class="expandable-body">
+                                        <td>
+                                        <div class="p-0">
+                                        <table class="table table-hover">
                                         <tbody>   
-                                            @foreach($grupo->detalles as $tipopermiso)
+                                        @foreach($grupo->detalles as $tipopermiso)
+                                            @if($permisos->contains('tipo_id', $tipopermiso->tipo_id))
                                                 <tr data-widget="expandable-table" aria-expanded="false">
                                                     <td>
                                                         <i class="fas fa-angle-left right"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="nav-icon {{$tipopermiso->tipo_icono}}"></i>&nbsp;&nbsp;{{$tipopermiso->tipo_nombre}}
                                                     </td>
                                                 </tr>
-                                        
-                                            
                                                 <tr class="expandable-body">
                                                     <td>
                                                         <div class="p-0">
                                                             <table class="table table-hover">
                                                                 <tbody>
                                                                 @foreach($tipopermiso->permisos as $permiso)
-                                                                    @if($permiso->permiso_estado == '1')
+                                                                    
+                                                                    @if($permiso->permiso_estado == '1' && $permisos->contains('permiso_id', $permiso->permiso_id))
                                                                         @if($rol->rol_tipo == $permiso->permiso_tipo)
                                                                             <?php $permisoEstado=0 ?>
                                                                             @foreach($rol->permisos as $rolpermiso)
@@ -71,14 +73,14 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            
-                                            @endforeach
+                                            @endif
+                                        @endforeach
                                         </tbody>
-                                    </table>
-                                    </div>
-                      
-                                    </td>
-                                </tr>
+                                        </table>
+                                        </div>
+                                        </td>
+                                        </tr>
+                                    @endif
                                 @endforeach
                             </tbody>
                         </table>

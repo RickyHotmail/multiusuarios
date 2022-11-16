@@ -174,19 +174,19 @@
                                         <div class="form-group row">
                                             <label for="Ruc" class="col-sm-3 col-form-label">Ruc: *</label>
                                             <div class="col-sm-5">
-                                                <input type="text" class="form-control" id="Ruc" name="Ruc" placeholder="Ej. 9999999999999" required>
+                                                <input type="text" class="form-control" id="Ruc" name="Ruc" placeholder="Ej. 9999999999999" maxlength=13 required>
                                             </div>
                                         </div>
                                         <div class="form-group row">
                                             <label for="idNombreCom" class="col-sm-3 col-form-label">Nombre Comercial: *</label>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="idNombreCom" name="idNombreCom" placeholder="Nombre Comercial" required>
+                                                <input type="text" class="form-control" id="idNombreCom" name="idNombreCom" placeholder="Nombre Comercial" maxlength=300 required>
                                             </div>
                                         </div>
                                         <div class="form-group row">
                                             <label for="idRazon" class="col-sm-3 col-form-label">Razon Social: *</label>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="idRazon" name="idRazon" placeholder="Razon Social" required>
+                                                <input type="text" class="form-control" id="idRazon" name="idRazon" placeholder="Razon Social" maxlength=300 required>
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -198,13 +198,13 @@
                                         <div class="form-group row">
                                             <label for="idDireccion" class="col-sm-3 col-form-label">Dirección: *</label>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="idDireccion" name="idDireccion" placeholder="Direccion" value="S/D" required> 
+                                                <input type="text" class="form-control" id="idDireccion" name="idDireccion" placeholder="Direccion" value="S/D" maxlength=300  required> 
                                             </div>
                                         </div>
                                         <div class="form-group row">
                                             <label for="idTelefono" class="col-sm-3 col-form-label">Teléfono: *</label>
                                             <div class="col-sm-5">
-                                                <input type="text" class="form-control" id="idTelefono" name="idTelefono" placeholder="Ej. 022999999"required>
+                                                <input type="text" class="form-control" id="idTelefono" name="idTelefono" placeholder="Ej. 022999999" maxlength=15 required>
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -276,7 +276,7 @@
                                         <div class="form-group row">
                                             <label for="idCedula" class="col-sm-3 col-form-label">Cédula:*</label>
                                             <div class="col-sm-5">
-                                                <input type="text" class="form-control" id="idCedula" name="idCedula" placeholder="Nombre Comercial" required>
+                                                <input type="text" class="form-control" id="idCedula" name="idCedula" placeholder="Nombre Comercial" maxlength="10" required>
                                             </div>
                                         </div>
 

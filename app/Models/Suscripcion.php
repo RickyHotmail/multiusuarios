@@ -19,7 +19,7 @@ class Suscripcion extends Model
         'suscripcion_cantidad_generado',
         'suscripcion_permiso',
         'suscripcion_ilimitada',
-        'estado'
+        'suscripcion_estado'
     ];
     protected $guarded=[
     ];
@@ -39,6 +39,6 @@ class Suscripcion extends Model
     public function scopeByEmpresa($query, $id){
         return $query->join('empresa', 'empresa.empresa_id','=','suscripcion.empresa_id')
                      ->where('empresa.empresa_id', '=', $id)
-                     ->where('estado','=',1);
+                     ->where('suscripcion_estado','=',1);
     }
 }

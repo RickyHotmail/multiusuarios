@@ -449,8 +449,8 @@ class SuscripcionController extends Controller{
             $rango->save();
 
 
-            //Buscar los permisos permitidos para facturacion
-            $parmetrizacionesP=Parametrizacion_Permiso::parametrizacionesPermiso()->get();
+            //Buscar los permisos permitidos para facturacion: grupo: facturacion id=4
+            $parmetrizacionesP=Parametrizacion_Permiso::parametrizacionesPermiso(4)->get();
             $rol=new Rol();
             $rol->rol_nombre='Administrador';
             $rol->empresa_id=$empresa->empresa_id;
@@ -530,16 +530,13 @@ class SuscripcionController extends Controller{
                 $generalController = new generalController();
                 $result=$generalController->enviarCorreo($request->idEmail, $usuario->user_nombre, "Registro en el Sistema", $html, $textoPlano, []);
             });
-
-
             
             $usuario_rol= new Usuario_Rol();
                 $usuario_rol->rol()->associate($rol);
                 $usuario_rol->usuario()->associate($usuario);
             $usuario_rol->save();
 
-
-            $plan=Plan::byNombre('BASICO')->first();
+            $plan=Plan::byNombre('GRATUITO')->first();
 
             $suscripcion=new Suscripcion();
                 $suscripcion->empresa_id=$empresa->empresa_id;
@@ -547,8 +544,8 @@ class SuscripcionController extends Controller{
                 $suscripcion->suscripcion_fecha_inicio= date("Y-m-d");
                 $suscripcion->suscripcion_fecha_finalizacion= date("Y-m-d",strtotime(date("d-m-Y").'+ 30 days'));
                 $suscripcion->suscripcion_cantidad_generado=0;
-                $suscripcion->suscripcion_permiso='FACTURACION';
-                $suscripcion->estado=1;
+                $suscripcion->suscripcion_permiso='4';
+                $suscripcion->suscripcion_estado=0;
             $suscripcion->save();
 
             $tarifaIva = new Tarifa_Iva();
@@ -640,7 +637,7 @@ class SuscripcionController extends Controller{
 
 
             DB::commit();
-            return redirect('login')->with('success','Éxito, Revisa tu bandeja de entrada para activar tu Cuenta, correo: '.$request->idEmail);
+            return redirect('login')->with('success','Éxito, Revisa tu bandeja de entrada para activar tu Cuenta, se envió al correo: '.$request->idEmail);
         }catch(\Exception $ex){
             DB::rollBack();
             return redirect('/registro')->with('error','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');

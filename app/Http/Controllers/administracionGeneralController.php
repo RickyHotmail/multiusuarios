@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Banco_Lista;
 use App\Models\Empresa;
 use App\Models\Pago;
+use App\Models\Parametrizacion_Grupo_Permiso;
 use App\Models\Parametrizacion_Permiso;
 use App\Models\Plan;
 use App\Models\Rol_Permiso;
@@ -44,10 +45,6 @@ class administracionGeneralController extends Controller{
         }
         return $pass;
     }
-    
-
-    
-
 
     public function restablecerClaveUsuario($id){
         try{
@@ -158,32 +155,27 @@ class administracionGeneralController extends Controller{
     
     public function verPermisos(Request $request, $id){
         $empresa=Empresa::findOrFail($id);
+        $grupos=Parametrizacion_Grupo_Permiso::grupos()->get();
 
         return view('admin.suscripcion.permiso',[
-            'empresa'=>$empresa
+            'empresa'=>$empresa,
+            'grupos'=>$grupos
         ]);
     }
 
     public function actualizarPermisosAdministrador(Request $request, $id){
         try{
-            $parmetrizacionesP=Parametrizacion_Permiso::parametrizacionesPermiso()->get();
-
+            $permisosGrupo=Parametrizacion_Permiso::parametrizacionesPermiso($request->permiso_general)->get();
             $rol=DB::select(DB::raw("select * from rol where rol_nombre='Administrador' and empresa_id=$id"));
-
-            return $rol;
             
-            $result=DB::select(DB::raw("delete from rol_permiso where rol_id=$rol[0]->rol_id"));
+            DB::select(DB::raw("delete from rol_permiso where rol_id=".$rol[0]->rol_id));
 
-            foreach($parmetrizacionesP as $param){
-                if($request->permiso_general==4)
-                if($param->parametrizacionp_facturacion==1){
-                    $rolPermiso=new Rol_Permiso();
-                    $rolPermiso->permiso_id=$param->permiso_id;
-                    $rolPermiso->rol_id=$rol->rol_id;
-                    $rolPermiso->save();
-                }
+            foreach($permisosGrupo as $param){
+                $rolPermiso=new Rol_Permiso();
+                $rolPermiso->permiso_id=$param->permiso_id;
+                $rolPermiso->rol_id=$rol[0]->rol_id;
+                $rolPermiso->save();
             }
-
 
             DB::commit();
             return redirect('administracion')->with('success','Los permisos fueron cambiados correctamente');
