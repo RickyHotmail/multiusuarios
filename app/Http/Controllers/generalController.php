@@ -702,15 +702,23 @@ class generalController extends Controller
                                     background: linear-gradient(352deg, rgba(241,222,44,1) 0%, rgba(250,250,250,1) 100%) !important;
                                     padding: 10px;
                                 }
+                                .encabezado-izquierdo{
+                                    width: 30%;
+                                    text-align: end
+                                }
+                                .encabezado-derecho{
+                                    width: 70%;
+                                    text-align: start
+                                }
                             </style>
                         </head>";
             $cuerpo .= "<body style='text-align: center'>";
             $cuerpo .= "<table style='min-width: 1000px>";
             $cuerpo .= "<tr style='text-align: center'>
-                            <td width: '20%'>
-                            <img src='cid:logo'  width='100px'>
+                            <td class='encabezado-izquierdo'>
+                                <img src='cid:logo'  width='150px'>
                             </td>
-                            <td width: '80%'>
+                            <td class='encabezado-derecho'>
                                 <strong>NEOPAGUPA - TU SISTEMA CONTABLE</strong>
                             </td>
                         </tr>";
