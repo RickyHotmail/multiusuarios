@@ -11,6 +11,7 @@ use App\Models\Nota_Credito;
 use App\Models\Nota_Debito;
 use App\Models\Punto_Emision;
 use App\Models\Retencion_Compra;
+use App\Models\Servidor_Correo;
 use App\Models\Transaccion_Identificacion;
 use DateTime;
 use Illuminate\Http\Request;
@@ -610,28 +611,34 @@ class facturacionElectronicaController extends Controller
         return PDF::loadHTML($view)->save('documentosElectronicos/'.$empresa->empresa_ruc.'/'.DateTime::createFromFormat('d/m/Y', $fecha)->format('d-m-Y').'/'.$nombreArchivo.'.pdf')->stream($nombreArchivo.'.pdf');
     }
     public function enviarCorreoCliente($mailCli, $fecha, $fileName,$empresa){
+        $servidor=Servidor_Correo::servidorCorreo()->first();
+
         require base_path("vendor/autoload.php");
         $mail = new PHPMailer(true);
         try {
             $mail->isSMTP(); 
             $mail->CharSet = 'utf-8'; 
-            $mail->Host = trim($empresa->emailEmpresa->email_servidor);
+            $mail->Host = trim($servidor->servidor_host);
             $mail->SMTPAuth = true;
-            $mail->SMTPSecure = 'tls';//$mail->SMTPSecure = false;
+            $mail->SMTPSecure = $servidor->servidor_secure;
             $mail->SMTPAutoTLS = false;
-            $mail->Port = trim($empresa->emailEmpresa->email_puerto); 
-            $mail->Username = trim($empresa->emailEmpresa->email_email);
-            $mail->Password = trim(($empresa->emailEmpresa->email_pass));
-            $mail->setFrom(trim($empresa->emailEmpresa->email_email), $empresa->empresa_nombreComercial);
+            $mail->Port = trim( $servidor->servidor_port); 
+            $mail->Username = trim($servidor->servidor_username);
+            $mail->Password = trim($servidor->servidor_password);
+            $mail->setFrom(trim($servidor->servidor_username), $servidor->servidor_from);
             $mail->Subject = $empresa->empresa_nombreComercial.' - Documento electronico '.$fileName;
             //$mail->MsgHTML($empresa->emailEmpresa->email_mensaje.'<br><br><img src="'. $image .'" alt="BANNER"  width="650"><br>');
-            $mail->MsgHTML($empresa->emailEmpresa->email_mensaje);
+            $mail->MsgHTML(" NEOPAGUPA // SISTEMA DE FACTURACIÓN ELECTRÓNICA  !!! ATENCIÓN ESTE DOCUMENTO TIENE VALIDEZ TRIBUTARIA!!!  Con la finalidad de brindar un mejor servicio, adjunto encontrará la Factura Electrónica, legalmente válida para las declaraciones de impuestos ante el SRI.  El archivo XML adjunto, le sugerimos que almacene de manera segura puesto que tiene validez tributaria.  La factura electrónica en formato PDF adjunto, no es necesario que la imprima, le sirve para verificar el detalle del servicio. ");
             $correos = explode(";",$mailCli);
             foreach ($correos as $correo) {
                 $mail->addAddress(trim($correo),'');
             }
             if(count($correos) == 0 ){
                 $mail->addAddress(trim($mailCli),'');
+            }
+
+            if(isset($empresa->empresa_email)){
+                $mail->addAddress(trim($empresa->empresa_email),'');
             }
             $mail->addAttachment('documentosElectronicos/'.$empresa->empresa_ruc.'/'.DateTime::createFromFormat('d/m/Y', $fecha)->format('d-m-Y').'/'.$fileName.'.pdf', $fileName.'.pdf');
             $mail->addAttachment('documentosElectronicos/'.$empresa->empresa_ruc.'/'.DateTime::createFromFormat('d/m/Y', $fecha)->format('d-m-Y').'/'.$fileName.'.xml', $fileName.'.xml');
