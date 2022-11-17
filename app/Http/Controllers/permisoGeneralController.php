@@ -19,7 +19,7 @@ class permisoGeneralController extends Controller{
         $grupos=Parametrizacion_Grupo_Permiso::grupos()->get();
         //return $grupos;
 
-        return view('admin.seguridad.rol.permisosGenerales.index', [
+        return view('admin.seguridad.rol.permisosgenerales.index', [
             'grupos'=>$grupos
         ]);
     }

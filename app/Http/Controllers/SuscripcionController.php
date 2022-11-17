@@ -459,12 +459,10 @@ class SuscripcionController extends Controller{
             $rol->save();
 
             foreach($parmetrizacionesP as $param){
-                if($param->parametrizacionp_facturacion==1){
-                    $rolPermiso=new Rol_Permiso();
-                    $rolPermiso->permiso_id=$param->permiso_id;
-                    $rolPermiso->rol_id=$rol->rol_id;
-                    $rolPermiso->save();
-                }
+                $rolPermiso=new Rol_Permiso();
+                $rolPermiso->permiso_id=$param->permiso_id;
+                $rolPermiso->rol_id=$rol->rol_id;
+                $rolPermiso->save();
             }
 
             $movimiento=new Tipo_MI();

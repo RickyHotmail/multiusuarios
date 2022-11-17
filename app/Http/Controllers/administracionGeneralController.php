@@ -165,11 +165,13 @@ class administracionGeneralController extends Controller{
 
     public function actualizarPermisosAdministrador(Request $request, $id){
         try{
+            DB::beginTransaction();
             $permisosGrupo=Parametrizacion_Permiso::parametrizacionesPermiso($request->permiso_general)->get();
             $rol=DB::select(DB::raw("select * from rol where rol_nombre='Administrador' and empresa_id=$id"));
             
             DB::select(DB::raw("delete from rol_permiso where rol_id=".$rol[0]->rol_id));
 
+            
             foreach($permisosGrupo as $param){
                 $rolPermiso=new Rol_Permiso();
                 $rolPermiso->permiso_id=$param->permiso_id;
