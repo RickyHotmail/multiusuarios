@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Suscripcion extends Model
 {
@@ -23,6 +24,10 @@ class Suscripcion extends Model
     ];
     protected $guarded=[
     ];
+
+    public function scopeSuscripcion($query){
+        return $query->where('empresa_id','=',Auth::user()->empresa_id);
+    }
 
     public function empresa(){
         return $this->belongsTo(Empresa::class, 'empresa_id', 'empresa_id');

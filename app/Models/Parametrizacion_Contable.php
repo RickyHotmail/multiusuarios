@@ -31,7 +31,10 @@ class Parametrizacion_Contable extends Model
     }
     public function scopeParametrizacionBySucursal($query, $sucursal_id){
         return $query->join('sucursal', 'sucursal.sucursal_id','=','parametrizacion_contable.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('parametrizacion_contable.sucursal_id','=',$sucursal_id);
-    }    
+    }
+    public function scopeBySucursal($query, $sucursal_id){
+        return $query->where('parametrizacion_contable.sucursal_id','=',$sucursal_id);
+    }
     public function scopeParametrizacionByNombre($query, $sucursal, $nombre){
         return $query->join('sucursal', 'sucursal.sucursal_id','=','parametrizacion_contable.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('parametrizacion_contable.sucursal_id','=',$sucursal)->where('parametrizacion_nombre','=',$nombre);
     }

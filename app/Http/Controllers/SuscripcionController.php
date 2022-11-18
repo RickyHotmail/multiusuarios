@@ -24,6 +24,7 @@ use App\Models\Empresa;
 use App\Models\Grupo_Producto;
 use App\Models\Marca_Producto;
 use App\Models\Pais;
+use App\Models\Parametrizacion_Contable;
 use App\Models\Parametrizacion_Permiso;
 use App\Models\Provincia;
 use App\Models\Punto_Emision;
@@ -161,10 +162,12 @@ class SuscripcionController extends Controller{
                 $puntoEmision->sucursal_id = $sucursal->sucursal_id;
             $puntoEmision->save();
 
+            $cajaPagupa=Caja::findOrFail(8);
             $caja = new Caja();
                 $caja->caja_nombre = 'Efectivo';            
                 $caja->empresa_id = $empresa->empresa_id;
                 $caja->sucursal_id = $sucursal->sucursal_id;
+                $caja->cuenta_id=$cajaPagupa->cuenta_id;
                 $caja->caja_estado = 1;
             $caja->save();
 
@@ -458,11 +461,25 @@ class SuscripcionController extends Controller{
             $rol->rol_estado=1;
             $rol->save();
 
+            
             foreach($parmetrizacionesP as $param){
                 $rolPermiso=new Rol_Permiso();
                 $rolPermiso->permiso_id=$param->permiso_id;
                 $rolPermiso->rol_id=$rol->rol_id;
                 $rolPermiso->save();
+            }
+
+            //Parametrizacion
+            $parametrizacionContable=Parametrizacion_Contable::bySucursal(11)->get();
+            foreach($parametrizacionContable as $param){
+                $nuevaParametrizacion=new Parametrizacion_Contable();
+                $nuevaParametrizacion->parametrizacion_nombre=$param->parametrizacion_nombre;
+                $nuevaParametrizacion->parametrizacion_cuenta_general=$param->parametrizacion_cuenta_general;
+                $nuevaParametrizacion->parametrizacion_orden=$param->parametrizacion_orden;
+                $nuevaParametrizacion->cuenta_id=$param->cuenta_id;
+                $nuevaParametrizacion->sucursal_id=$sucursal->sucursal_id;
+                $nuevaParametrizacion->parametrizacion_estado=1;
+                $nuevaParametrizacion->save();
             }
 
             $movimiento=new Tipo_MI();

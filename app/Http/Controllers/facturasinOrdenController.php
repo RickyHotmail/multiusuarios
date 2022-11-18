@@ -93,7 +93,8 @@ class facturasinOrdenController extends Controller
                     'unidadMedidas'=>$unidadMedidas,
                     'tamanos'=>$tamanos,
                     'grupos'=>$grupos,
-                    'sucursales'=>sucursal::sucursales()->get()
+                    'sucursales'=>sucursal::sucursales()->get(),
+                    'cuentas'=>$cuentas
                 ]);
             }else{
                 return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir facturas de venta, configueros y vuelva a intentar');
@@ -524,7 +525,7 @@ class facturasinOrdenController extends Controller
             if($facturaAux->factura_xml_estado == 'AUTORIZADO'){
                 $urlPdf='documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $request->get('factura_fecha'))->format('d-m-Y').'/'.$factura->factura_xml_nombre.'.pdf';
 
-                if (!Schema::hasTable('parametrizacion_impresion_factura')) {
+                if (Schema::hasTable('parametrizacion_impresion_factura')) {
                     $parametrizacionImpresion=Parametrizacion_Impresion::ParametrizacionImpresion()->first();
 
                     if($parametrizacionImpresion){

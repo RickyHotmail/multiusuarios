@@ -685,7 +685,19 @@ class facturacionElectronicaController extends Controller
         $key = openssl_pkey_get_private($privKey);
 
         $data=openssl_x509_parse($pubKey,true);
-        $emisor = "CN=".$data['issuer']['CN'].",OU=".$data['issuer']['OU'].",O=".$data['issuer']['O'].",C=".$data['issuer']['C'];
+
+        //$emisor = "CN=".$data['issuer']['CN'].",OU=".$data['issuer']['OU'].",O=".$data['issuer']['O'].",C=".$data['issuer']['C'];
+
+        $emisor="";
+        foreach($data['issuer'] as $clave=>$valor){
+            if(str_starts_with($clave,'organizationIdentifier'))
+                $emisor.="2.5.4.97=#0c0f".bin2hex($valor).",";
+            else
+                $emisor.=$clave."=".$valor.",";
+        }
+
+        $emisor=substr($emisor, 0, -1);
+
         $X509SerialNumber = $data['serialNumber'];
         $certlist = $this->obtener_Certificate($pubKey);
         $certificateX509 = $certlist['Certificate'];
