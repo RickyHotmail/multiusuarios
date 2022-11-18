@@ -74,7 +74,25 @@ class facturasinOrdenController extends Controller
                 if($secuencialAux){$secuencial=$secuencialAux+1;}
                 $general = new generalController();
                 if($general->documentos()){
-                    return view('admin.ventas.facturaSinOrden.nuevo',['vendedores'=>Vendedor::Vendedores()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 'bodegas'=>Bodega::bodegasSucursal($id)->get(),'formasPago'=>Forma_Pago::formaPagos()->get(), 'cajaAbierta'=>$cajaAbierta, 'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                    return view('admin.ventas.facturaSinOrden.nuevo',[
+                        'vendedores'=>Vendedor::Vendedores()->get(),
+                        'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),
+                        'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 
+                        'bodegas'=>Bodega::bodegasSucursal($id)->get(),
+                        'formasPago'=>Forma_Pago::formaPagos()->get(), 
+                        'cajaAbierta'=>$cajaAbierta, 
+                        'rangoDocumento'=>$rangoDocumento,
+                        'PE'=>Punto_Emision::puntos()->get(),
+                        'tipoPermiso'=>$tipoPermiso,
+                        'gruposPermiso'=>$gruposPermiso, 
+                        'permisosAdmin'=>$permisosAdmin,
+                        'categorias'=>$categorias,
+                        'marcas'=>$marcas,
+                        'unidadMedidas'=>$unidadMedidas,
+                        'tamanos'=>$tamanos,
+                        'grupos'=>$grupos,
+                        'sucursales'=>sucursal::sucursales()->get(),
+                        'cuentas'=>$cuentas])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
                 }
                 return view('admin.ventas.facturaSinOrden.nuevo',[
                     'vendedores'=>Vendedor::Vendedores()->get(),
