@@ -115,7 +115,6 @@ class SuscripcionController extends Controller{
                 $empresa->empresa_contribuyenteEspecial =$request->get('idContribuyente');
                 $empresa->empresa_estado=1;
             $empresa->save();
-
             
             $usuarioControlador = new usuarioController();
             $usuario = new User();
@@ -560,7 +559,7 @@ class SuscripcionController extends Controller{
                 $suscripcion->suscripcion_fecha_finalizacion= date("Y-m-d",strtotime(date("d-m-Y").'+ 30 days'));
                 $suscripcion->suscripcion_cantidad_generado=0;
                 $suscripcion->suscripcion_permiso='4';
-                $suscripcion->suscripcion_estado=0;
+                $suscripcion->suscripcion_estado=1;
             $suscripcion->save();
 
             $tarifaIva = new Tarifa_Iva();
