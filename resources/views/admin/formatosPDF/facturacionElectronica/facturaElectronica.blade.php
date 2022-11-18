@@ -149,7 +149,11 @@
               <td><b>Tiempo: </b></td>
             </tr>
             <tr>
-              @if($xml->infoFactura->pagos->pago->formaPago == 20)<td>OTROS CON UTILIZACIÓN DEL SISTEMA FINANCIERO</td>@endif
+              @foreach($formapago as $forma)
+                @if($xml->infoFactura->pagos->pago->formaPago == $forma->forma_pago_codigo)
+                <td>$forma->forma_pago_nombre</td>
+                @endif
+              @endforeach
               <td>{{ $xml->infoFactura->pagos->pago->total }}</td>
               <td>{{ $xml->infoFactura->pagos->pago->plazo }}</td>
               <td>{{ $xml->infoFactura->pagos->pago->unidadTiempo }}</td>

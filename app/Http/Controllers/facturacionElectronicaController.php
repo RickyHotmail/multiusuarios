@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Empresa;
 use App\Models\Factura_Venta;
 use App\Models\Firma_Electronica;
+use App\Models\Forma_Pago;
 use App\Models\Guia_Remision;
 use App\Models\Liquidacion_Compra;
 use App\Models\Nota_Credito;
@@ -588,9 +589,10 @@ class facturacionElectronicaController extends Controller
     
     function crearPDFdocElectronico($xml, $fecha, $nombreArchivo,$empresa, $fechaAutorizacion, $ambiente, $tipoDocumento) 
     {
+        $formapago=Forma_Pago::FormaPagos()->get();
         switch ($tipoDocumento) {
             case 'FACTURA':
-                $view =  \View::make('admin.formatosPDF.facturacionElectronica.facturaElectronica', ['xml'=> $xml, 'logo'=> $empresa->empresa_logo, 'fechaAutorizacion'=>strstr($fechaAutorizacion, 'T', true), 'horaAutorizacion'=> str_replace('-05:00','',str_replace('T','',strstr($fechaAutorizacion, 'T'))), 'ambiente'=>$ambiente]);
+                $view =  \View::make('admin.formatosPDF.facturacionElectronica.facturaElectronica', ['formapago'=> $formapago,'xml'=> $xml, 'logo'=> $empresa->empresa_logo, 'fechaAutorizacion'=>strstr($fechaAutorizacion, 'T', true), 'horaAutorizacion'=> str_replace('-05:00','',str_replace('T','',strstr($fechaAutorizacion, 'T'))), 'ambiente'=>$ambiente]);
                 break;
             case 'RETENCION':
                 $view =  \View::make('admin.formatosPDF.facturacionElectronica.retencionElectronica', ['xml'=> $xml, 'logo'=> $empresa->empresa_logo, 'fechaAutorizacion'=>strstr($fechaAutorizacion, 'T', true), 'horaAutorizacion'=> str_replace('-05:00','',str_replace('T','',strstr($fechaAutorizacion, 'T'))), 'ambiente'=>$ambiente]);
