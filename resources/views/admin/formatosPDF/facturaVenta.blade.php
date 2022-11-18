@@ -153,7 +153,12 @@
               <td><b>Tiempo: </b></td>
             </tr>
             <tr>
-              @if($factura->formaPago->forma_pago_codigo == 20)<td>OTROS CON UTILIZACIÓN DEL SISTEMA FINANCIERO</td>@endif
+              {{--@if($factura->formaPago->forma_pago_codigo == 20)<td>OTROS CON UTILIZACIÓN DEL SISTEMA FINANCIERO</td>@endif--}}
+              @if($factura->formaPago)
+                <td>{{$factura->formaPago->forma_pago_nombre}}</td>
+              @else
+                <td>OTROS CON UTILIZACIÓN DEL SISTEMA FINANCIERO</td>
+              @endif
               <td>{{ number_format($factura->factura_total,2) }}</td>
               <td>{{$factura->factura_dias_plazo }}</td>
               <td> dias </td>
