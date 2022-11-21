@@ -25,10 +25,7 @@ class Detalle_RV extends Model
     protected $guarded =[
     ];
     public function scopeDetalleByFecha($query, $fechaInicio, $fechaFin){
-        return $query->join('retencion_venta','retencion_venta.retencion_id','=','detalle_rv.retencion_id')->join('concepto_retencion','concepto_retencion.concepto_id','=','detalle_rv.concepto_id')
-        ->join('rango_documento','rango_documento.rango_id','=','retencion_venta.rango_id')
-        ->join('punto_emision','rango_documento.punto_id','=','punto_emision.punto_id')
-        ->join('sucursal','sucursal.sucursal_id','=','punto_emision.sucursal_id')->where('sucursal.empresa_id','=',Auth::user()->empresa_id)->where('retencion_fecha','>=',$fechaInicio)->where('retencion_fecha','<=',$fechaFin);
+        return $query->join('retencion_venta','retencion_venta.retencion_id','=','detalle_rv.retencion_id')->join('concepto_retencion','concepto_retencion.concepto_id','=','detalle_rv.concepto_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('retencion_fecha','>=',$fechaInicio)->where('retencion_fecha','<=',$fechaFin);
     }
     public function conceptoRetencion(){
         return $this->belongsTo(Concepto_Retencion::class, 'concepto_id', 'concepto_id');

@@ -151,7 +151,7 @@
             <tr>
               @foreach($formapago as $forma)
                 @if($xml->infoFactura->pagos->pago->formaPago == $forma->forma_pago_codigo)
-                <td>$forma->forma_pago_nombre</td>
+                <td>{{$forma->forma_pago_nombre}}</td>
                 @endif
               @endforeach
               <td>{{ $xml->infoFactura->pagos->pago->total }}</td>
