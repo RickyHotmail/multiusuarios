@@ -47,6 +47,11 @@ class Entidad_Procedimiento extends Model
     public function procedimiento()
     {
         return $this->belongsTo(Procedimiento_Especialidad::class, 'procedimiento_id', 'procedimiento_id');
-    } 
+    }
+
+    public function entidad()
+    {
+        return $this->hasOne(Entidad::class, 'entidad_id', 'entidad_id');
+    }
 
 }

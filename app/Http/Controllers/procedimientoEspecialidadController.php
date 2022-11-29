@@ -83,49 +83,70 @@ class procedimientoEspecialidadController extends Controller
             $agregado=array();
             $saltado=array();
 
+            $auditoria = new generalController();
+            
             foreach($procedimientos as $procedimiento){
-                $aseguradora_procedimiento=$procedimiento->aseguradoraprocedimientos;
-                $entidad_procedimiento=$procedimiento->entidadprocedimientos;
-
-                echo $procedimiento->procedimiento_id.'   '.$procedimiento->producto_id.'  '.$procedimiento->especialidad_id.'       '.count($aseguradora_procedimiento).'    '.count($entidad_procedimiento) .' <br>';
-
-                foreach($aseguradora_procedimiento as $ap) $ap->delete();
-                foreach($entidad_procedimiento as $ep) $ep->delete();
-
-                if(count($aseguradora_procedimiento)==0  &&  count($entidad_procedimiento)==0){
-                    $borrado[]=$procedimiento->producto_id;
-                    //$procedimiento->delete();
-
-                    $procedimiento = Procedimiento_Especialidad::where('procedimiento_id', '=',  $procedimiento->procedimiento_id)->delete();
-                    //return 'en borrar '.$procedimiento->procedimiento_id;
+                $encontro=false;
+                
+                if(isset($request->producto)){
+                    foreach($request->producto as $prod=>$valor){
+                        if($prod==$procedimiento->producto_id){
+                            $encontro=true;
+                            break;
+                        }
+                    }
                 }
-                else{
-                    $saltado[]=$procedimiento;
-                    //return $aseguradora_procedimiento;
+
+                if(!$encontro){
+                    $aseguradora_procedimiento=$procedimiento->aseguradoraprocedimientos;
+                    $entidad_procedimiento=$procedimiento->entidadprocedimientos;
+
+                    $borrado[]=$aseguradora_procedimiento;
+                    $borrado[]=$entidad_procedimiento;
+                    foreach($aseguradora_procedimiento as $ap){
+                        echo 'prod: '.$ap->procedimiento->producto_id.'  esp: '.$ap->procedimiento->especialidad_id.'   cli '.$ap->cliente->cliente_nombre.'<br>';
+                        $auditoria->registrarAuditoria('Se borró Registro Aseg Proced de table procedimiento_especialidad ',$request->especialidad_id,'El registro fué -> ' . $ap->procedimientoA_id);
+                        $ap->delete();
+                    }
+
+                    foreach($entidad_procedimiento as $ep){
+                        echo 'prod: '.$ep->procedimiento->producto_id.'  esp: '.$ep->procedimiento->especialidad_id.'   cli '.$ep->entidad->entidad_nombre.'<br>';
+                        $auditoria->registrarAuditoria('Se borró Registro Ent Proced de table procedimiento_especialidad ',$request->especialidad_id,'El registro fué -> ' . $ap->procedimientoA_id);
+                        $ep->delete();
+                    }
+
+                    $procedimiento->delete();
                 }
             }
-            
+
             if(isset($request->producto)){
                 foreach($request->producto as $prod=>$valor){
-                    $PE=Procedimiento_Especialidad::procedimientoProductoEspecialidad($prod,$request->especialidad_id)->get();
+                    $encontro=false;
 
-                    if(count($PE)==0){
+                    foreach($procedimientos as $procedimiento){
+                        if($procedimiento->producto_id==$prod){
+                            $encontro=true;
+                            break;
+                        }
+                    }
+                    
+                    if(!$encontro){
                         $nuevo_procedimiento=new Procedimiento_Especialidad();
                         $nuevo_procedimiento->producto_id=$prod;
                         $nuevo_procedimiento->especialidad_id=$request->especialidad_id;
                         $nuevo_procedimiento->procedimiento_estado=1;
                         $nuevo_procedimiento->save();
 
-                        $agregado[]=$prod;
+                        echo json_encode($nuevo_procedimiento);
+
+                        $auditoria->registrarAuditoria('Se guardó Registro procedimiento_especialidad ',$request->especialidad_id,'El registro fué -> ' . $nuevo_procedimiento->procedimiento_id);
                     }
                 }
             }
 
         
-            /*Inicio de registro de auditoria */
-            $auditoria = new generalController();
-            $auditoria->registrarAuditoria('Actualizacion de procedimientos especialidad en grupo ', $request->especialidad_id, 'Las especialidades borradas  fueron -> ' . json_encode($borrado).'\n Los procedimientos añadidos fueron '.json_encode($agregado));
-            /*Fin de registro de auditoria */
+            //$auditoria = new generalController();
+            //$auditoria->registrarAuditoria('Actualizacion de procedimientos especialidad en grupo ', $request->especialidad_id, 'Las especialidades borradas  fueron -> ' . json_encode($borrado).'\n Los procedimientos añadidos fueron '.json_encode($agregado));
             DB::commit();
             return redirect('procedimientoEspecialidad')->with('success', 'Datos guardados exitosamente');
         } catch (\Exception $ex) {

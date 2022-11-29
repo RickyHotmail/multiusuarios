@@ -54,6 +54,19 @@ class Aseguradora_Procedimiento extends Model
                     )->where('aseguradora_procedimiento.procedimientoA_estado','=','1'
                     )->where('cliente.cliente_id','=',$id);
     }
+
+    public function scopeAseguradoraProcedimientoEspecialidad($query, $cliente, $especialidad){
+        return $query->join('cliente','cliente.cliente_id','=','aseguradora_procedimiento.cliente_id'
+                    )->join('tipo_cliente','tipo_cliente.tipo_cliente_id','=','cliente.tipo_cliente_id'
+                    )->join('procedimiento_especialidad','procedimiento_especialidad.procedimiento_id','=','aseguradora_procedimiento.procedimiento_id'
+                    )->join('especialidad','especialidad.especialidad_id','=','procedimiento_especialidad.especialidad_id'
+                    )->where('tipo_cliente.empresa_id','=',Auth::user()->empresa_id
+                    )->where('aseguradora_procedimiento.procedimientoA_estado','=','1'
+                    )->where('cliente.cliente_id','=',$cliente
+                    )->where('especialidad.especialidad_id','=',$especialidad);
+    }
+
+
     public function scopeProcedimientosAsignados($query, $procedimiento, $aseguradora){
         return $query->join('cliente','cliente.cliente_id','=','aseguradora_procedimiento.cliente_id'
                     )->join('categoria_cliente', 'categoria_cliente.categoria_cliente_id','=','cliente.categoria_cliente_id'
