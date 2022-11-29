@@ -25,14 +25,17 @@ class sucursal extends Model
     protected static function booted()
     {
         static::created(function ($sucursal) {
-            foreach(Cuentas_Parametrizar::cuentas()->get() as $cuenta){
-                $parametrizacionContable = new Parametrizacion_Contable();
-                $parametrizacionContable->parametrizacion_nombre = $cuenta->parametrizar_nombre;
-                $parametrizacionContable->parametrizacion_cuenta_general ="1";   
-                $parametrizacionContable->parametrizacion_estado  = 1;
-                $parametrizacionContable->parametrizacion_orden = $cuenta->parametrizar_orden;
-                $parametrizacionContable->sucursal()->associate($sucursal);
-                $parametrizacionContable->save();
+            $parametrizacionContable=Parametrizacion_Contable::bySucursal(11)->get();
+
+            foreach($parametrizacionContable as $param){
+                $nuevaParametrizacion=new Parametrizacion_Contable();
+                $nuevaParametrizacion->parametrizacion_nombre=$param->parametrizacion_nombre;
+                $nuevaParametrizacion->parametrizacion_cuenta_general=$param->parametrizacion_cuenta_general;
+                $nuevaParametrizacion->parametrizacion_orden=$param->parametrizacion_orden;
+                $nuevaParametrizacion->cuenta_id=$param->cuenta_id;
+                $nuevaParametrizacion->sucursal_id=$sucursal->sucursal_id;
+                $nuevaParametrizacion->parametrizacion_estado=1;
+                $nuevaParametrizacion->save();
             }
         });
     }

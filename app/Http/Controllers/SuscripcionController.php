@@ -468,19 +468,6 @@ class SuscripcionController extends Controller{
                 $rolPermiso->save();
             }
 
-            //Parametrizacion
-            $parametrizacionContable=Parametrizacion_Contable::bySucursal(11)->get();
-            foreach($parametrizacionContable as $param){
-                $nuevaParametrizacion=new Parametrizacion_Contable();
-                $nuevaParametrizacion->parametrizacion_nombre=$param->parametrizacion_nombre;
-                $nuevaParametrizacion->parametrizacion_cuenta_general=$param->parametrizacion_cuenta_general;
-                $nuevaParametrizacion->parametrizacion_orden=$param->parametrizacion_orden;
-                $nuevaParametrizacion->cuenta_id=$param->cuenta_id;
-                $nuevaParametrizacion->sucursal_id=$sucursal->sucursal_id;
-                $nuevaParametrizacion->parametrizacion_estado=1;
-                $nuevaParametrizacion->save();
-            }
-
             $movimiento=new Tipo_MI();
                 $movimiento->tipo_nombre='SIN MOVIMIENTO';
                 $movimiento->tipo_estado='1';
