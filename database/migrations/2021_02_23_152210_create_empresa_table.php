@@ -33,6 +33,7 @@ class CreateEmpresaTable extends Migration
             $table->string('empresa_tipo');
             $table->string('empresa_contribuyenteEspecial');
             $table->string('empresa_contabilidad');
+            $table->integer('empresa_factura_correo')->default(0);
             $table->string('empresa_electronica');
             $table->string('empresa_nomina');
             $table->string('empresa_medico');
