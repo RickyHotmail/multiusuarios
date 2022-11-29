@@ -307,6 +307,11 @@ class empresaController extends Controller
             $empresa->empresa_cedula_contador =$request->get('idcedulacontador');
             $empresa->empresa_contador =$request->get('idcontador');
             $empresa->empresa_email =$request->get('idEmail');
+            if ($request->get('idFacturaCorreo') == "on"){
+                $empresa->empresa_factura_correo =1;
+            }else{
+                $empresa->empresa_factura_correo =0;
+            }
             if ($request->get('idInventario') == "on"){
                 $empresa->empresa_control_inventario ="1";
             }else{
