@@ -285,9 +285,9 @@ class procedimientoEspecialidadController extends Controller
 
     public function buscarByClienteEntidadEspecialidad(Request $request){
         return DB::select(DB::raw('select e.especialidad_nombre, pe.especialidad_id, p.producto_id, p.producto_codigo, p.producto_nombre, p.producto_precio_costo, pe.procedimiento_id,'.
-                                '(select coalesce("procedimientoA_valor", 0) from aseguradora_procedimiento where procedimiento_id=pe.procedimiento_id and cliente_id='.$request->cliente.') as valor,'.
-                                '(select ep_tipo from entidad_procedimiento where procedimiento_id=pe.procedimiento_id and entidad_id='.$request->entidad.') as ep_tipo,'.
-                                '(select ep_valor from entidad_procedimiento where procedimiento_id=pe.procedimiento_id and entidad_id='.$request->entidad.') as ep_valor '.
+                                '(select coalesce("procedimientoA_valor", 0) from aseguradora_procedimiento where procedimiento_id=pe.procedimiento_id and cliente_id='.$request->cliente.' limit 1) as valor,'.
+                                '(select ep_tipo from entidad_procedimiento where procedimiento_id=pe.procedimiento_id and entidad_id='.$request->entidad.' limit 1) as ep_tipo,'.
+                                '(select ep_valor from entidad_procedimiento where procedimiento_id=pe.procedimiento_id and entidad_id='.$request->entidad.' limit 1) as ep_valor '.
    
                                 'from especialidad as e, producto as p, procedimiento_especialidad as pe '.
                                 
