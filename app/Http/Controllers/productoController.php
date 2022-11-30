@@ -17,10 +17,12 @@ use App\Models\Cliente;
 use App\Models\Codigo_Producto;
 use App\Models\Detalle_Lista;
 use App\Models\Empresa;
+use App\Models\Imagen;
 use App\Models\Precio_Producto;
 use App\Models\Proveedor;
 use App\Models\Punto_Emision;
 use App\Models\Sucursal;
+use App\Models\Tipo_Imagen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -134,6 +136,7 @@ class productoController extends Controller
             }
             $producto->save();
 
+            $auditoria = new generalController();
             $grupo=Grupo_Producto::findOrFail($request->get('grupo_id'));
 
             if($grupo->grupo_nombre=="Laboratorio"){
@@ -146,9 +149,21 @@ class productoController extends Controller
                 $examen->save();
             }
 
+            if($grupo->grupo_nombre=="Imagen" || $grupo->grupo_nombre=="IMAGEN"){
+                $imagen = new Imagen();
+                $imagen->producto_id=$producto->producto_id;
+                $imagen->imagen_estado = 1;
+
+                $tipoImagen=Tipo_Imagen::findOrFail(3);
+                if($tipoImagen) $imagen->tipo_id = $tipoImagen('tipo_id');
+
+                $imagen->save();
+                $auditoria->registrarAuditoria('Registro de imagen -> '.$request->get('imagen_nombre').', producto_id -> '.$producto->producto_id,'0','');
+            }
+
             
             /*Inicio de registro de auditoria */
-            $auditoria = new generalController();
+           
             $auditoria->registrarAuditoria('Registro de producto -> '.$request->get('producto_nombre').'con codigo de ->'.$request->get('producto_codigo'),'0','');
             /*Fin de registro de auditoria */
             DB::commit();
