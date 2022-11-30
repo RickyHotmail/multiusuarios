@@ -164,7 +164,7 @@ class productoController extends Controller
             
             /*Inicio de registro de auditoria */
            
-            $auditoria->registrarAuditoria('Registro de producto -> '.$request->get('producto_nombre').'con codigo de ->'.$request->get('producto_codigo'),'0','');
+            $auditoria->registrarAuditoria('Registro de producto -> '.$producto->producto_nombre.',  con codigo de producto ->'.$request->get('producto_codigo'),'0','');
             /*Fin de registro de auditoria */
             DB::commit();
             return redirect('producto')->with('success','Datos guardados exitosamente');
