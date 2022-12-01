@@ -200,7 +200,7 @@ class formulariosController extends Controller
                 try{   
                     DB::beginTransaction();
                     $auditoria = new generalController();
-                    $sucursales=sucursal::Sucursales()->get();
+                    $sucursales=Sucursal::Sucursales()->get();
                     foreach($sucursales as $sucursal){
                         $cierre = $auditoria->cierre($request->get('fecha_desde'),$sucursal->sucursal_id);          
                         if($cierre){

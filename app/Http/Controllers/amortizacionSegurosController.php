@@ -30,7 +30,7 @@ class amortizacionSegurosController extends Controller
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
             $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get(); 
             $estados=Amortizacion_Seguros::segurosdistinc()->orderBy('amortizacion_estado')->select('amortizacion_estado')->distinct()->get();        
-            return view('admin.bancos.seguros.index',['estados'=>$estados,'cuentas'=>Cuenta::CuentasMovimiento()->get(),'proveedores'=>Proveedor::proveedores()->get(),'sucursales'=>sucursal::sucursales()->get(), 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+            return view('admin.bancos.seguros.index',['estados'=>$estados,'cuentas'=>Cuenta::CuentasMovimiento()->get(),'proveedores'=>Proveedor::proveedores()->get(),'sucursales'=>Sucursal::sucursales()->get(), 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
         }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
@@ -43,7 +43,7 @@ class amortizacionSegurosController extends Controller
             $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
             $seguros=Amortizacion_Seguros::segurosucursal($request->get('idsucursal'),$request->get('idestado'))->get();
             $estados=Amortizacion_Seguros::segurosdistinc()->orderBy('amortizacion_estado')->select('amortizacion_estado')->distinct()->get();
-            return view('admin.bancos.seguros.index',['estadoselect'=>$request->get('idestado'),'estados'=>$estados,'seguros'=>$seguros,'cuentas'=>Cuenta::CuentasMovimiento()->get(),'proveedores'=>Proveedor::proveedores()->get(),'sucursales'=>sucursal::Sucursales()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+            return view('admin.bancos.seguros.index',['estadoselect'=>$request->get('idestado'),'estados'=>$estados,'seguros'=>$seguros,'cuentas'=>Cuenta::CuentasMovimiento()->get(),'proveedores'=>Proveedor::proveedores()->get(),'sucursales'=>Sucursal::Sucursales()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
 
     }
 

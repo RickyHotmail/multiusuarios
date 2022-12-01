@@ -54,6 +54,6 @@ class Amortizacion_Seguros extends Model
         return $this->belongsTo(Cuenta::class, 'cuenta_debe', 'cuenta_id');
     }
     public function sucursal(){
-        return $this->belongsTo(sucursal::class, 'sucursal_id', 'sucursal_id');
+        return $this->belongsTo(Sucursal::class, 'sucursal_id', 'sucursal_id');
     }
 }

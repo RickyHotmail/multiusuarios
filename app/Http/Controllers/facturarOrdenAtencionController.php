@@ -64,7 +64,7 @@ class facturarOrdenAtencionController extends Controller
         $rol=User::findOrFail(Auth::user()->user_id)->roles->first();
 
         $datos=[
-            'sucursales'=>sucursal::Sucursales()->get(),
+            'sucursales'=>Sucursal::Sucursales()->get(),
             "pacientes"=>$pacientes,
             "pacienteSel"=>$pacienteSel,
             "sucursalSel"=>$sucursalSel,

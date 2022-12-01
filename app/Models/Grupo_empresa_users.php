@@ -10,7 +10,7 @@ class Grupo_empresa_users extends Model
 {
     use HasFactory;
     
-    protected $table='grupo_empresa_user';
+    protected $table='grupo_empresa_users';
     protected $primaryKey = 'grupo_id';
     public $timestamps = true;
     protected $fillable = [        
@@ -27,7 +27,7 @@ class Grupo_empresa_users extends Model
     public function scopeGruposusers($query,$iduser){
         return $query->where('user_id','=',$iduser)->where('grupo_estado','=','1');
     }
-    public function empresa(){
+    public function empresas(){
         return $this->belongsTo(Empresa::class, 'empresa_id', 'empresa_id');
     }
     public function usuarios(){

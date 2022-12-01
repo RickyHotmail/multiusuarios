@@ -140,7 +140,7 @@ class cierreAnualController extends Controller
             $activador2=false;
             foreach($sucursales as $sucursal){
                 if(round($resultado[1]['debe'.$sucursal->sucursal_id],2)>=round($resultado[1]['haber'.$sucursal->sucursal_id],2)){
-                    $parametrizacion=sucursal::SucursalByContable($sucursal->sucursal_id,'UTILIDA DEL EJERCICIO')->first();
+                    $parametrizacion=Sucursal::SucursalByContable($sucursal->sucursal_id,'UTILIDA DEL EJERCICIO')->first();
                     $datos[$count]['cuenta'] = $parametrizacion->cuenta_id;
                     $datos[$count]['numero'] = $parametrizacion->cuenta_numero;
                     $datos[$count]['nombre'] = $parametrizacion->cuenta_nombre;
@@ -168,7 +168,7 @@ class cierreAnualController extends Controller
             $activador3=false;
             foreach($sucursales as $sucursal){  
                 if(round($resultado[1]['debe'.$sucursal->sucursal_id],2)<=round($resultado[1]['haber'.$sucursal->sucursal_id],2)){
-                    $parametrizacion=sucursal::SucursalByContable($sucursal->sucursal_id,'PERDIDA DEL EJERCICIO')->first();
+                    $parametrizacion=Sucursal::SucursalByContable($sucursal->sucursal_id,'PERDIDA DEL EJERCICIO')->first();
                     $datos[$count]['cuenta'] = $parametrizacion->cuenta_id;
                     $datos[$count]['numero'] = $parametrizacion->cuenta_numero;
                     $datos[$count]['nombre'] = $parametrizacion->cuenta_nombre;
@@ -283,7 +283,7 @@ class cierreAnualController extends Controller
             $activador2=false;
             foreach($sucursales as $sucursal){
                 if(round($resultado[1]['debe'.$sucursal->sucursal_id],2)>=round($resultado[1]['haber'.$sucursal->sucursal_id],2)){
-                    $parametrizacion=sucursal::SucursalByContable($sucursal->sucursal_id,'UTILIDADES ACUMULADAS')->first();
+                    $parametrizacion=Sucursal::SucursalByContable($sucursal->sucursal_id,'UTILIDADES ACUMULADAS')->first();
                     $datos[$count]['cuenta'] = $parametrizacion->cuenta_id;
                     $datos[$count]['numero'] = $parametrizacion->cuenta_numero;
                     $datos[$count]['nombre'] = $parametrizacion->cuenta_nombre;
@@ -311,7 +311,7 @@ class cierreAnualController extends Controller
             $activador3=false;
             foreach($sucursales as $sucursal){  
                 if(round($resultado[1]['debe'.$sucursal->sucursal_id],2)<=round($resultado[1]['haber'.$sucursal->sucursal_id],2)){
-                    $parametrizacion=sucursal::SucursalByContable($sucursal->sucursal_id,'PERDIDAS ACUMULADAS')->first();
+                    $parametrizacion=Sucursal::SucursalByContable($sucursal->sucursal_id,'PERDIDAS ACUMULADAS')->first();
                     $datos[$count]['cuenta'] = $parametrizacion->cuenta_id;
                     $datos[$count]['numero'] = $parametrizacion->cuenta_numero;
                     $datos[$count]['nombre'] = $parametrizacion->cuenta_nombre;

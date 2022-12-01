@@ -70,7 +70,7 @@ class Prestamo_Banco extends Model
         return $this->belongsTo(Banco::class, 'banco_id', 'banco_id');
     } 
     public function sucursal(){
-        return $this->belongsTo(sucursal::class, 'sucursal_id', 'sucursal_id');
+        return $this->belongsTo(Sucursal::class, 'sucursal_id', 'sucursal_id');
     }  
     public function cuentadebe(){
         return $this->belongsTo(Cuenta::class, 'cuenta_debe', 'cuenta_id');

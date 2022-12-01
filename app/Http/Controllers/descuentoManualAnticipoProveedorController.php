@@ -36,7 +36,7 @@ class descuentoManualAnticipoProveedorController extends Controller
         $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
     $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
         $proveedores = Proveedor::Proveedores()->get();
-        $sucursales = sucursal::Sucursales()->get();
+        $sucursales = Sucursal::Sucursales()->get();
         $cajasxusuario=Arqueo_Caja::arqueoCajaxuser(Auth::user()->user_id)->first();                 
         $cajas = Caja::cajas()->get();
         return view('admin.cuentasPagar.descuentoManual.index',
@@ -107,7 +107,7 @@ class descuentoManualAnticipoProveedorController extends Controller
             $proveedorS =  $request->get('proveedorID'); 
             $sucursalS =  $request->get('sucursalID');
             $proveedores = Proveedor::Proveedores()->get();
-            $sucursales = sucursal::Sucursales()->get();
+            $sucursales = Sucursal::Sucursales()->get();
             $cajasxusuario=Arqueo_Caja::arqueoCajaxuser(Auth::user()->user_id)->first();                 
             $cajas = Caja::cajas()->get();
             return view('admin.cuentasPagar.descuentoManual.index',
@@ -136,9 +136,9 @@ class descuentoManualAnticipoProveedorController extends Controller
             $general = new generalController();
             
             if($request->get('sucursalID') == '0'){
-                $sucursales = sucursal::Sucursales()->get();
+                $sucursales = Sucursal::Sucursales()->get();
             }else{
-                $sucursales = sucursal::Sucursal($request->get('sucursalID'))->get();
+                $sucursales = Sucursal::Sucursal($request->get('sucursalID'))->get();
             }            
             $proveedor = Proveedor::Proveedor($request->get('proveedorID'))->first();
             $arqueoCaja=Arqueo_Caja::arqueoCaja(Auth::user()->user_id)->first();

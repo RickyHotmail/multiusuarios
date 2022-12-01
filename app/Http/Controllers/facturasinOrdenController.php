@@ -91,7 +91,7 @@ class facturasinOrdenController extends Controller
                         'unidadMedidas'=>$unidadMedidas,
                         'tamanos'=>$tamanos,
                         'grupos'=>$grupos,
-                        'sucursales'=>sucursal::sucursales()->get(),
+                        'sucursales'=>Sucursal::sucursales()->get(),
                         'cuentas'=>$cuentas])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
                 }
                 return view('admin.ventas.facturaSinOrden.nuevo',[
@@ -111,7 +111,7 @@ class facturasinOrdenController extends Controller
                     'unidadMedidas'=>$unidadMedidas,
                     'tamanos'=>$tamanos,
                     'grupos'=>$grupos,
-                    'sucursales'=>sucursal::sucursales()->get(),
+                    'sucursales'=>Sucursal::sucursales()->get(),
                     'cuentas'=>$cuentas
                 ]);
             }else{

@@ -270,7 +270,7 @@ class productoController extends Controller
                                     $producto->sucursal_id = $tipoaux->sucursal_id;
                                 }
                             }else{
-                                $sucursal=Sucursal::SucursalesEmpresa($empresas->empresa->empresa_id)->first();
+                                $sucursal=ucursal::SucursalesEmpresa($empresas->empresa->empresa_id)->first();
                                 $producto->sucursal_id=$sucursal->sucursal_id;    
                             }
 

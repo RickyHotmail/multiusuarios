@@ -13,7 +13,7 @@ class CreateGrupoEmpresaUserTable extends Migration
      */
     public function up()
     {
-        Schema::create('grupo_empresa_user', function (Blueprint $table) {
+        Schema::create('grupo_empresa_users', function (Blueprint $table) {
             $table->id('grupo_id');
             $table->bigInteger('empresa_id');
             $table->foreign('empresa_id')->references('empresa_id')->on('empresa');

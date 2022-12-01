@@ -69,7 +69,7 @@ class listaChequeAnuladoController extends Controller
 
             $general = new generalController();
             $auditoria = new generalController();
-            $sucursales=sucursal::Sucursales()->get();
+            $sucursales=Sucursal::Sucursales()->get();
             foreach($sucursales as $sucursal){
                 $cierre = $auditoria->cierre($cheque->cheque_fecha_emision,$sucursal->sucursal_id);          
                 if($cierre){

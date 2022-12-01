@@ -53,7 +53,7 @@ class Orden_Mantenimiento extends Model
         return $this->hasOne(usuario::class, 'user_id', 'user_id');
     }
     public function sucursal(){
-        return $this->hasOne(sucursal::class, 'sucursal_id', 'sucursal_id');
+        return $this->hasOne(Sucursal::class, 'sucursal_id', 'sucursal_id');
     }
     public function scopeOrdenes($query){
         return $query->select('orden_mantenimiento.orden_id', 'orden_mantenimiento.orden_fecha_inicio', 'orden_mantenimiento.orden_estado','orden_mantenimiento.orden_resultado','orden_mantenimiento.orden_prioridad', 'orden_mantenimiento.tipo_id', 'orden_mantenimiento.orden_lugar','cliente.cliente_id', 'cliente.cliente_nombre'
