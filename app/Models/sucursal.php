@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
-class sucursal extends Model
+class Sucursal extends Model
 {
     use HasFactory;
     protected $table='sucursal';
@@ -43,7 +43,7 @@ class sucursal extends Model
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('sucursal_estado','=','1')->orderBy('sucursal_codigo','asc');
     }
     public function scopeSucursalesEmpresaNombre($query, $nombre,$empresa){
-        return $query->where('empresa_id','=',$empresa)->where('sucursal_nombre','=',$nombre)->where('sucursal_estado','=','1')->orderBy('sucursal_codigo','asc');
+        return $query->where('empresa_id','=',$empresa)->where('sucursal_nombre','=',$nombre)->where('sucursal_estado','=','1');
     }
     public function scopeSucursalesEmpresa($query,$empresa){
         return $query->where('empresa_id','=',$empresa)->where('sucursal_estado','=','1')->orderBy('sucursal_codigo','asc');
