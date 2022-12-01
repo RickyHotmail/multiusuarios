@@ -218,7 +218,7 @@
                             <div class="form-group">
                                 <div class="form-line">
                                     <input type="text" id="factura_lugar" name="factura_lugar" class="form-control "
-                                        value="Machala" placeholder="Lugar" required>
+                                        value="{{$sucursales[0]->empresa->empresa_ciudad}}" placeholder="Lugar" required>
                                 </div>
                             </div>
                         </div>
