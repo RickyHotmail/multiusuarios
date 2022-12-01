@@ -27,6 +27,12 @@ class Credito extends Model
     public function scopeCredito($query, $id){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('credito_id','=',$id);
     }
+    public function scopeCreditoEmpresaNombre($query, $nombre, $empresa){
+        return $query->where('empresa_id','=', $empresa)->where('credito_nombre','=',$nombre);
+    }
+    public function scopeCreditoEmpresa($query,  $empresa){
+        return $query->where('empresa_id','=', $empresa);
+    }
     public function scopeCreditoNombre($query, $nom){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('credito_nombre','=',$nom);
     }

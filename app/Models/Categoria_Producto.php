@@ -24,6 +24,12 @@ class Categoria_Producto extends Model
     public function scopeCategoriaByName($query, $nombre){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('categoria_nombre','=',$nombre);
     }
+    public function scopeCategoriaEmpresa($query, $empresa){
+        return $query->where('empresa_id','=',$empresa);
+    }
+    public function scopeCategoriaEmpresaNombre($query, $nombre, $empresa){
+        return $query->where('empresa_id','=',$empresa)->where('categoria_nombre','=',$nombre);
+    }
     public function scopeExtraer($query, $id, $nombre){
         return $query->join('producto','producto.categoria_id','=','categoria_producto.categoria_id')
         ->where('categoria_producto.empresa_id','=',Auth::user()->empresa_id)

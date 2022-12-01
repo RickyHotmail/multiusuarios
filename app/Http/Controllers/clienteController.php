@@ -169,7 +169,7 @@ class clienteController extends Controller
                     }
                 
             }
-           
+            
             $cliente->ciudad_id = $request->get('idCiudad');
             $cliente->tipo_identificacion_id = $request->get('idTidentificacion');
             $cliente->tipo_cliente_id = $request->get('idTipoCliente');
@@ -184,6 +184,67 @@ class clienteController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Registro de Cliente -> '.$request->get('idNombre').' con Cedula -> '.$request->get('idCedula'),'0','con el tipo de Identificacion ->'.$request->get('idTidentificacion'));
             /*Fin de registro de auditoria */
+
+            
+
+            if(isset(Auth::user()->empresa->grupo)){
+                foreach(Auth::user()->empresa->grupo->usuarios->empresas as $empresas){
+                    if(Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id){
+                        $cliente = new Cliente();
+                        $cliente->cliente_cedula = $request->get('idCedula');
+                        $cliente->cliente_nombre = $request->get('idNombre');
+                        $cliente->cliente_abreviatura = $request->get('idAbreviatura');
+                        $cliente->cliente_direccion = $request->get('idDireccion');
+                        $cliente->cliente_telefono = $request->get('idTelefono');
+                        $cliente->cliente_celular = $request->get('idCelular');
+                        $cliente->cliente_email = $request->get('idEmail');
+                        $cliente->cliente_fecha_ingreso = $request->get('idFecha');
+                        if ($request->get('idLlevacontabilidad') == "on"){
+                            $cliente->cliente_lleva_contabilidad ="1";
+                        }else{
+                            $cliente->cliente_lleva_contabilidad ="0";
+                        }
+                        if ($request->get('idTienecredito') == "on"){
+                            $cliente->cliente_tiene_credito ="1";
+                        }else{
+                            $cliente->cliente_tiene_credito ="0";
+                        }
+                        if(Auth::user()->empresa->empresa_contabilidad == '1'){
+                            $cliente->cliente_cuenta_cobrar = $request->get('idCuentaxcobrar');
+                            $cliente->cliente_cuenta_anticipo = $request->get('idCuentaAnticipo');
+                        }
+                        $cliente->ciudad_id = $request->get('idCiudad');
+
+                        $cliente->tipo_identificacion_id = $request->get('idTidentificacion');
+
+                        $tipo=Tipo_Cliente::findOrFail($request->get('idTipoCliente'));
+                        $tipoaux=Tipo_Cliente::TipoClienteEmpresaNombre($tipo->tipo_cliente_nombre,$empresas->empresa->empresa_id)->first();
+                        if($tipoaux){
+                            $cliente->tipo_cliente_id = $tipoaux->tipo_cliente_id;
+                        }else{
+                            $tipoaux=Tipo_Cliente::TipoClienteEmpresa($empresas->empresa->empresa_id)->first();
+                            $cliente->tipo_cliente_id = $tipoaux->tipo_cliente_id;
+                        }
+                        $cliente->cliente_credito = $request->get('idCupoCredito');
+                        
+                        $tipo=Categoria_Cliente::findOrFail($request->get('idCategoria'));
+                        $tipoaux=Categoria_Cliente::CategoriaClienteEmpresaNombre($tipo->categoria_cliente_nombre,$empresas->empresa->empresa_id)->first();
+                        if($tipoaux){
+                            $cliente->categoria_cliente_id = $tipoaux->categoria_cliente_id;
+                        }else{
+                            $tipoaux=Categoria_Cliente::CategoriaClienteEmpresa($empresas->empresa->empresa_id)->first();
+                            $cliente->categoria_cliente_id = $tipoaux->categoria_cliente_id;
+                        }
+
+                        $cliente->cliente_estado  = 1;            
+                        $cliente->save();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Registro de Cliente -> '.$request->get('idNombre').' con Cedula -> '.$request->get('idCedula').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,$empresas->empresa->empresa_id,'con el tipo de Identificacion ->'.$request->get('idTidentificacion'));
+                       
+                    }
+                }
+            }
             DB::commit();
             return redirect('cliente')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
@@ -263,7 +324,7 @@ class clienteController extends Controller
             DB::beginTransaction();
             $parametrizacionContable=Parametrizacion_Contable::ParametrizacionByNombreFinanciero('CUENTA POR COBRAR')->first();
             $parametrizacionContableCliente=Parametrizacion_Contable::ParametrizacionByNombreFinanciero('ANTICIPO DE CLIENTE')->first();
-           
+            $clienteaux=Cliente::findOrFail($id);
             $cliente = Cliente::findOrFail($id);
             $cliente->cliente_cedula = $request->get('idCedula');
             $cliente->cliente_nombre = $request->get('idNombre');
@@ -314,6 +375,72 @@ class clienteController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Actualizacion de Cliente -> '.$request->get('idNombre'),'0','Con cedula-> '.$request->get('idCedula').' y tipo de Identificacion -> '.$request->get('idTipo'));
            /*Fin de registro de auditoria */
+
+           if(isset(Auth::user()->empresa->grupo)){
+                foreach(Auth::user()->empresa->grupo->usuarios->empresas as $empresas){
+                        if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                            $clienteaux=Cliente::ClientesCedulaEmpresa($clienteaux->cliente_cedula,$empresas->empresa->empresa_id)->first();
+                            $cliente = Cliente::findOrFail($clienteaux->cliente_id);
+                            $cliente->cliente_cedula = $request->get('idCedula');
+                            $cliente->cliente_nombre = $request->get('idNombre');
+                            $cliente->cliente_abreviatura = $request->get('idAbreviatura');
+                            $cliente->cliente_direccion = $request->get('idDireccion');
+                            $cliente->cliente_telefono = $request->get('idTelefono');
+                            $cliente->cliente_celular = $request->get('idCelular');
+                            $cliente->cliente_email = $request->get('idEmail');
+                            $cliente->cliente_fecha_ingreso = $request->get('idFecha');
+                            if ($request->get('idContabilidad') == "on"){
+                                $cliente->cliente_lleva_contabilidad = 1;
+                            }else{
+                                $cliente->cliente_lleva_contabilidad = 0;
+                            } 
+                            if ($request->get('idTienecredito') == "on"){
+                                $cliente->cliente_tiene_credito = 1;
+                            }else{
+                                $cliente->cliente_tiene_credito = 0;
+                            } 
+                            if(Auth::user()->empresa->empresa_contabilidad == '1'){
+                                $cliente->cliente_cuenta_cobrar = $request->get('idCobrar');
+                                $cliente->cliente_cuenta_anticipo = $request->get('idAnticipo');
+                            }
+                            $cliente->ciudad_id = $request->get('idCiudad');
+                            $cliente->tipo_identificacion_id = $request->get('idTipo');
+                            $tipo=Tipo_Cliente::findOrFail($request->get('idTcliente'));
+                            $tipoaux=Tipo_Cliente::TipoClienteEmpresaNombre($tipo->tipo_cliente_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $cliente->tipo_cliente_id = $tipoaux->tipo_cliente_id;
+                            }else{
+                                $tipoaux=Tipo_Cliente::TipoClienteEmpresa($empresas->empresa->empresa_id)->first();
+                                $cliente->tipo_cliente_id = $tipoaux->tipo_cliente_id;
+                            }
+                            $cliente->cliente_credito = $request->get('idCupoCredito');
+                            
+                            $tipo=Categoria_Cliente::findOrFail($request->get('idCategoria'));
+                            $tipoaux=Categoria_Cliente::CategoriaClienteEmpresaNombre($tipo->categoria_cliente_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $cliente->categoria_cliente_id = $tipoaux->categoria_cliente_id;
+                            }else{
+                                $tipoaux=Categoria_Cliente::CategoriaClienteEmpresa($empresas->empresa->empresa_id)->first();
+                                $cliente->categoria_cliente_id = $tipoaux->categoria_cliente_id;
+                            }
+                            if ($request->get('idEstado') == "on"){
+                                $cliente->cliente_estado = 1;
+                            }else{
+                                $cliente->cliente_estado = 0;
+                            }
+                            if ($parametrizacionContableCliente->parametrizacion_cuenta_general == '0') {
+                                $cliente->cliente_cuenta_anticipo = $request->get('idAnticipo');
+                            }
+                            if ($parametrizacionContable->parametrizacion_cuenta_general == '0') {
+                                $cliente->cliente_cuenta_cobrar = $request->get('idCobrar');
+                            }
+                            $cliente->save();
+                               
+                    }
+                }
+            }
+
+
             DB::commit();
             return redirect('cliente')->with('success','Datos actualizados exitosamente');
         }catch(\Exception $ex){
@@ -332,12 +459,25 @@ class clienteController extends Controller
     {
         try{
             DB::beginTransaction();
-            $cliente = Cliente::findOrFail($id);            
+            $cliente = Cliente::findOrFail($id); 
+            $clienteaux=Cliente::findOrFail($id);           
             $cliente->delete();
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Eliminacion de Cliente -> '.$cliente->cliente_nombre,'0','Con cedula-> '.$cliente->cliente_cedula);
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                            $clienteaux=Cliente::ClientesCedulaEmpresa($clienteaux->cliente_cedula,$empresas->empresa->empresa_id)->first();
+                            $cliente = Cliente::findOrFail($clienteaux->cliente_id);
+                            $cliente->delete();
+                            $auditoria = new generalController();
+                            $auditoria->registrarAuditoria('Eliminacion de Cliente -> '.$cliente->cliente_nombre.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,$empresas->empresa->empresa_id,'0','Con cedula-> '.$cliente->cliente_cedula);
+           
+                    }
+                }
+            }
             DB::commit();
             return redirect('cliente')->with('success','Datos eliminados exitosamente');
         }catch(\Exception $ex){

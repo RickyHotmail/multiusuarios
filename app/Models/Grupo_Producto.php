@@ -22,6 +22,12 @@ class Grupo_Producto extends Model
     public function scopeGrupoByName($query, $nombre){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('grupo_nombre','=',$nombre);
     }
+    public function scopeGrupoEmpresa($query, $empresa){
+        return $query->where('empresa_id','=', $empresa);
+    }
+    public function scopeGrupoEmpresaNombre($query, $nombre, $empresa){
+        return $query->where('empresa_id','=',$empresa)->where('grupo_nombre','=',$nombre);
+    }
     public function scopeGrupos($query){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('grupo_estado','=','1')->orderBy('grupo_nombre','asc');
     }

@@ -63,4 +63,10 @@ class Empresa extends Model
     public function suscripcion(){
         return $this->belongsTo(Suscripcion::class, 'empresa_id', 'empresa_id');
     }
+    public function usuarios(){
+        return $this->hasMany(User::class, 'empresa_id', 'empresa_id');
+    }
+    public function grupo(){
+        return $this->belongsTo(Grupo_empresa_users::class, 'empresa_id', 'empresa_id');
+    }
 }

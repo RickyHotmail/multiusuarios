@@ -2,26 +2,57 @@
 <html lang="es">
 @include('admin.layouts.head')
 <body class="hold-transition sidebar-mini layout-fixed">
+        
     <div class="wrapper">
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        
             <!-- Left navbar links -->
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
             </ul>
+            @if(session('error5'))
+            <div class="alert alert-warning alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h5><i class="icon fas fa-check"></i>{{ session('error5') }}</h5>
+            </div>
+            @endif
              <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <!-- Messages Dropdown Menu -->
                 <li class="nav-item nombreEmpresa">
                     <b>{{ Auth::user()->empresa->empresa_razonSocial }}</b>
                 </li>
-                <li class="nav-item">
-                    <a class="brand-link" href="{{ url("logout") }}" style="width: 70px;">
-                        <button class="btn btn-neo-blue btn-sm float-right" data-toggle="tooltip" data-placement="bottom" title="Cerrar Sesión"><i class="fas fa-sign-out-alt"></i></button>
+               
+               
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" >
+                    <i class="far fa-user img-circle elevation-2"></i>
+                    <span class="badge badge-danger navbar-badge"></span>
                     </a>
-                </li> 
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <div class="dropdown-divider"></div>
+                    @if(isset(Auth::user()->empresa->grupo))
+                    @foreach(Auth::user()->empresa->grupo->usuarios->empresas as $empresas)
+                        @if(Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id)
+                        <i class="fas fa-user"></i> {{$empresas->empresa->empresa_ruc}} {{$empresas->empresa->empresa_razonSocial}}
+                        <span class="float-right text-muted text-sm"></span>
+                        <a class="brand-link" href="{{ url("cambio/{$empresas->empresa->empresa_id}") }}" >                       
+                            <button class="btn btn-info btn-block" data-toggle="tooltip" data-placement="bottom" title="Cerrar Sesión"><i class="fas fa-sign-out-alt"> Iniciar Sesion</i></button>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        @endif
+                    @endforeach
+                    @endif
+                    <a class="brand-link" href="{{ url("logout") }}" >
+                        <button class="btn btn-neo-blue btn-block" data-toggle="tooltip" data-placement="bottom" title="Cerrar Sesión"><i class="fas fa-sign-out-alt">Cerrar Sesion</i></button>
+                    </a>
+                    </div>
+                </li>
+               
+               
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -110,3 +141,10 @@
 </body>
 @include('admin.layouts.footer')
 </html>
+<style>
+    a {
+    color: #565c60;
+    text-decoration: none;
+    background-color: transparent;
+    }
+</style>

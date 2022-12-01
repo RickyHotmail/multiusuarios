@@ -151,6 +151,123 @@ class productoController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Registro de producto -> '.$request->get('producto_nombre').'con codigo de ->'.$request->get('producto_codigo'),'0','');
             /*Fin de registro de auditoria */
+            
+            if(isset(Auth::user()->empresa->grupo)){
+                foreach(Auth::user()->empresa->grupo->usuarios->empresas as $empresas){
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $producto = new Producto();
+                        $producto->producto_codigo = $request->get('producto_codigo');
+                        $producto->producto_nombre = $request->get('producto_nombre');
+                        $producto->producto_codigo_barras = $request->get('producto_codigo_barras');
+                        $producto->producto_tipo = $request->get('producto_tipo');
+                        $producto->producto_precio_costo = $request->get('producto_precio_costo');           
+                        $producto->producto_stock = "0";
+                        $producto->producto_stock_minimo = $request->get('producto_stock_minimo');
+                        $producto->producto_stock_maximo = $request->get('producto_stock_maximo');
+                        $producto->producto_fecha_ingreso = $request->get('producto_fecha_ingreso');
+                        if ($request->get('producto_tiene_iva') == "on"){
+                            $producto->producto_tiene_iva ="1";
+                        }else{
+                            $producto->producto_tiene_iva ="0";
+                        }
+                        if ($request->get('producto_tiene_descuento') == "on"){
+                            $producto->producto_tiene_descuento ="1";
+                        }else{
+                            $producto->producto_tiene_descuento ="0";
+                        }
+                        if ($request->get('producto_tiene_serie') == "on"){
+                            $producto->producto_tiene_serie ="1";
+                        }else{
+                            $producto->producto_tiene_serie ="0";
+                        }   
+                          
+                        $producto->producto_compra_venta = $request->get('idCompraventa');
+                        $producto->producto_precio1 = $request->get('producto_precio1');
+                        $producto->producto_estado = 1;
+                       
+                        if(Auth::user()->empresa->empresa_llevaContabilidad == '1'){
+                            $producto->producto_cuenta_inventario = $request->get('producto_cuenta_inventario');
+                            $producto->producto_cuenta_venta = $request->get('producto_cuenta_venta');
+                            $producto->producto_cuenta_gasto = $request->get('producto_cuenta_gasto');
+                        }
+                            
+                            
+                            $producto->empresa_id = $empresas->empresa->empresa_id;
+                            
+                            $tipo=Categoria_Producto::findOrFail($request->get('categoria_id'));
+                            $tipoaux=Categoria_Producto::CategoriaEmpresaNombre($tipo->categoria_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $producto->categoria_id = $tipoaux->categoria_id;
+                            }else{
+                                $tipoaux=Categoria_Producto::CategoriaEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->categoria_id= $tipoaux->categoria_id;
+                            }
+
+                           
+                            $tipo=Marca_Producto::findOrFail($request->get('marca_id'));
+                            $tipoaux=Marca_Producto::MarcaEmpresaNombre($tipo->marca_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $producto->marca_id = $tipoaux->marca_id;
+                            }else{
+                                $tipoaux=Marca_Producto::MarcaEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->marca_id= $tipoaux->marca_id;
+                            }
+
+                           
+                            $tipo=Unidad_Medida_Producto::findOrFail($request->get('unidad_medida_id'));
+                            $tipoaux=Unidad_Medida_Producto::UnidadEmpresaNombre($tipo->unidad_medida_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $producto->unidad_medida_id = $tipoaux->unidad_medida_id;
+                            }else{
+                                $tipoaux=Unidad_Medida_Producto::UnidadEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->unidad_medida_id= $tipoaux->unidad_medida_id;
+                            }
+
+                            
+                            $tipo=Tamano_Producto::findOrFail($request->get('tamano_id'));
+                            $tipoaux=Tamano_Producto::TamanoEmpresaNombre($tipo->tamano_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $producto->tamano_id = $tipoaux->tamano_id;
+                            }else{
+                                $tipoaux=Tamano_Producto::TamanoEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->tamano_id= $tipoaux->tamano_id;
+                            }
+
+                           
+                            $tipo=Grupo_Producto::findOrFail($request->get('grupo_id'));
+                            $tipoaux=Grupo_Producto::GrupoEmpresaNombre($tipo->grupo_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $producto->grupo_id = $tipoaux->grupo_id;
+                            }else{
+                                $tipoaux=Grupo_Producto::GrupoEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->grupo_id= $tipoaux->grupo_id;
+                            }
+
+                            
+                            if($request->get('sucursal_id') != '0'){
+                               
+                                $tipo=Sucursal::findOrFail($request->get('sucursal_id'));
+                                $tipoaux=Sucursal::SucursalesEmpresaNombre($tipo->sucursal_nombre,$empresas->empresa->empresa_id)->first();
+                                if($tipoaux){
+                                    $producto->sucursal_id = $tipoaux->sucursal_id;
+                                }else{
+                                    $tipoaux=Sucursal::SucursalesEmpresa($empresas->empresa->empresa_id)->first();
+                                    $producto->sucursal_id = $tipoaux->sucursal_id;
+                                }
+                            }else{
+                                $sucursal=Sucursal::SucursalesEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->sucursal_id=$sucursal->sucursal_id;    
+                            }
+
+                            
+                            $producto->save();
+                            $auditoria = new generalController();
+                            $auditoria->registrarAuditoria('Registro de producto -> '.$request->get('producto_nombre').'con codigo de ->'.$request->get('producto_codigo'),'0','');
+                           
+                    }   
+                }
+            }
+            
             DB::commit();
             return redirect('producto')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
@@ -323,6 +440,7 @@ class productoController extends Controller
         try{
             DB::beginTransaction();
             $producto = Producto::findOrFail($id);
+            $productoaux = Producto::findOrFail($id);
             $producto->producto_codigo = $request->get('producto_codigo');
             $producto->producto_nombre = $request->get('producto_nombre');
             $producto->producto_codigo_barras = $request->get('producto_codigo_barras');
@@ -393,6 +511,123 @@ class productoController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Actualizacion de producto -> '.$request->get('producto_nombre').' con codigo de -> '.$request->get('producto_codigo'),'0','');
             /*Fin de registro de auditoria */
+
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $productoaux=Producto::ProductoEmpresa($productoaux->producto_codigo,$empresas->empresa->empresa_id)->first();
+                            $producto = Producto::findOrFail($productoaux->producto_id);
+                            $producto->producto_codigo = $request->get('producto_codigo');
+                            $producto->producto_nombre = $request->get('producto_nombre');
+                            $producto->producto_codigo_barras = $request->get('producto_codigo_barras');
+                            $producto->producto_tipo = $request->get('producto_tipo');
+                            $producto->producto_precio_costo = $request->get('producto_precio_costo');           
+                            $producto->producto_stock_minimo = $request->get('producto_stock_minimo');
+                            $producto->producto_stock_maximo = $request->get('producto_stock_maximo');
+                            $producto->producto_fecha_ingreso = $request->get('producto_fecha_ingreso');
+                            if ($request->get('producto_tiene_iva') == "on"){
+                                $producto->producto_tiene_iva ="1";
+                            }else{
+                                $producto->producto_tiene_iva ="0";
+                            }
+                            if ($request->get('producto_tiene_descuento') == "on"){
+                                $producto->producto_tiene_descuento ="1";
+                            }else{
+                                $producto->producto_tiene_descuento ="0";
+                            }
+                            if ($request->get('producto_tiene_serie') == "on"){
+                                $producto->producto_tiene_serie ="1";
+                            }else{
+                                $producto->producto_tiene_serie ="0";
+                            }         
+                            $producto->producto_compra_venta = $request->get('producto_compra_venta');
+                            $producto->producto_precio1 = $request->get('producto_precio1');
+                            if ($request->get('producto_estado') == "on"){
+                                $producto->producto_estado = 1; 
+                            }else{
+                                $producto->producto_estado = 0;
+                            }
+                            if(Auth::user()->empresa->empresa_llevaContabilidad == '1'){
+                                $producto->producto_cuenta_inventario = $request->get('producto_cuenta_inventario');
+                                $producto->producto_cuenta_venta = $request->get('producto_cuenta_venta');
+                                $producto->producto_cuenta_gasto = $request->get('producto_cuenta_gasto');
+                            }
+              
+                          
+  
+                            $producto->empresa_id = $empresas->empresa->empresa_id;
+
+                            
+
+
+                            $tipo=Categoria_Producto::findOrFail($request->get('categoria_id'));
+                            $tipoaux=Categoria_Producto::CategoriaEmpresaNombre($tipo->categoria_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $producto->categoria_id = $tipoaux->categoria_id;
+                            }else{
+                                $tipoaux=Categoria_Producto::CategoriaEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->categoria_id= $tipoaux->categoria_id;
+                            }
+
+                           
+                            $tipo=Marca_Producto::findOrFail($request->get('marca_id'));
+                            $tipoaux=Marca_Producto::MarcaEmpresaNombre($tipo->marca_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $producto->marca_id = $tipoaux->marca_id;
+                            }else{
+                                $tipoaux=Marca_Producto::MarcaEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->marca_id= $tipoaux->marca_id;
+                            }
+
+                           
+                            $tipo=Unidad_Medida_Producto::findOrFail($request->get('unidad_medida_id'));
+                            $tipoaux=Unidad_Medida_Producto::UnidadEmpresaNombre($tipo->unidad_medida_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $producto->unidad_medida_id = $tipoaux->unidad_medida_id;
+                            }else{
+                                $tipoaux=Unidad_Medida_Producto::UnidadEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->unidad_medida_id= $tipoaux->unidad_medida_id;
+                            }
+
+                            
+                            $tipo=Tamano_Producto::findOrFail($request->get('tamano_id'));
+                            $tipoaux=Tamano_Producto::TamanoEmpresaNombre($tipo->tamano_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $producto->tamano_id = $tipoaux->tamano_id;
+                            }else{
+                                $tipoaux=Tamano_Producto::TamanoEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->tamano_id= $tipoaux->tamano_id;
+                            }
+
+                           
+                            $tipo=Grupo_Producto::findOrFail($request->get('grupo_id'));
+                            $tipoaux=Grupo_Producto::GrupoEmpresaNombre($tipo->grupo_nombre,$empresas->empresa->empresa_id)->first();
+                            if($tipoaux){
+                                $producto->grupo_id = $tipoaux->grupo_id;
+                            }else{
+                                $tipoaux=Grupo_Producto::GrupoEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->grupo_id= $tipoaux->grupo_id;
+                            }
+
+                            
+                            if($request->get('sucursal_id') != '0'){
+                               
+                                $tipo=Sucursal::findOrFail($request->get('sucursal_id'));
+                                $tipoaux=Sucursal::SucursalesEmpresaNombre($tipo->sucursal_nombre,$empresas->empresa->empresa_id)->first();
+                                if($tipoaux){
+                                    $producto->sucursal_id = $tipoaux->sucursal_id;
+                                }else{
+                                    $tipoaux=Sucursal::SucursalesEmpresa($empresas->empresa->empresa_id)->first();
+                                    $producto->sucursal_id = $tipoaux->sucursal_id;
+                                }
+                            }else{
+                                $sucursal=Sucursal::SucursalesEmpresa($empresas->empresa->empresa_id)->first();
+                                $producto->sucursal_id=$sucursal->sucursal_id;    
+                            }
+                            $producto->save();
+                    }
+                }
+            }
             DB::commit();
             return redirect('producto')->with('success','Datos actualizados exitosamente');
         }catch(\Exception $ex){
@@ -412,11 +647,25 @@ class productoController extends Controller
         try{
             DB::beginTransaction();
             $producto = Producto::findOrFail($id);
+            $productoaux=Producto::findOrFail($id);        
             $producto->delete();
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Eliminacion de producto -> '.$producto->producto_nombre.' con codigo de -> '.$producto->producto_codigo,'0','');
             /*Fin de registro de auditoria */
+
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                            $productoaux=Producto::ProductoEmpresa($productoaux->producto_codigo,$empresas->empresa->empresa_id)->first();
+                            $producto = Producto::findOrFail($productoaux->producto_id);
+                            $producto->delete();
+                            $auditoria = new generalController();
+                            $auditoria->registrarAuditoria('Eliminacion de producto -> '.$producto->producto_nombre.' con codigo de -> '.$producto->producto_codigo.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,$empresas->empresa->empresa_id,'0','0');
+           
+                    }
+                }
+            }
             DB::commit();
             return redirect('producto')->with('success','Datos eliminados exitosamente');
         }catch(\Exception $ex){

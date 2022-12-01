@@ -22,6 +22,12 @@ class Tamano_Producto extends Model
     public function scopeTamanoByName($query, $nombre){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('tamano_nombre','=',$nombre);
     }
+    public function scopeTamanoEmpresa($query, $empresa){
+        return $query->where('empresa_id','=', $empresa);
+    }
+    public function scopeTamanoEmpresaNombre($query, $nombre, $empresa){
+        return $query->where('empresa_id','=', $empresa)->where('tamano_nombre','=',$nombre);
+    }
     public function scopeTamanos($query){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('tamano_estado','=','1')->orderBy('tamano_nombre','asc');
     }

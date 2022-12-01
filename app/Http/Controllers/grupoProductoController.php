@@ -59,6 +59,20 @@ class grupoProductoController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Registro de grupo Producto -> '.$request->get('grupo_nombre'),'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $grupo = new Grupo_Producto();
+                        $grupo->grupo_nombre = $request->get('grupo_nombre');
+                        $grupo->empresa_id = $empresas->empresa->empresa_id;
+                        $grupo->grupo_estado = 1;
+                        $grupo->save();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Registro de grupo Producto -> '.$request->get('grupo_nombre').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                    }
+                }
+            }
             DB::commit();
             return redirect('grupoProducto')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
@@ -127,6 +141,7 @@ class grupoProductoController extends Controller
         try{            
             DB::beginTransaction();
             $grupo = Grupo_Producto::findOrFail($id);
+            $grupoaux = Grupo_Producto::findOrFail($id);
             $grupo->grupo_nombre = $request->get('grupo_nombre');           
             if ($request->get('grupo_estado') == "on"){
                 $grupo->grupo_estado = 1;
@@ -137,7 +152,24 @@ class grupoProductoController extends Controller
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Actualizacion de grupo Producto -> '.$request->get('grupo_nombre'),'0','');
-            /*Fin de registro de auditoria */   
+            /*Fin de registro de auditoria */ 
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $grupoaux = Grupo_Producto::GrupoEmpresaNombre($grupoaux->grupo_nombre,$empresas->empresa->empresa_id)->first();
+                        $grupo = Grupo_Producto::findOrFail($grupoaux->grupo_id);
+                        $grupo->grupo_nombre = $request->get('grupo_nombre');           
+                        if ($request->get('grupo_estado') == "on"){
+                            $grupo->grupo_estado = 1;
+                        }else{
+                            $grupo->grupo_estado = 0;
+                        }
+                        $grupo->save();
+                        /*Inicio de registro de auditoria */
+                       
+                    }
+                }
+            }
             DB::commit();
             return redirect('grupoProducto')->with('success','Datos actualizados exitosamente');
         }catch(\Exception $ex){
@@ -157,11 +189,25 @@ class grupoProductoController extends Controller
         try{
             DB::beginTransaction();
             $grupo = Grupo_Producto::findOrFail($id);
+            $grupoaux = Grupo_Producto::findOrFail($id);
             $grupo->delete();
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Eliminacion de grupo de Producto -> '.$grupo->grupo_nombre,'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $grupoaux = Grupo_Producto::GrupoEmpresaNombre($grupoaux->grupo_nombre,$empresas->empresa->empresa_id)->first();
+                        $grupo = Grupo_Producto::findOrFail($grupoaux->grupo_id);
+                     
+                       
+                        $grupo->delete();
+                        /*Inicio de registro de auditoria */
+                        $auditoria->registrarAuditoria('Eliminacion de grupo de Producto -> '.$grupo->grupo_nombre.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                    }
+                }
+            }
             DB::commit();
             return redirect('grupoProducto')->with('success','Datos eliminados exitosamente');
         }catch(\Exception $ex){

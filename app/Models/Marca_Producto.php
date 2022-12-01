@@ -22,6 +22,12 @@ class Marca_Producto extends Model
     public function scopeMarcaByName($query, $nombre){
         return $query->where('empresa_id', '=', Auth::user()->empresa_id)->where('marca_nombre', '=', $nombre);
     }
+    public function scopeMarcaEmpresa($query, $empresa){
+        return $query->where('empresa_id', '=', $empresa);
+    }
+    public function scopeMarcaEmpresaNombre($query, $nombre, $empresa){
+        return $query->where('empresa_id', '=', $empresa)->where('marca_nombre', '=', $nombre);
+    }
     public function scopeMarcas($query)
     {
         return $query->where('empresa_id', '=', Auth::user()->empresa_id)->where('marca_estado', '=', '1')->orderBy('marca_nombre', 'asc');

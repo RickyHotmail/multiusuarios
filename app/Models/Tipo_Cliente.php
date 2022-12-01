@@ -25,6 +25,12 @@ class Tipo_Cliente extends Model
     public function scopeTipoCliente($query, $id){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('tipo_cliente_id','=',$id);
     }
+    public function scopeTipoClienteEmpresaNombre($query, $nombre, $empresa){
+        return $query->where('empresa_id','=', $empresa)->where('tipo_cliente_nombre','=',$nombre);
+    }
+    public function scopeTipoClienteEmpresa($query, $empresa){
+        return $query->where('empresa_id','=', $empresa);
+    }
     public function scopeTipoClienteNombre($query, $nom){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('tipo_cliente_nombre','=',$nom);
     }

@@ -59,6 +59,22 @@ class tamanoProductoController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Registro de tamaños de Producto -> '.$request->get('tamano_nombre'),'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $tamano = new Tamano_Producto();
+                        $tamano->tamano_nombre = $request->get('tamano_nombre');
+                        $tamano->empresa_id = $empresas->empresa->empresa_id;
+                        $tamano->tamano_estado = 1;
+                        $tamano->save();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Registro de tamaños de Producto -> '.$request->get('tamano_nombre').$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        /*Inicio de registro de auditoria */
+                        
+                    }
+                }
+            }
             DB::commit();
             return redirect('tamanoProducto')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
@@ -127,6 +143,7 @@ class tamanoProductoController extends Controller
         try{            
             DB::beginTransaction();
             $tamano = Tamano_Producto::findOrFail($id);
+            $tamanoaux = Tamano_Producto::findOrFail($id);
             $tamano->tamano_nombre = $request->get('tamano_nombre');           
             if ($request->get('tamano_estado') == "on"){
                 $tamano->tamano_estado = 1;
@@ -138,6 +155,23 @@ class tamanoProductoController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Actualizacion de tamaños de Producto -> '.$request->get('tamano_nombre'),'0','');
             /*Fin de registro de auditoria */   
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $tamanoaux = Tamano_Producto::TamanoEmpresaNombre($tamanoaux->tamano_nombre,$empresas->empresa->empresa_id)->first();
+                        $tamano = Tamano_Producto::findOrFail($tamanoaux->tamano_id);
+                        $tamano->tamano_nombre = $request->get('tamano_nombre');           
+                        if ($request->get('tamano_estado') == "on"){
+                            $tamano->tamano_estado = 1;
+                        }else{
+                            $tamano->tamano_estado = 0;
+                        }
+                        $tamano->save();
+                        /*Inicio de registro de auditoria */
+                        
+                    }
+                }
+            }
             DB::commit();
             return redirect('tamanoProducto')->with('success','Datos actualizados exitosamente');
         }catch(\Exception $ex){
@@ -157,11 +191,26 @@ class tamanoProductoController extends Controller
         try{
             DB::beginTransaction();
             $tamano = Tamano_Producto::findOrFail($id);
+            $tamanoaux = Tamano_Producto::findOrFail($id);
             $tamano->delete();
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Eliminacion de tamaños de Producto -> '.$tamano->tamano_nombre,'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $tamanoaux = Tamano_Producto::TamanoEmpresaNombre($tamanoaux->tamano_nombre,$empresas->empresa->empresa_id)->first();
+                        $tamano = Tamano_Producto::findOrFail($tamanoaux->tamano_id);
+                        $tamano->delete();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Eliminacion de tamaños de Producto -> '.$tamano->tamano_nombre.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        /*Inicio de registro de auditoria */
+                        
+                    }
+                }
+            }
             DB::commit();
             return redirect('tamanoProducto')->with('success','Datos eliminados exitosamente');
         }catch(\Exception $ex){

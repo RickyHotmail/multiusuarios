@@ -26,6 +26,12 @@ class Categoria_Cliente extends Model
     public function scopeCategoriaCliente($query, $id){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('categoria_cliente_id','=',$id);
     }
+    public function scopeCategoriaClienteEmpresaNombre($query, $nombre, $empresa){
+        return $query->where('empresa_id','=',$empresa)->where('categoria_cliente_nombre','=',$nombre);
+    }
+    public function scopeCategoriaClienteEmpresa($query,  $empresa){
+        return $query->where('empresa_id','=',$empresa);
+    }
     public function scopeCategoriaClienteNombre($query, $nom){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('categoria_cliente_nombre','=',$nom);
     }

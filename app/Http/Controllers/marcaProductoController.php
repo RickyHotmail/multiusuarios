@@ -59,6 +59,20 @@ class marcaProductoController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Registro de marca -> '.$request->get('marca_nombre'),'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $marca = new Marca_Producto();
+                        $marca->marca_nombre = $request->get('marca_nombre');           
+                        $marca->empresa_id = $empresas->empresa->empresa_id;
+                        $marca->marca_estado = 1;
+                        $marca->save();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Registro de marca -> '.$request->get('marca_nombre').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                    }
+                }
+            }
             DB::commit();
             return redirect('marcaProducto')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
@@ -127,6 +141,7 @@ class marcaProductoController extends Controller
         try{            
             DB::beginTransaction();
             $marca = Marca_Producto::findOrFail($id);
+            $marcaaux = Marca_Producto::findOrFail($id);
             $marca->marca_nombre = $request->get('marca_nombre');
             if ($request->get('marca_estado') == "on"){
                 $marca->marca_estado = 1;
@@ -137,7 +152,24 @@ class marcaProductoController extends Controller
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Actualizacion de marca -> '.$request->get('marca_nombre'),'0','');
-            /*Fin de registro de auditoria */   
+            /*Fin de registro de auditoria */  
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $marcaaux = Marca_Producto::MarcaEmpresaNombre($marcaaux->marca_nombre,$empresas->empresa->empresa_id)->first();
+                        $marca = Marca_Producto::findOrFail($marcaaux->marca_id);
+                        $marca->marca_nombre = $request->get('marca_nombre');
+                        if ($request->get('marca_estado') == "on"){
+                            $marca->marca_estado = 1;
+                        }else{
+                            $marca->marca_estado = 0;
+                        }
+                        $marca->save();  
+                        /*Inicio de registro de auditoria */
+                        
+                    }
+                }
+            } 
             DB::commit();
             return redirect('marcaProducto')->with('success','Datos actualizados exitosamente');
         }catch(\Exception $ex){
@@ -157,11 +189,23 @@ class marcaProductoController extends Controller
         try{
             DB::beginTransaction();
             $marca = Marca_Producto::findOrFail($id);
+            $marcaaux = Marca_Producto::findOrFail($id);
             $marca->delete();
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Eliminacion de marca -> '.$marca->marca_nombre,'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $marcaaux = Marca_Producto::MarcaEmpresaNombre($marcaaux->marca_nombre,$empresas->empresa->empresa_id)->first();
+                        $marca = Marca_Producto::findOrFail($marcaaux->marca_id);
+                        $marca->delete();
+                        /*Inicio de registro de auditoria */
+                        
+                    }
+                }
+            } 
             DB::commit();
             return redirect('marcaProducto')->with('success','Datos eliminados exitosamente');
         }catch(\Exception $ex){

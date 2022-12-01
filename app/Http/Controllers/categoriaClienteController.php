@@ -61,6 +61,23 @@ class categoriaClienteController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Registro de categoria cliente -> '.$request->get('categoria_cliente_nombre').' con descripcion -> '.$request->get('categoria_cliente_descripcion'),'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $categoriaClien = new Categoria_Cliente();
+                        $categoriaClien->categoria_cliente_nombre = $request->get('categoria_cliente_nombre');
+                        $categoriaClien->categoria_cliente_descripcion = $request->get('categoria_cliente_descripcion');
+                        $categoriaClien->empresa_id =$empresas->empresa->empresa_id;
+                        $categoriaClien->categoria_cliente_estado = 1;
+                        $categoriaClien->save();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Registro de categoria cliente -> '.$request->get('categoria_cliente_nombre').' con descripcion -> '.$request->get('categoria_cliente_descripcion').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                      
+                       
+                    }
+                }
+            }
             DB::commit();
             return redirect('categoriaCliente')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
@@ -129,6 +146,7 @@ class categoriaClienteController extends Controller
         try{            
             DB::beginTransaction();
             $categoriaClien = Categoria_Cliente::findOrFail($id);
+            $categoriaClienaux = Categoria_Cliente::findOrFail($id);
             $categoriaClien->categoria_cliente_nombre = $request->get('categoria_cliente_nombre');
             $categoriaClien->categoria_cliente_descripcion = $request->get('categoria_cliente_descripcion');          
             if ($request->get('categoria_cliente_estado') == "on"){
@@ -141,6 +159,25 @@ class categoriaClienteController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Actualizacion de categoria cliente -> '.$request->get('categoria_cliente_nombre').' con descripcion -> '.$request->get('categoria_cliente_descripcion'),'0','');
             /*Fin de registro de auditoria */   
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $categoriaClienaux = Categoria_Cliente::CategoriaClienteEmpresaNombre($categoriaClienaux->categoria_cliente_nombre,$empresas->empresa->empresa_id)->first();
+                        $categoriaClien = Categoria_Cliente::findOrFail($categoriaClienaux->categoria_cliente_id);
+                        $categoriaClien->categoria_cliente_nombre = $request->get('categoria_cliente_nombre');
+                        $categoriaClien->categoria_cliente_descripcion = $request->get('categoria_cliente_descripcion');          
+                        if ($request->get('categoria_cliente_estado') == "on"){
+                            $categoriaClien->categoria_cliente_estado = 1;
+                        }else{
+                            $categoriaClien->categoria_cliente_estado = 0;
+                        }
+                        $categoriaClien->save();
+                        /*Inicio de registro de auditoria */
+                        
+                    }
+                }
+            }
+
             DB::commit();
             return redirect('categoriaCliente')->with('success','Datos actualizados exitosamente');
         }catch(\Exception $ex){
@@ -160,11 +197,26 @@ class categoriaClienteController extends Controller
         try{
             DB::beginTransaction();
             $categoriaClien = Categoria_Cliente::findOrFail($id);
+            $categoriaClienaux = Categoria_Cliente::findOrFail($id);
             $categoriaClien->delete();
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Eliminacion de categoria cliente -> '.$categoriaClien->categoria_cliente_nombre.' con descripcion -> '.$categoriaClien->categoria_cliente_descripcion,'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $categoriaClienaux = Categoria_Cliente::CategoriaClienteEmpresaNombre($categoriaClienaux->categoria_cliente_nombre,$empresas->empresa->empresa_id)->first();
+                        $categoriaClien = Categoria_Cliente::findOrFail($categoriaClienaux->categoria_cliente_id);
+                        $categoriaClien->delete();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Eliminacion de categoria cliente -> '.$categoriaClien->categoria_cliente_nombre.' con descripcion -> '.$categoriaClien->categoria_cliente_descripcion.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        /*Inicio de registro de auditoria */
+                        
+                    }
+                }
+            }
             DB::commit();
             return redirect('categoriaCliente')->with('success','Datos eliminados exitosamente');
         }catch(\Exception $ex){

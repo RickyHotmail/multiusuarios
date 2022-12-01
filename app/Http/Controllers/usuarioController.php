@@ -37,7 +37,23 @@ class usuarioController extends Controller
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
-
+    public function cambio($id)
+    {
+        try{
+            $empresa=Empresa::findOrFail($id);
+            foreach($empresa->usuarios as $users){
+                if($users->user_username == Auth::user()->user_username){
+                    $usuario=User::findOrFail($users->user_id); 
+                    Auth::login($usuario);
+                    return redirect('/principal');                       
+                }
+            }
+            return redirect('principal')->with('error5','No existe el usuario');
+        }catch(\Exception $ex){
+            
+            return redirect('usuario')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
+    }
     /**
      * Store a newly created resource in storage.
      *

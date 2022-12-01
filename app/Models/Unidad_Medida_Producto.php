@@ -22,6 +22,12 @@ class Unidad_Medida_Producto extends Model
     public function scopeUnidadByName($query, $nombre){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('unidad_medida_nombre','=',$nombre);
     }
+    public function scopeUnidadEmpresa($query, $empresa){
+        return $query->where('empresa_id','=',$empresa);
+    }
+    public function scopeUnidadEmpresaNombre($query, $nombre, $empresa){
+        return $query->where('empresa_id','=',$empresa)->where('unidad_medida_nombre','=',$nombre);
+    }
     public function scopeUnidadMedidas($query){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('unidad_medida_estado','=','1')->orderBy('unidad_medida_nombre','asc');
     }

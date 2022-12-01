@@ -787,3 +787,9 @@ li.timeline-item::before {
 [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link {
   color: #ffffff;
 }
+
+a {
+  color: #565c60;
+  text-decoration: none;
+  background-color: transparent;
+}

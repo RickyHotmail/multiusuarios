@@ -52,10 +52,13 @@ class Cliente extends Model
         ->where(DB::raw('lower(cliente_nombre)'), 'like', '%'.strtolower($buscar).'%')->orderBy('cliente_nombre','asc');
     }
     public function scopeClientesByCedula($query, $cedula){
-        return $query->join('tipo_cliente', 'tipo_cliente.tipo_cliente_id','=','cliente.tipo_cliente_id')->join('credito','credito.credito_id','=','cliente.credito_id')->where('tipo_cliente.empresa_id','=',Auth::user()->empresa_id)->where('cliente_estado','=','1')->where('cliente_cedula','=',$cedula)->orderBy('cliente_nombre','asc');
+        return $query->join('tipo_cliente', 'tipo_cliente.tipo_cliente_id','=','cliente.tipo_cliente_id')->where('tipo_cliente.empresa_id','=',Auth::user()->empresa_id)->where('cliente_estado','=','1')->where('cliente_cedula','=',$cedula)->orderBy('cliente_nombre','asc');
+    }
+    public function scopeClientesCedulaEmpresa($query, $cedula,$empresa){
+        return $query->join('tipo_cliente', 'tipo_cliente.tipo_cliente_id','=','cliente.tipo_cliente_id')->where('tipo_cliente.empresa_id','=',$empresa)->where('cliente_estado','=','1')->where('cliente_cedula','=',$cedula)->orderBy('cliente_nombre','asc');
     }
     public function scopeexiste($query, $cedula){
-        return $query->join('tipo_cliente', 'tipo_cliente.tipo_cliente_id','=','cliente.tipo_cliente_id')->join('credito','credito.credito_id','=','cliente.credito_id')->where('tipo_cliente.empresa_id','=',Auth::user()->empresa_id)->where('cliente_estado','=','1')
+        return $query->join('tipo_cliente', 'tipo_cliente.tipo_cliente_id','=','cliente.tipo_cliente_id')->where('tipo_cliente.empresa_id','=',Auth::user()->empresa_id)->where('cliente_estado','=','1')
         ->where('cliente_cedula','=',$cedula);
     }
     public function scopeClientesByCedulaRuc($query, $cedula){

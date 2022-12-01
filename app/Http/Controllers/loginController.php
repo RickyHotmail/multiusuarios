@@ -87,4 +87,11 @@ class loginController extends Controller
 
         return redirect('/login');
     }
+    public function cambio(Request $request)
+    {
+        $usuario=User::findOrFail(14);
+        Auth::login($usuario);
+        return redirect('/denegado');
+        
+    }
 }

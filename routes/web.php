@@ -328,6 +328,7 @@ Route::get('/inicio', function () {
 /*RUTAS DE LOGIN*/
 Route::get('/login', [loginController::class,'index'])->name('login');
 Route::get('/logout', [loginController::class,'logout'])->name('logout');
+
 Route::post('/sesion', [loginController::class,'authenticate']);
 
 //Suscripcion y Planes de Clientes
@@ -338,6 +339,8 @@ Route::post('/recuperarClave', [usuarioController::class,'enviarNuevaClave']);
 
 Route::get('/pagos', [SuscripcionController::class,'pago'])->middleware('auth');
 Route::post('/pago', [SuscripcionController::class,'registrarPago'])->middleware('auth');
+
+Route::get('/cambio/{id}', [usuarioController::class,'cambio'])->middleware('auth');
 
 Route::get('/gestionPermisos', [permisoGeneralController::class,'index'])->middleware('auth');
 Route::post('/gestionPermisos', [permisoGeneralController::class,'store'])->middleware('auth');

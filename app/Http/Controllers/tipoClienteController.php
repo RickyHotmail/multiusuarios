@@ -53,12 +53,26 @@ class tipoClienteController extends Controller
             $tipoClien = new Tipo_Cliente();
             $tipoClien->tipo_cliente_nombre = $request->get('tipo_cliente_nombre');
             $tipoClien->empresa_id = Auth::user()->empresa_id;
-            $tipoClien->tipo_cliente_estado = 1;
+            $tipoClien->tipo_cliente_estado = 1;    
             $tipoClien->save();
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Registro de tipo cliente -> '.$request->get('tipo_cliente_nombre'),'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $tipoClien = new Tipo_Cliente();
+                        $tipoClien->tipo_cliente_nombre = $request->get('tipo_cliente_nombre');
+                        $tipoClien->empresa_id = $empresas->empresa->empresa_id;
+                        $tipoClien->tipo_cliente_estado = 1;    
+                        $tipoClien->save();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Registro de tipo cliente -> '.$request->get('tipo_cliente_nombre').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                    }
+                }
+            }
             DB::commit();
             return redirect('tipoCliente')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
@@ -127,6 +141,7 @@ class tipoClienteController extends Controller
         try{            
             DB::beginTransaction();
             $tipoClien = Tipo_Cliente::findOrFail($id);
+            $tipoClienaux = Tipo_Cliente::findOrFail($id);
             $tipoClien->tipo_cliente_nombre = $request->get('tipo_cliente_nombre');
             if ($request->get('tipo_cliente_estado') == "on"){
                 $tipoClien->tipo_cliente_estado = 1;
@@ -138,6 +153,23 @@ class tipoClienteController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Actualizacion de tipo cliente -> '.$request->get('tipo_cliente_nombre'),'0','');
             /*Fin de registro de auditoria */   
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $tipoClienaux = Tipo_Cliente::TipoClienteEmpresaNombre($tipoClienaux->tipo_cliente_nombre,$empresas->empresa->empresa_id)->first();
+                        $tipoClien = Tipo_Cliente::findOrFail($tipoClienaux->tipo_cliente_id);
+                        $tipoClien->tipo_cliente_nombre = $request->get('tipo_cliente_nombre');
+                        if ($request->get('tipo_cliente_estado') == "on"){
+                            $tipoClien->tipo_cliente_estado = 1;
+                        }else{
+                            $tipoClien->tipo_cliente_estado = 0;
+                        }  
+                        $tipoClien->save();
+                        /*Inicio de registro de auditoria */
+                        
+                    }
+                }
+            }
             DB::commit();
             return redirect('tipoCliente')->with('success','Datos actualizados exitosamente');
         }catch(\Exception $ex){
@@ -157,11 +189,26 @@ class tipoClienteController extends Controller
         try{
             DB::beginTransaction();
             $tipoClien = Tipo_Cliente::findOrFail($id);
+            $tipoClienaux = Tipo_Cliente::findOrFail($id);
             $tipoClien->delete();
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Eliminacion de tipo cliente -> '.$tipoClien->tipo_cliente_nombre,'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $tipoClienaux = Tipo_Cliente::TipoClienteEmpresaNombre($tipoClienaux->tipo_cliente_nombre,$empresas->empresa->empresa_id)->first();
+                        $tipoClien = Tipo_Cliente::findOrFail($tipoClienaux->tipo_cliente_id);
+                        $tipoClien->delete();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Eliminacion de tipo cliente -> '.$tipoClien->tipo_cliente_nombre.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        /*Inicio de registro de auditoria */
+                        
+                    }
+                }
+            }
             DB::commit();
             return redirect('tipoCliente')->with('success','Datos eliminados exitosamente');
         }catch(\Exception $ex){

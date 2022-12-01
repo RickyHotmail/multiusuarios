@@ -59,6 +59,20 @@ class unidadMedidaController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Registro de unidad medida -> '.$request->get('unidad_medida_nombre'),'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $medida = new Unidad_Medida_Producto();
+                        $medida->unidad_medida_nombre = $request->get('unidad_medida_nombre');           
+                        $medida->empresa_id = $empresas->empresa->empresa_id;
+                        $medida->unidad_medida_estado = 1;
+                        $medida->save();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Registro de unidad medida -> '.$request->get('unidad_medida_nombre').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                    }
+                }
+            }
             DB::commit();
             return redirect('unidadMedida')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
@@ -127,6 +141,7 @@ class unidadMedidaController extends Controller
         try{            
             DB::beginTransaction();
             $medida = Unidad_Medida_Producto::findOrFail($id);
+            $medidaaux = Unidad_Medida_Producto::findOrFail($id);
             $medida->unidad_medida_nombre = $request->get('unidad_medida_nombre');
             if ($request->get('unidad_medida_estado') == "on"){
                 $medida->unidad_medida_estado = 1;
@@ -137,7 +152,23 @@ class unidadMedidaController extends Controller
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Actualizacion de unidad medida -> '.$request->get('unidad_medida_nombre'),'0','');
-            /*Fin de registro de auditoria */   
+            /*Fin de registro de auditoria */  
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $medidaaux = Unidad_Medida_Producto::UnidadEmpresaNombre($medidaaux->unidad_medida_nombre,$empresas->empresa->empresa_id)->first();
+                        $medida = Unidad_Medida_Producto::findOrFail($medidaaux->unidad_medida_id);
+                        $medida->unidad_medida_nombre = $request->get('unidad_medida_nombre');
+                        if ($request->get('unidad_medida_estado') == "on"){
+                            $medida->unidad_medida_estado = 1;
+                        }else{
+                            $medida->unidad_medida_estado = 0;
+                        }
+                        $medida->save();   
+                        
+                    }
+                }
+            } 
             DB::commit();
             return redirect('unidadMedida')->with('success','Datos actualizados exitosamente');
         }catch(\Exception $ex){
@@ -157,11 +188,25 @@ class unidadMedidaController extends Controller
         try{
             DB::beginTransaction();
             $medida = Unidad_Medida_Producto::findOrFail($id);
+            $medidaaux = Unidad_Medida_Producto::findOrFail($id);
             $medida->delete();
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Eliminacion de medida -> '.$medida->unidad_medida_nombre,'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $medidaaux = Unidad_Medida_Producto::UnidadEmpresaNombre($medidaaux->unidad_medida_nombre,$empresas->empresa->empresa_id)->first();
+                        $medida = Unidad_Medida_Producto::findOrFail($medidaaux->unidad_medida_id);
+                        $medida->delete();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Eliminacion de medida -> '.$medida->unidad_medida_nombre.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0',''); 
+                        
+                    }
+                }
+            } 
             DB::commit();
             return redirect('unidadMedida')->with('success','Datos eliminados exitosamente');
         }catch(\Exception $ex){
