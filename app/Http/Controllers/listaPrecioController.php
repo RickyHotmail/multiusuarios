@@ -62,7 +62,23 @@ class listaPrecioController extends Controller
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Registro de lista de precios -> '.$request->get('idNombre'),'0','');
-            /*Fin de registro de auditoria */            
+            /*Fin de registro de auditoria */        
+            
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $listaPrecio = new Lista_Precio();
+                        $listaPrecio->lista_nombre = $request->get('idNombre');
+                        $listaPrecio->lista_estado = 1;     
+                        $listaPrecio->empresa_id = $empresas->empresa->empresa_id;    
+                        $listaPrecio->save();
+            
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Registro de lista de precios -> '.$request->get('idNombre').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                    }
+                }
+            }
             DB::commit();
             return redirect('listaPrecio')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
@@ -150,6 +166,7 @@ class listaPrecioController extends Controller
             $idProducto = $request->get('DLproductoID');
             DB::beginTransaction();
             $listaPrecio = Lista_Precio::findOrFail($id); 
+            $listaPrecioaux = Lista_Precio::findOrFail($id); 
             $detalleLista = Detalle_Lista::where('lista_id', '=', $listaPrecio->lista_id)->where('producto_id', '=', $request->get('idProducto'))->delete(); 
             $listaPrecio->lista_nombre = $request->get('idNombre');
             if ($request->get('idEstado') == "on"){
@@ -173,12 +190,39 @@ class listaPrecioController extends Controller
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Actualizacion de lista de precios -> '.$request->get('idNombre'),'0','');
             /*Fin de registro de auditoria */
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $listaPrecioaux = Lista_Precio::ListasPrecioseEmpresaNombre($listaPrecioaux->lista_nombre, $empresas->empresa->empresa_id)->first();
+                        $listaPrecio = Lista_Precio::findOrFail($listaPrecioaux->lista_id);
+                        $detalleLista = Detalle_Lista::where('lista_id', '=', $listaPrecio->lista_id)->where('producto_id', '=', $request->get('idProducto'))->delete(); 
+                        $listaPrecio->lista_nombre = $request->get('idNombre');
+                        if ($request->get('idEstado') == "on"){
+                            $listaPrecio->lista_estado ="1";
+                        }else{
+                            $listaPrecio->lista_estado ="0";
+                        }      
+                        $listaPrecio->save();
+                        for ($i=1; $i < count($dias); $i++) { 
+                            $detalleLista = new Detalle_Lista();
+                            $detalleLista->detallel_dias = $dias[$i];
+                            $detalleLista->detallel_valor = $valor[$i];
+                            $detalleLista->detallel_estado = 1;
+                            $detalleLista->producto_id = $idProducto[$i];
+                            
+                            $listaPrecio->detalles()->save($detalleLista);
+                        }
+                        /*Inicio de registro de auditoria */
+                    }
+                }
+            }
+
             $lista = Lista_Precio::ListaPrecioDetalle($id)->first();
             DB::commit();
             if($lista){
                 $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
                 $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();    
+                $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();    
                 return view('admin.inventario.listaPrecio.editar',['lista'=>$lista,'productos'=>Producto::Productos()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
             }
             return redirect('listaPrecio')->with('success','Datos guardados exitosamente');
@@ -199,9 +243,22 @@ class listaPrecioController extends Controller
         try{
             DB::beginTransaction();
             $lista = Lista_Precio::findOrFail($id);
+            $listaaux= Lista_Precio::findOrFail($id);
             Detalle_Lista::where('lista_id', '=', $lista->lista_id)->delete(); 
             $lista->delete();
-
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $listaPrecioaux = Lista_Precio::ListasPrecioseEmpresaNombre($listaaux->lista_nombre, $empresas->empresa->empresa_id)->first();
+                        $listaPrecio = Lista_Precio::findOrFail($listaPrecioaux->lista_id);
+                        Detalle_Lista::where('lista_id', '=', $lista->lista_id)->delete(); 
+                        $listaPrecio->delete();
+                        /*Inicio de registro de auditoria */
+                        $auditoria = new generalController();
+                        $auditoria->registrarAuditoria('Eliminacion de lista de precio -> '.$lista->lista_id.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                    }
+                }
+            }
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Eliminacion de lista de precio -> '.$lista->lista_id,'0','');

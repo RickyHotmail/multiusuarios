@@ -27,7 +27,7 @@ class Grupo_empresa_users extends Model
     public function scopeGruposusers($query,$iduser){
         return $query->where('user_id','=',$iduser)->where('grupo_estado','=','1');
     }
-    public function empresas(){
+    public function empresa(){
         return $this->belongsTo(Empresa::class, 'empresa_id', 'empresa_id');
     }
     public function usuarios(){

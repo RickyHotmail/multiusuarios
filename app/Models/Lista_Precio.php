@@ -23,6 +23,14 @@ class Lista_Precio extends Model
     {
         return $query->where('empresa_id', '=', Auth::user()->empresa_id)->where('lista_estado', '=', '1');
     }
+    public function scopeListasPrecioseEmpresa($query, $empresa)
+    {
+        return $query->where('empresa_id', '=', $empresa)->where('lista_estado', '=', '1');
+    }
+    public function scopeListasPrecioseEmpresaNombre($query, $nombre, $empresa)
+    {
+        return $query->where('empresa_id', '=', $empresa)->where('lista_nombre', '=', $nombre)->where('lista_estado', '=', '1');
+    }
     public function scopeListasPreciosDetalle($query)
     {
         return $query->join('detalle_lista', 'detalle_lista.lista_id','=','lista_precio.lista_id'

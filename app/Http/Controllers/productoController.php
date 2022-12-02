@@ -270,7 +270,7 @@ class productoController extends Controller
                                     $producto->sucursal_id = $tipoaux->sucursal_id;
                                 }
                             }else{
-                                $sucursal=ucursal::SucursalesEmpresa($empresas->empresa->empresa_id)->first();
+                                $sucursal=Sucursal::SucursalesEmpresa($empresas->empresa->empresa_id)->first();
                                 $producto->sucursal_id=$sucursal->sucursal_id;    
                             }
 
@@ -1301,6 +1301,7 @@ class productoController extends Controller
             $dias = $request->get('DLdias');
             $valor = $request->get('DLvalor');
             $producto = Producto::findOrFail($request->get('idProducto'));
+            $productoaux = Producto::findOrFail($request->get('idProducto'));
             $precio=Precio_Producto::where('producto_id','=',$producto->producto_id)->delete();
             for ($i=1; $i < count($dias); $i++) { 
                 $precio = new Precio_Producto();
@@ -1312,6 +1313,24 @@ class productoController extends Controller
             }
             $auditoria = new generalController();
             $auditoria->registrarAuditoria('Registro de precios a producto-> '.$producto->producto_nomrbe,'0','');
+            if (isset(Auth::user()->empresa->grupo)) {
+                foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
+                    if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        $productoaux=Producto::ProductoEmpresa($productoaux->producto_codigo,$empresas->empresa->empresa_id)->first();
+                        $producto = Producto::findOrFail($productoaux->producto_id);
+                        $precio=Precio_Producto::where('producto_id','=',$producto->producto_id)->delete();
+                        for ($i=1; $i < count($dias); $i++) { 
+                            $precio = new Precio_Producto();
+                            $precio->precio_dias = $dias[$i];
+                            $precio->precio_valor = $valor[$i];
+                            $precio->precio_estado = 1;
+                            $precio->producto_id = $producto->producto_id;
+                            $precio->save();
+                        }
+                        
+                    }
+                }
+            }
             DB::commit();
             return redirect('producto')->with('success','Datos guardados exitosamente');
         }catch(\Exception $ex){
