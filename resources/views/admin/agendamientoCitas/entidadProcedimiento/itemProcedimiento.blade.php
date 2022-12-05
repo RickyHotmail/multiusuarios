@@ -20,6 +20,18 @@
                     <input type="number" class="input-group-text" style="height:30px;" id="Pcobertura{ID}" name="Pcobertura[]" value="{Pcobertura}" step="0.01" min="0" readonly/>
                 </div>
             </td>
+            <td>
+                <div class="input-group-prepend">
+                    <input type="text" class="input-group-text" style="width:40px; height:30px;" value="$" readonly/>
+                    <input type="number" class="input-group-text" style="height:30px;" id="Pcobertura2{ID}" value="{Pcobertura2}" readonly/>
+                </div>
+            </td>
+            <td>
+                <div class="input-group-prepend">
+                    <input type="text" class="input-group-text" style="width:40px; height:30px;" value="$" readonly/>
+                    <input type="number" class="input-group-text" style="height:30px;" id="Pcopago{ID}" value="{Pcopago}" step="0.01" min="0" readonly/>
+                </div>
+            </td>
             
             <?php $count ++ ?>
         </tr>

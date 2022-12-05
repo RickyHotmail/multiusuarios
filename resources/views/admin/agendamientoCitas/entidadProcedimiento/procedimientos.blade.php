@@ -97,7 +97,9 @@
                                         <th>Descripcion</th>
                                         <th>Especialidad</th>
                                         <th>Precio Aseg</th> 
+                                        <th>% Cobertura</th>                                              
                                         <th>Cobertura</th>                                              
+                                        <th>COPAGO</th>                                              
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -184,7 +186,8 @@
                     for (var i=0; i<data.length; i++) {
                         var linea = $("#plantillaItemProcedimiento").html();
                         var cod = data[i].procedimiento_id;     
-                                    
+                        
+                        console.log("1 ---------------")
                         linea = linea.replace(/{PcheckboxEstado}/g, 0);
                         linea = linea.replace(/{Pcheckbox}/g, 0);
                         linea = linea.replace(/{ID}/g, i);
@@ -196,14 +199,22 @@
                         var combo = document.getElementById("especialidad_id");
                         var especialidadNombre = combo.options[combo.selectedIndex].text; 
                         linea = linea.replace(/{PespecialidadN}/g, especialidadNombre);
-                        linea = linea.replace(/{Pcosto}/g, cargarProcedimientoAsignados(cod));
+
+                        costo = cargarProcedimientoAsignados(cod);
+                        cobertura=cargarValorAsignado(cod);
+
+                        console.log(cargarProcedimientoAsignados(cod));
+                        console.log("2 ---------------")
+                        console.log(cargarValorAsignado(cod));
+
+                        linea = linea.replace(/{Pcosto}/g, costo);
                         if(data[i].grupo_nombre == "Laboratorio"){
                             linea = linea.replace(/{Ptipo}/g, "%");  
                         }else{
                             linea = linea.replace(/{Ptipo}/g, "$");
                         }                                      
                         
-                        linea = linea.replace(/{Pcobertura}/g, cargarValorAsignado(cod));
+                        linea = linea.replace(/{Pcobertura}/g, cobertura);
                         
                         $("#cargarItemProcedimiento tbody").append(linea); 
                         var pala= "#Pcheckbox"+i;
@@ -247,6 +258,10 @@
                     var combo = document.getElementById("especialidad_id");
                     var especialidadNombre = combo.options[combo.selectedIndex].text;
                     linea = linea.replace(/{PespecialidadN}/g, especialidadNombre);
+
+                    costo=data[i].valor?? 0;
+                    porcentaje=data[i].ep_valor;
+
                     linea = linea.replace(/{Pcosto}/g, data[i].valor?? 0);
 
                     //if(data[i].grupo_nombre == "Laboratorio"){
@@ -257,11 +272,30 @@
                     
                     linea = linea.replace(/{Pcobertura}/g, data[i].ep_valor);
                     
-                    $("#cargarItemProcedimiento tbody").append(linea); 
+                    if(data[i].ep_valor>0){
+                        desc=parseFloat(costo)*parseFloat(data[i].ep_valor)/100;
+                        copago=costo-desc;
+
+                        linea = linea.replace(/{Pcobertura2}/g, desc.toFixed(2));
+                        linea = linea.replace(/{Pcopago}/g, copago.toFixed(2));
+                    }
+
+                    $("#cargarItemProcedimiento tbody").append(linea);
+
                     if(data[i].ep_valor>0){
                         $("#Pcheckbox"+i).prop('checked', true); 
                         unlockRow(i);
+
+                        desc=parseFloat(costo)*parseFloat(data[i].ep_valor)/100;
+                        copago=costo-desc;
+
+                        linea = linea.replace(/{Pcobertura2}/g, desc);
+                        linea = linea.replace(/{Pcopago}/g, copago);
+
+                        console.log(copago)
                     }
+                    
+                    
                 }
                 cont = data.length
                 
