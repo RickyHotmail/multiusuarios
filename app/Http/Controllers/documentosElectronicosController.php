@@ -205,7 +205,7 @@ class documentosElectronicosController extends Controller
                 for ($i = 0; $i < count($rets); ++$i) {
                     $ret = Retencion_Compra::findOrFail($rets[$i]);
                     if($ret->retencion_emision == 'ELECTRONICA'){
-                        $retencionAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlRetencion($ret),'RETENCION');
+                        $retencionAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlRetencionV2($ret),'RETENCION');
                         $ret->retencion_xml_estado = $retencionAux->retencion_xml_estado;
                         $ret->retencion_xml_mensaje =$retencionAux->retencion_xml_mensaje;
                         $ret->retencion_xml_respuestaSRI = $retencionAux->retencion_xml_respuestaSRI;
@@ -399,7 +399,7 @@ class documentosElectronicosController extends Controller
             $ret = Retencion_Compra::Retencion($id)->first();
             if($ret->retencion_emision == 'ELECTRONICA'){
                 $ret->retencion_autorizacion = $docElectronico->generarClaveAcceso($ret->retencion_numero,$ret->retencion_fecha,"07");
-                $retencionAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlRetencion($ret),'RETENCION');
+                $retencionAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlRetencionV2($ret),'RETENCION');
                 $ret->retencion_xml_estado = $retencionAux->retencion_xml_estado;
                 $ret->retencion_xml_mensaje =$retencionAux->retencion_xml_mensaje;
                 $ret->retencion_xml_respuestaSRI = $retencionAux->retencion_xml_respuestaSRI;
