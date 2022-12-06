@@ -1301,383 +1301,246 @@ class facturacionElectronicaController extends Controller
         //inicio del documento
         xmlwriter_start_document($xml, '1.0', 'UTF-8');
 
-            //primer elemento
-            xmlwriter_start_element($xml, 'comprobanteRetencion');
-                // atributo 'id' del elemento 'retencion'
-                xmlwriter_start_attribute($xml, 'id');
-                xmlwriter_text($xml, 'comprobante');
-                xmlwriter_end_attribute($xml);
+        //primer elemento
+        xmlwriter_start_element($xml, 'comprobanteRetencion');
 
-                // atributo 'version' del elemento 'retencion'
-                xmlwriter_start_attribute($xml, 'version');
-                xmlwriter_text($xml, '2.0.0');
-                xmlwriter_end_attribute($xml);
+        // atributo 'id' del elemento 'retencion'
+        xmlwriter_start_attribute($xml, 'id');
+        xmlwriter_text($xml, 'comprobante');
+        xmlwriter_end_attribute($xml);
 
+        // atributo 'version' del elemento 'retencion'
+        xmlwriter_start_attribute($xml, 'version');
+        xmlwriter_text($xml, '1.0.0');
+        xmlwriter_end_attribute($xml);
 
-
-
-
-                // Elemento hijo de 'retencion'
-                xmlwriter_start_element($xml, 'infoTributaria');
-                    /**********************/
-                    xmlwriter_start_element($xml, 'ambiente');
-                    xmlwriter_text($xml, $empresa->firmaElectronica->firma_ambiente);
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    xmlwriter_start_element($xml, 'tipoEmision');
-                    xmlwriter_text($xml, $empresa->firmaElectronica->firma_disponibilidad);
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    xmlwriter_start_element($xml, 'razonSocial');
-                    xmlwriter_text($xml, $empresa->empresa_razonSocial);
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    xmlwriter_start_element($xml, 'nombreComercial');
-                    xmlwriter_text($xml, $empresa->empresa_nombreComercial);
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    xmlwriter_start_element($xml, 'ruc');
-                    xmlwriter_text($xml, $empresa->empresa_ruc);
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    xmlwriter_start_element($xml, 'claveAcceso');
-                    xmlwriter_text($xml, $retencion->retencion_autorizacion);
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    xmlwriter_start_element($xml, 'codDoc');
-                    xmlwriter_text($xml, '07');
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    xmlwriter_start_element($xml, 'estab');
-                    xmlwriter_text($xml, $retencion->rangoDocumento->puntoEmision->sucursal->sucursal_codigo);
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    xmlwriter_start_element($xml, 'ptoEmi');
-                    xmlwriter_text($xml, $retencion->rangoDocumento->puntoEmision->punto_serie);
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    xmlwriter_start_element($xml, 'secuencial');//
-                    xmlwriter_text($xml, substr(str_repeat(0, 9).$retencion->retencion_secuencial, - 9));
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    xmlwriter_start_element($xml, 'dirMatriz');
-                    xmlwriter_text($xml, $empresa->empresa_direccion);
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    if($empresa->empresa_tipo == 'Agente de Retención'){
-                        xmlwriter_start_element($xml, 'agenteRetencion');
-                        xmlwriter_text($xml, '1');
-                        xmlwriter_end_element($xml); 
-                    }elseif($empresa->empresa_tipo == 'Microempresas'){
-                        xmlwriter_start_element($xml, 'regimenMicroempresas');
-                        xmlwriter_text($xml, 'CONTRIBUYENTE RÉGIMEN MICROEMPRESAS');
-                        xmlwriter_end_element($xml); 
-                    }
-                    /**********************/
-                xmlwriter_end_element($xml); 
-                // final 'infoTributaria'
-
-                // Elemento hijo de 'retencion'
-                xmlwriter_start_element($xml, 'infoCompRetencion');
-                    /**********************/
-                    xmlwriter_start_element($xml, 'fechaEmision');
-                    xmlwriter_text($xml, DateTime::createFromFormat('Y-m-d', $retencion->retencion_fecha)->format('d/m/Y'));
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    xmlwriter_start_element($xml, 'dirEstablecimiento');
-                    xmlwriter_text($xml, $retencion->rangoDocumento->puntoEmision->sucursal->sucursal_direccion);
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                    if($empresa->empresa_tipo == 'Contribuyente Especial'){
-                        xmlwriter_start_element($xml, 'contribuyenteEspecial');
-                        xmlwriter_text($xml, $empresa->empresa_contribuyenteEspecial);
-                        xmlwriter_end_element($xml); 
-                    }
-                    /**********************/
-                    xmlwriter_start_element($xml, 'obligadoContabilidad');
-                    if($empresa->empresa_llevaContabilidad == 1){
-                        xmlwriter_text($xml, 'SI');
-                    }else{
-                        xmlwriter_text($xml, 'NO');
-                    }
-                    xmlwriter_end_element($xml); 
-                    /**********************/ 
-
-                    xmlwriter_start_element($xml, 'tipoIdentificacionSujetoRetenido');
-                        xmlwriter_text($xml, '05');
-                    xmlwriter_end_element($xml); 
-
-
-
-                    
-                    /* xmlwriter_start_element($xml, 'tipoSujetoRetenido');
-                    xmlwriter_text($xml, '01'); */
-
-                    /*if($retencion->transaccionCompra){
-                        xmlwriter_text($xml, $retencion->transaccionCompra->proveedor->tipoSujeto->tipo_sujeto_codigo);
-                    }
-                    if($retencion->liquidacionCompra){
-                        xmlwriter_text($xml, $retencion->liquidacionCompra->proveedor->tipoSujeto->tipo_sujeto_codigo);
-                    } */
-                    //xmlwriter_end_element($xml);
-                    /**********************/
-
-                    xmlwriter_start_element($xml, 'parteRel');
-                        xmlwriter_text($xml, 'NO');
-                    xmlwriter_end_element($xml);
-
-                    
-                    /**********************/
-                    xmlwriter_start_element($xml, 'razonSocialSujetoRetenido');
-                    if($retencion->transaccionCompra){
-                        xmlwriter_text($xml, $retencion->transaccionCompra->proveedor->proveedor_nombre);
-                    }
-                    if($retencion->liquidacionCompra){
-                        xmlwriter_text($xml, $retencion->liquidacionCompra->proveedor->proveedor_nombre);
-                    }
-                    xmlwriter_end_element($xml); 
-
-                    
-
-                    xmlwriter_start_element($xml, 'identificacionSujetoRetenido');
-                    if($retencion->transaccionCompra){
-                        xmlwriter_text($xml, $retencion->transaccionCompra->proveedor->proveedor_ruc);
-                    }
-                    else if($retencion->liquidacionCompra){
-                        xmlwriter_text($xml, $retencion->liquidacionCompra->proveedor->proveedor_ruc);
-                    }
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                
-                
-                    /**********************/
-                    xmlwriter_start_element($xml, 'periodoFiscal');
-                    xmlwriter_text($xml, DateTime::createFromFormat('Y-m-d', $retencion->retencion_fecha)->format('m/Y'));
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                xmlwriter_end_element($xml); 
-                // final 'infoCompRetencion'
-
-                // DocsSustento
-                xmlwriter_start_element($xml, 'docsSustento');
-                    xmlwriter_start_element($xml, 'docSustento');
-                        xmlwriter_start_element($xml, 'codSustento');
-                            if($retencion->transaccionCompra){
-                                xmlwriter_text($xml, $retencion->transaccionCompra->sustentoTributario->sustento_codigo);
-                            }
-                            if($retencion->liquidacionCompra){
-                                xmlwriter_text($xml, $retencion->liquidacionCompra->sustentoTributario->sustento_codigo);
-                            }
-                        xmlwriter_end_element($xml);
-
-                        xmlwriter_start_element($xml, 'codDocSustento');
-                            if($retencion->transaccionCompra){
-                                xmlwriter_text($xml, $retencion->transaccionCompra->tipoComprobante->tipo_comprobante_codigo);
-                            }else{
-                                xmlwriter_text($xml, '03');
-                            }
-                        xmlwriter_end_element($xml);
-                        
-
-
-                        xmlwriter_start_element($xml, 'numDocSustento');
-                            if($retencion->transaccionCompra){
-                                xmlwriter_text($xml, $retencion->transaccionCompra->transaccion_numero);
-                            }
-                            if($retencion->liquidacionCompra){
-                                xmlwriter_text($xml, $retencion->liquidacionCompra->lc_numero);
-                            }
-                        xmlwriter_end_element($xml);
-
-                        xmlwriter_start_element($xml, 'fechaEmisionDocSustento');
-                            if($retencion->transaccionCompra){
-                                xmlwriter_text($xml, DateTime::createFromFormat('Y-m-d', $retencion->transaccionCompra->transaccion_fecha)->format('d/m/Y'));
-                            }
-                            if($retencion->liquidacionCompra){
-                                xmlwriter_text($xml, DateTime::createFromFormat('Y-m-d', $retencion->liquidacionCompra->lc_fecha)->format('d/m/Y'));
-                            }
-                        xmlwriter_end_element($xml);
-
-                        xmlwriter_start_element($xml, 'pagoLocExt');
-                            xmlwriter_text($xml, '01');
-                        xmlwriter_end_element($xml);
-
-                       /*  xmlwriter_start_element($xml, 'tipoRegi');
-                            xmlwriter_text($xml, '01');
-                        xmlwriter_end_element($xml); */
-
-                        xmlwriter_start_element($xml, 'paisEfecPago');
-                            xmlwriter_text($xml, '593');
-                        xmlwriter_end_element($xml);
-
-
-
-
-                        xmlwriter_start_element($xml, 'totalSinImpuestos');
-                            if($retencion->transaccionCompra)
-                                xmlwriter_text($xml, number_format($retencion->transaccionCompra->transaccion_subtotal,2));
-                            else
-                                xmlwriter_text($xml, number_format($retencion->liquidacionCompra->lc_subtotal,2));
-                        xmlwriter_end_element($xml);
-
-                        xmlwriter_start_element($xml, 'importeTotal');
-                            if($retencion->transaccionCompra)
-                                xmlwriter_text($xml, number_format($retencion->transaccionCompra->transaccion_total,2));
-                            else
-                                xmlwriter_text($xml, number_format($retencion->liquidacionCompra->lc_total,2));
-                        xmlwriter_end_element($xml);
-
-                        $compra= $retencion->transaccionCompra;
-
-                        xmlwriter_start_element($xml, 'impuestosDocSustento');
-                            if($compra->transaccion_tarifa0>0){
-                                xmlwriter_start_element($xml, 'impuestoDocSustento');
-                                    xmlwriter_start_element($xml, 'codImpuestoDocSustento');
-                                        xmlwriter_text($xml, "2");
-                                    xmlwriter_end_element($xml);
-
-                                    xmlwriter_start_element($xml, 'codigoPorcentaje');
-                                        xmlwriter_text($xml, '0');
-                                    xmlwriter_end_element($xml);
-
-                                    xmlwriter_start_element($xml, 'baseImponible');
-                                        xmlwriter_text($xml, number_format($compra->transaccion_tarifa0,2));
-                                    xmlwriter_end_element($xml);
-
-                                    xmlwriter_start_element($xml, 'tarifa');
-                                        xmlwriter_text($xml, '0');
-                                    xmlwriter_end_element($xml);
-
-                                    xmlwriter_start_element($xml, 'valorImpuesto');
-                                        xmlwriter_text($xml, '0.00');
-                                    xmlwriter_end_element($xml);
-                                xmlwriter_end_element($xml);
-                            }
-                            if($compra->transaccion_tarifa12>0){
-                                xmlwriter_start_element($xml, 'impuestoDocSustento');
-                                    xmlwriter_start_element($xml, 'codImpuestoDocSustento');
-                                        xmlwriter_text($xml, "2");
-                                    xmlwriter_end_element($xml);
-
-                                    xmlwriter_start_element($xml, 'codigoPorcentaje');
-                                        xmlwriter_text($xml, '2');
-                                    xmlwriter_end_element($xml);
-
-                                    xmlwriter_start_element($xml, 'baseImponible');
-                                        xmlwriter_text($xml, number_format($compra->transaccion_tarifa12,2));
-                                    xmlwriter_end_element($xml);
-
-                                    xmlwriter_start_element($xml, 'tarifa');
-                                        xmlwriter_text($xml, '12');
-                                    xmlwriter_end_element($xml);
-
-                                    xmlwriter_start_element($xml, 'valorImpuesto');
-                                        xmlwriter_text($xml, number_format($compra->transaccion_iva,2));
-                                    xmlwriter_end_element($xml);
-                                xmlwriter_end_element($xml);
-                            }
-                        xmlwriter_end_element($xml);
-
-
-                        xmlwriter_start_element($xml, 'retenciones');
-                            foreach($retencion->detalles as $detalle){
-                                xmlwriter_start_element($xml, 'retencion');
-                                    /**********************/
-                                    xmlwriter_start_element($xml, 'codigo');
-                                    if($detalle->detalle_tipo == "IVA"){
-                                        xmlwriter_text($xml, "2");
-                                    }else{
-                                        xmlwriter_text($xml, "1");
-                                    }
-                                    xmlwriter_end_element($xml); 
-                                    /**********************/
-                                    xmlwriter_start_element($xml, 'codigoRetencion');
-                                    xmlwriter_text($xml, $detalle->conceptoRetencion->concepto_codigo);
-                                    xmlwriter_end_element($xml); 
-                                    /**********************/
-                                    xmlwriter_start_element($xml, 'baseImponible');
-                                    xmlwriter_text($xml, number_format($detalle->detalle_base, 2, '.', ''));
-                                    xmlwriter_end_element($xml); 
-                                    /**********************/
-                                    xmlwriter_start_element($xml, 'porcentajeRetener');
-                                    xmlwriter_text($xml, $detalle->detalle_porcentaje);
-                                    xmlwriter_end_element($xml); 
-                                    /**********************/
-                                    xmlwriter_start_element($xml, 'valorRetenido');
-                                    xmlwriter_text($xml, number_format($detalle->detalle_valor, 2, '.', ''));
-                                    xmlwriter_end_element($xml);
-                                    /**********************/
-                                xmlwriter_end_element($xml); 
-                            }
-                        xmlwriter_end_element($xml);
-
-                       
-                        xmlwriter_start_element($xml, 'pagos');
-                            xmlwriter_start_element($xml, 'pago');
-                                xmlwriter_start_element($xml, 'formaPago');
-                                    xmlwriter_text($xml, '01');
-                                xmlwriter_end_element($xml);
-
-                                xmlwriter_start_element($xml, 'total');
-                                    if($retencion->transaccionCompra){
-                                        xmlwriter_text($xml, $retencion->transaccionCompra->transaccion_total);
-                                    }
-                                    if($retencion->liquidacionCompra){
-                                        xmlwriter_text($xml, $retencion->liquidacionCompra->lc_total);
-                                    }
-                                xmlwriter_end_element($xml);
-                            xmlwriter_end_element($xml); 
-                        xmlwriter_end_element($xml); 
-                    xmlwriter_end_element($xml); 
-                xmlwriter_end_element($xml); 
-                //final docsSustento
-
-                
-
-                // Elemento hijo de 'retencion'
-                xmlwriter_start_element($xml, 'infoAdicional');
-                    /**********************/
-                    xmlwriter_start_element($xml, 'campoAdicional');
-                        /**********************/
-                        xmlwriter_start_attribute($xml, 'nombre');
-                        xmlwriter_text($xml, 'Dirección');
-                        xmlwriter_end_attribute($xml);
-                        if($retencion->transaccionCompra){
-                            xmlwriter_text($xml, $retencion->transaccionCompra->proveedor->proveedor_direccion);
-                        }
-                        if($retencion->liquidacionCompra){
-                            xmlwriter_text($xml, $retencion->liquidacionCompra->proveedor->proveedor_direccion);
-                        }
-                        /**********************/
-                    xmlwriter_end_element($xml);
-                    /**********************/
-                    xmlwriter_start_element($xml, 'campoAdicional');
-                        /**********************/
-                        xmlwriter_start_attribute($xml, 'nombre');
-                        xmlwriter_text($xml, 'Email');
-                        xmlwriter_end_attribute($xml);
-                        /**********************/
-                    if($retencion->transaccionCompra){
-                        if(empty($retencion->transaccionCompra->proveedor->proveedor_email)){
-                            xmlwriter_text($xml, 'SIN CORREO');
-                        }else{
-                            xmlwriter_text($xml, $retencion->transaccionCompra->proveedor->proveedor_email);
-                        }
-                    }
-                    if($retencion->liquidacionCompra){
-                        if(empty($retencion->liquidacionCompra->proveedor->proveedor_email)){
-                            xmlwriter_text($xml, 'SIN CORREO');
-                        }else{
-                            xmlwriter_text($xml, $retencion->liquidacionCompra->proveedor->proveedor_email);
-                        }
-                    }
-                    xmlwriter_end_element($xml); 
-                    /**********************/
-                xmlwriter_end_element($xml); 
-                // final 'infoAdicional'
-
+        // Elemento hijo de 'retencion'
+        xmlwriter_start_element($xml, 'infoTributaria');
+            /**********************/
+            xmlwriter_start_element($xml, 'ambiente');
+            xmlwriter_text($xml, $empresa->firmaElectronica->firma_ambiente);
             xmlwriter_end_element($xml); 
-                // final 'retencion'
+            /**********************/
+            xmlwriter_start_element($xml, 'tipoEmision');
+            xmlwriter_text($xml, $empresa->firmaElectronica->firma_disponibilidad);
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'razonSocial');
+            xmlwriter_text($xml, $empresa->empresa_razonSocial);
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'nombreComercial');
+            xmlwriter_text($xml, $empresa->empresa_nombreComercial);
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'ruc');
+            xmlwriter_text($xml, $empresa->empresa_ruc);
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'claveAcceso');
+            xmlwriter_text($xml, $retencion->retencion_autorizacion);
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'codDoc');
+            xmlwriter_text($xml, '07');
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'estab');
+            xmlwriter_text($xml, $retencion->rangoDocumento->puntoEmision->sucursal->sucursal_codigo);
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'ptoEmi');
+            xmlwriter_text($xml, $retencion->rangoDocumento->puntoEmision->punto_serie);
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'secuencial');//
+            xmlwriter_text($xml, substr(str_repeat(0, 9).$retencion->retencion_secuencial, - 9));
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'dirMatriz');
+            xmlwriter_text($xml, $empresa->empresa_direccion);
+            xmlwriter_end_element($xml); 
+            /**********************/
+            if($empresa->empresa_tipo == 'Agente de Retención'){
+                xmlwriter_start_element($xml, 'agenteRetencion');
+                xmlwriter_text($xml, '1');
+                xmlwriter_end_element($xml); 
+            }elseif($empresa->empresa_tipo == 'Microempresas'){
+                xmlwriter_start_element($xml, 'regimenMicroempresas');
+                xmlwriter_text($xml, 'CONTRIBUYENTE RÉGIMEN MICROEMPRESAS');
+                xmlwriter_end_element($xml); 
+            }
+            /**********************/
+        xmlwriter_end_element($xml); 
+        // final 'infoTributaria'
+
+        // Elemento hijo de 'retencion'
+        xmlwriter_start_element($xml, 'infoCompRetencion');
+            /**********************/
+            xmlwriter_start_element($xml, 'fechaEmision');
+            xmlwriter_text($xml, DateTime::createFromFormat('Y-m-d', $retencion->retencion_fecha)->format('d/m/Y'));
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'dirEstablecimiento');
+            xmlwriter_text($xml, $retencion->rangoDocumento->puntoEmision->sucursal->sucursal_direccion);
+            xmlwriter_end_element($xml); 
+            /**********************/
+            if($empresa->empresa_tipo == 'Contribuyente Especial'){
+                xmlwriter_start_element($xml, 'contribuyenteEspecial');
+                xmlwriter_text($xml, $empresa->empresa_contribuyenteEspecial);
+                xmlwriter_end_element($xml); 
+            }
+            /**********************/
+            xmlwriter_start_element($xml, 'obligadoContabilidad');
+            if($empresa->empresa_llevaContabilidad == 1){
+                xmlwriter_text($xml, 'SI');
+            }else{
+                xmlwriter_text($xml, 'NO');
+            }
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'tipoIdentificacionSujetoRetenido');
+            if($retencion->transaccionCompra){
+                xmlwriter_text($xml, Transaccion_Identificacion::Identificacion($retencion->transaccionCompra->proveedor->tipo_identificacion_id, 'Venta')->first()->transaccion_codigo);
+            }
+            if($retencion->liquidacionCompra){
+                xmlwriter_text($xml, Transaccion_Identificacion::Identificacion($retencion->liquidacionCompra->proveedor->tipo_identificacion_id, 'Venta')->first()->transaccion_codigo);
+            }
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'razonSocialSujetoRetenido');
+            if($retencion->transaccionCompra){
+                xmlwriter_text($xml, $retencion->transaccionCompra->proveedor->proveedor_nombre);
+            }
+            if($retencion->liquidacionCompra){
+                xmlwriter_text($xml, $retencion->liquidacionCompra->proveedor->proveedor_nombre);
+            }
+            
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'identificacionSujetoRetenido');
+            if($retencion->transaccionCompra){
+                xmlwriter_text($xml, $retencion->transaccionCompra->proveedor->proveedor_ruc);
+            }
+            if($retencion->liquidacionCompra){
+                xmlwriter_text($xml, $retencion->liquidacionCompra->proveedor->proveedor_ruc);
+            }
+            xmlwriter_end_element($xml); 
+            /**********************/
+            xmlwriter_start_element($xml, 'periodoFiscal');
+            xmlwriter_text($xml, DateTime::createFromFormat('Y-m-d', $retencion->retencion_fecha)->format('m/Y'));
+            xmlwriter_end_element($xml); 
+            /**********************/
+        xmlwriter_end_element($xml); 
+        // final 'infoCompRetencion'
+
+        // Elemento hijo de 'retencion'
+        xmlwriter_start_element($xml, 'impuestos');
+            /**********************/
+            foreach($retencion->detalles as $detalle){
+                xmlwriter_start_element($xml, 'impuesto');
+                    /**********************/
+                    xmlwriter_start_element($xml, 'codigo');
+                    if($detalle->detalle_tipo == "IVA"){
+                        xmlwriter_text($xml, "2");
+                    }else{
+                        xmlwriter_text($xml, "1");
+                    }
+                    xmlwriter_end_element($xml); 
+                    /**********************/
+                    xmlwriter_start_element($xml, 'codigoRetencion');
+                    xmlwriter_text($xml, $detalle->conceptoRetencion->concepto_codigo);
+                    xmlwriter_end_element($xml); 
+                    /**********************/
+                    xmlwriter_start_element($xml, 'baseImponible');
+                    xmlwriter_text($xml, number_format($detalle->detalle_base, 2, '.', ''));
+                    xmlwriter_end_element($xml); 
+                    /**********************/
+                    xmlwriter_start_element($xml, 'porcentajeRetener');
+                    xmlwriter_text($xml, $detalle->detalle_porcentaje);
+                    xmlwriter_end_element($xml); 
+                    /**********************/
+                    xmlwriter_start_element($xml, 'valorRetenido');
+                    xmlwriter_text($xml, number_format($detalle->detalle_valor, 2, '.', ''));
+                    xmlwriter_end_element($xml); 
+                    /**********************/
+                    xmlwriter_start_element($xml, 'codDocSustento');
+                    if($retencion->transaccionCompra){
+                        xmlwriter_text($xml, $retencion->transaccionCompra->tipoComprobante->tipo_comprobante_codigo);
+                    }else{
+                        xmlwriter_text($xml, '03');
+                    }
+                    
+                    xmlwriter_end_element($xml); 
+                    /**********************/
+                    xmlwriter_start_element($xml, 'numDocSustento');
+                    if($retencion->transaccionCompra){
+                        xmlwriter_text($xml, $retencion->transaccionCompra->transaccion_numero);
+                    }
+                    if($retencion->liquidacionCompra){
+                        xmlwriter_text($xml, $retencion->liquidacionCompra->lc_numero);
+                    }
+                    xmlwriter_end_element($xml); 
+                    /**********************/
+                    xmlwriter_start_element($xml, 'fechaEmisionDocSustento');
+                    if($retencion->transaccionCompra){
+                        xmlwriter_text($xml, DateTime::createFromFormat('Y-m-d', $retencion->transaccionCompra->transaccion_fecha)->format('d/m/Y'));
+                    }
+                    if($retencion->liquidacionCompra){
+                        xmlwriter_text($xml, DateTime::createFromFormat('Y-m-d', $retencion->liquidacionCompra->lc_fecha)->format('d/m/Y'));
+                    }
+                    xmlwriter_end_element($xml); 
+                    /**********************/
+                xmlwriter_end_element($xml); 
+            }
+            /**********************/
+        xmlwriter_end_element($xml); 
+        // final 'detalles'
+
+        // Elemento hijo de 'retencion'
+        xmlwriter_start_element($xml, 'infoAdicional');
+            /**********************/
+            xmlwriter_start_element($xml, 'campoAdicional');
+                /**********************/
+                xmlwriter_start_attribute($xml, 'nombre');
+                xmlwriter_text($xml, 'Dirección');
+                xmlwriter_end_attribute($xml);
+                if($retencion->transaccionCompra){
+                    xmlwriter_text($xml, $retencion->transaccionCompra->proveedor->proveedor_direccion);
+                }
+                if($retencion->liquidacionCompra){
+                    xmlwriter_text($xml, $retencion->liquidacionCompra->proveedor->proveedor_direccion);
+                }
+                /**********************/
+            xmlwriter_end_element($xml);
+            /**********************/
+            xmlwriter_start_element($xml, 'campoAdicional');
+                /**********************/
+                xmlwriter_start_attribute($xml, 'nombre');
+                xmlwriter_text($xml, 'Email');
+                xmlwriter_end_attribute($xml);
+                /**********************/
+            if($retencion->transaccionCompra){
+                if(empty($retencion->transaccionCompra->proveedor->proveedor_email)){
+                    xmlwriter_text($xml, 'SIN CORREO');
+                }else{
+                    xmlwriter_text($xml, $retencion->transaccionCompra->proveedor->proveedor_email);
+                }
+            }
+            if($retencion->liquidacionCompra){
+                if(empty($retencion->liquidacionCompra->proveedor->proveedor_email)){
+                    xmlwriter_text($xml, 'SIN CORREO');
+                }else{
+                    xmlwriter_text($xml, $retencion->liquidacionCompra->proveedor->proveedor_email);
+                }
+            }
+            xmlwriter_end_element($xml); 
+            /**********************/
+        xmlwriter_end_element($xml); 
+        // final 'infoAdicional'
+
+        xmlwriter_end_element($xml); 
+        // final 'retencion'
 
         xmlwriter_end_document($xml); 
         // final del documento
@@ -1804,10 +1667,21 @@ class facturacionElectronicaController extends Controller
 
                     xmlwriter_start_element($xml, 'tipoIdentificacionSujetoRetenido');
                         if($retencion->transaccionCompra){
-                            xmlwriter_text($xml, Transaccion_Identificacion::Identificacion($retencion->transaccionCompra->proveedor->tipo_identificacion_id, 'Venta')->first()->transaccion_codigo);
+                            $codigo=$retencion->transaccionCompra->proveedor->tipoIdentificacion->tipo_identificacion_codigo;
+
+                            if($codigo=="R") xmlwriter_text($xml, "04");
+                            if($codigo=="C") xmlwriter_text($xml, "05");
+                            if($codigo=="P") xmlwriter_text($xml, "05");
+                            if($codigo=="F") xmlwriter_text($xml, "05");
                         }
                         if($retencion->liquidacionCompra){
-                            xmlwriter_text($xml, Transaccion_Identificacion::Identificacion($retencion->liquidacionCompra->proveedor->tipo_identificacion_id, 'Venta')->first()->transaccion_codigo);
+                            $codigo=$retencion->liquidacionCompra->proveedor->tipoIdentificacion->tipo_identificacion_codigo;
+
+                            if($codigo=="R") xmlwriter_text($xml, "04");
+                            if($codigo=="C") xmlwriter_text($xml, "05");
+                            if($codigo=="P") xmlwriter_text($xml, "05");
+                            if($codigo=="F") xmlwriter_text($xml, "05");
+                            //xmlwriter_text($xml, Transaccion_Identificacion::Identificacion($retencion->liquidacionCompra->proveedor->tipo_identificacion_id, 'Compra')->first()->transaccion_codigo);
                         }
                     xmlwriter_end_element($xml); 
 

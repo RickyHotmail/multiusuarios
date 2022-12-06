@@ -35,7 +35,7 @@ class Retencion_Compra extends Model
     protected $guarded =[
     ];
     public function scopeRetencion($query, $id){
-        return $query->join('rango_documento','rango_documento.rango_id','=','retencion_compra.rango_id')->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','rango_documento.tipo_comprobante_id')->where('empresa_id','=',Auth::user()->empresa_id)->where('retencion_id','=',$id);
+        return $query->where('retencion_id','=',$id);
     }
     public function scopeSecuencial($query, $id){
         return $query->where('retencion_compra.rango_id','=',$id);
