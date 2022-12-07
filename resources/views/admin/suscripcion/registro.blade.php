@@ -243,7 +243,7 @@
                                                 <select class="custom-select" id="idTipo" name="idTipo" require>
                                                     <option value="Microempresas">Microempresas</option>
                                                     <option value="Agente de Retención">Agente de Retención</option>
-                                                    <option value="Contribuyente Especial">Contribuyente Especial</option>
+                                             
 
                                                     <option value="Contribuyente Régimen Rimpe">Contribuyente Régimen Rimpe</option>
                                                     <option value="Contribuyente Rimpe y Agente de Retención">Contribuyente Rimpe y Agente de Retención</option>
