@@ -96,8 +96,10 @@
                                         <th>Codigo</th>
                                         <th>Descripcion</th>
                                         <th>Especialidad</th>
-                                        <th>Precio Aseg</th> 
-                                        <th>Cobertura</th>                                              
+                                        <th style="width:130px">Precio Aseg</th> 
+                                        <th style="width:130px">Cobertura</th>
+                                        <th style="width:130px">Cobertura</th>                                              
+                                        <th style="width:130px">COPAGO</th>                                            
                                     </tr>
                                 </thead>
                                 <tbody>

@@ -151,7 +151,7 @@ class documentosElectronicosController extends Controller
                     $factura = Factura_Venta::findOrFail($facturas[$i]);
                     if($factura->factura_emision == 'ELECTRONICA'){
                         $factura->factura_autorizacion = $docElectronico->generarClaveAcceso($factura->factura_numero,$factura->factura_fecha,"01");
-                        $facturaAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlFactura($factura),'FACTURA');
+                        $facturaAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlFacturaV2($factura),'FACTURA');
                         $factura->factura_xml_estado = $facturaAux->factura_xml_estado;
                         $factura->factura_xml_mensaje = $facturaAux->factura_xml_mensaje;
                         $factura->factura_xml_respuestaSRI = $facturaAux->factura_xml_respuestaSRI;
@@ -205,7 +205,7 @@ class documentosElectronicosController extends Controller
                 for ($i = 0; $i < count($rets); ++$i) {
                     $ret = Retencion_Compra::findOrFail($rets[$i]);
                     if($ret->retencion_emision == 'ELECTRONICA'){
-                        $retencionAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlRetencion($ret),'RETENCION');
+                        $retencionAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlRetencionV2($ret),'RETENCION');
                         $ret->retencion_xml_estado = $retencionAux->retencion_xml_estado;
                         $ret->retencion_xml_mensaje =$retencionAux->retencion_xml_mensaje;
                         $ret->retencion_xml_respuestaSRI = $retencionAux->retencion_xml_respuestaSRI;
@@ -267,7 +267,7 @@ class documentosElectronicosController extends Controller
             $factura = Factura_Venta::factura($id)->first();
             if($factura->factura_emision == 'ELECTRONICA'){
                 $factura->factura_autorizacion = $docElectronico->generarClaveAcceso($factura->factura_numero,$factura->factura_fecha,"01");
-                $facturaAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlFactura($factura),'FACTURA');
+                $facturaAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlFacturaV2($factura),'FACTURA');
                 $factura->factura_xml_estado = $facturaAux->factura_xml_estado;
                 $factura->factura_xml_mensaje = $facturaAux->factura_xml_mensaje;
                 $factura->factura_xml_respuestaSRI = $facturaAux->factura_xml_respuestaSRI;
@@ -399,7 +399,7 @@ class documentosElectronicosController extends Controller
             $ret = Retencion_Compra::Retencion($id)->first();
             if($ret->retencion_emision == 'ELECTRONICA'){
                 $ret->retencion_autorizacion = $docElectronico->generarClaveAcceso($ret->retencion_numero,$ret->retencion_fecha,"07");
-                $retencionAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlRetencion($ret),'RETENCION');
+                $retencionAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlRetencionV2($ret),'RETENCION');
                 $ret->retencion_xml_estado = $retencionAux->retencion_xml_estado;
                 $ret->retencion_xml_mensaje =$retencionAux->retencion_xml_mensaje;
                 $ret->retencion_xml_respuestaSRI = $retencionAux->retencion_xml_respuestaSRI;
