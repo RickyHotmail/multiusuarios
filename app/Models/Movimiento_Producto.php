@@ -116,6 +116,6 @@ class Movimiento_Producto extends Model
     }
     public function detalle_or()
     {
-        return $this->hasOne(detalle_or::class, 'movimiento_id', 'movimiento_id');
+        return $this->hasOne(Detalle_OR::class, 'movimiento_id', 'movimiento_id');
     }
 }
