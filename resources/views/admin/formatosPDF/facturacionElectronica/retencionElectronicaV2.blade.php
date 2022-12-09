@@ -13,8 +13,13 @@
             <td>
                 <table>
                     <tr>
-                        <td>@if(!empty($logo))<img class="logo" src="logos/{{ $logo }}">@else <img class="logo"
-                                src="logos/NOLOGO.jpg">@endif</td>
+                        <td>
+                            @if(!empty($logo))
+                                <img class="logo" src="logos/{{ $logo }}">
+                            @else 
+                                <img class="logo" src="logos/NOLOGO.jpg">
+                            @endif
+                        </td>
                     </tr>
                 </table>
             </td>
@@ -139,15 +144,21 @@
                         <td><b>Porcentaje Retenido</b></td>
                         <td><b>Valor Retenido</b></td>
                     </tr>
-                    <?php $total = 0; ?>
-                    @foreach($xml->impuestos->impuesto as $impuesto)
+                    <?php 
+                        $total = 0;
+                        foreach($sustentos as $sustento){
+                            if($sustento->tipo_comprobante_codigo==$xml->docsSustento->docSustento->codDocSustento){
+                                $tipoDoc=strtoupper($sustento->tipo_comprobante_nombre);
+                            }
+                        }
+                      
+                    ?>
+                    @foreach($xml->docsSustento->docSustento->retenciones->retencion as $impuesto)
                     <?php $total = (double)$total + (double)$impuesto->valorRetenido; ?>
                     <tr>
-                        <td>@if($impuesto->codDocSustento == '01') FACTURA @endif @if($impuesto->codDocSustento == '19')
-                            COMPROBANTES DE PAGO DE CUOTAS O APORTES @endif @if($impuesto->codDocSustento == '03')
-                            LIQUIDACIÓN DE COMPRA @endif </td>
-                        <td>{{ $impuesto->numDocSustento }}</td>
-                        <td>{{ $impuesto->fechaEmisionDocSustento }}</td>
+                        <td>{{$tipoDoc}}</td>
+                        <td>{{ $xml->docsSustento->docSustento->numDocSustento }}</td>
+                        <td>{{ $xml->docsSustento->docSustento->fechaEmisionDocSustento }}</td>
                         <td>{{ $xml->infoCompRetencion->periodoFiscal }}</td>
                         <td>{{ $impuesto->baseImponible }}</td>
                         <td>@if($impuesto->codigoRetencion == '1') 725 @elseif($impuesto->codigoRetencion == '2') 729

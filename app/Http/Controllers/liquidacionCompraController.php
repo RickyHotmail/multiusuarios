@@ -391,7 +391,7 @@ class liquidacionCompraController extends Controller
                 /*********************************************************************/
             }
             if($retencion->retencion_emision == 'ELECTRONICA'){
-                $retencionAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlRetencion($retencion),'RETENCION');
+                $retencionAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlRetencionV2($retencion),'RETENCION');
                 $retencion->retencion_xml_estado = $retencionAux->retencion_xml_estado;
                 $retencion->retencion_xml_mensaje =$retencionAux->retencion_xml_mensaje;
                 $retencion->retencion_xml_respuestaSRI = $retencionAux->retencion_xml_respuestaSRI;

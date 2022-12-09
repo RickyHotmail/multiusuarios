@@ -110,10 +110,11 @@
             data: {
                 buscar: document.getElementById("especialidad_id").value
             },                      
-            success: function(data){                    
+            success: function(data){        
+                console.log(data)            
                 for (var i=0; i<data.length; i++) {
                     var coma = ",";
-                    var cod = data[i].procedimiento_id;    
+                    var cod = data[i].procedimientoa_id;    
                     var value = 0; 
                     var costo = 0; 
                     var codigoT = 0; 
@@ -185,7 +186,7 @@
                     linea = linea.replace(/{check}/g, (i+1));
                     linea = linea.replace(/{Pcodigo}/g, data[i].producto_codigo);
                     linea = linea.replace(/{Pnombre}/g, data[i].producto_nombre);
-                    linea = linea.replace(/{Pprocedimiento}/g, data[i].procedimiento_id);
+                    linea = linea.replace(/{Pprocedimiento}/g, data[i].procedimientoa_id);
                     linea = linea.replace(/{Pespecialidad}/g, document.getElementById("especialidad_id").value);
                     linea = linea.replace(/{Pcliente_id}/g, document.getElementById("cliente_id").value);
                     

@@ -367,7 +367,7 @@ class facturaproformaController extends Controller
             }
             /*******************************************************************/
             if($factura->factura_emision == 'ELECTRONICA'){
-                $facturaAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlFactura($factura),'FACTURA');
+                $facturaAux = $docElectronico->enviarDocumentoElectronico($docElectronico->xmlFacturaV2($factura),'FACTURA');
                 $factura->factura_xml_estado = $facturaAux->factura_xml_estado;
                 $factura->factura_xml_mensaje = $facturaAux->factura_xml_mensaje;
                 $factura->factura_xml_respuestaSRI = $facturaAux->factura_xml_respuestaSRI;
