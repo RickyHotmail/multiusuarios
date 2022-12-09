@@ -39,6 +39,6 @@ class Provincia extends Model
 
     public function scopePaisProvincias($query, $id){
         return $query->join('pais', 'pais.pais_id','=','provincia.pais_id' 
-                    )->where('pais.empresa_id','=',Auth::user()->empresa_id)->where('provincia.pais_id','=',$id)->where('provincia.provincia_estado','=','1');
+                    )->where('provincia.provincia_estado','=','1');
     }
 }
