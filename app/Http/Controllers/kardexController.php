@@ -23,7 +23,7 @@ class kardexController extends Controller
         try{  
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
             return view('admin.inventario.kardex.index',['productos'=>Producto::productos()->where('producto_compra_venta','=','3')->get(),'categorias'=>Categoria_Producto::categorias()->get(),'bodegas'=>Bodega::bodegas()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
         }
         catch(\Exception $ex){      
@@ -33,8 +33,14 @@ class kardexController extends Controller
     public function consultar(Request $request)
     {   
         if (isset($_POST['buscar'])){
+           
             return $this->buscar($request);
         }
+        if (isset($_POST['Actualizar'])){
+           
+            return $this->actualizar($request);
+        }
+       
         if (isset($_POST['excel'])){
             return $this->excel($this->datos($this->datosProcesar($request)),$request->get('radioKardex'));
             //return $this->excel($this->datos($request,$request->get('radioKardex')),$request->get('radioKardex'));
@@ -43,8 +49,34 @@ class kardexController extends Controller
             return $this->pdf($this->datos($request,$request->get('radioKardex')),$request->get('radioKardex'),$request->get('fecha_desde'),$request->get('fecha_hasta'));
         }
     }
+    public function actualizar(Request $request){
+        try{
+            $productos=Producto::Productos()->get();
+            $fechaActual = date('d-m-Y');
+            foreach ($productos as $producto) {
+                $can=DB::table('movimiento_producto')->where('movimiento_producto.producto_id','=',$producto->producto_id)->where('movimiento_fecha','<=',$fechaActual)->where('movimiento_tipo','=','ENTRADA')->sum('movimiento_cantidad');
+                $prec=DB::table('movimiento_producto')->where('movimiento_producto.producto_id','=',$producto->producto_id)->where('movimiento_fecha','<=',$fechaActual)->where('movimiento_tipo','=','ENTRADA')->sum('movimiento_total');
+                $can2=DB::table('movimiento_producto')->where('movimiento_producto.producto_id','=',$producto->producto_id)->where('movimiento_fecha','<=',$fechaActual)->where('movimiento_tipo','=','SALIDA')->sum('movimiento_cantidad');
+                $precio=DB::table('movimiento_producto')->where('movimiento_producto.producto_id','=',$producto->producto_id)->where('movimiento_fecha','<=',$fechaActual)->where('movimiento_tipo','=','ENTRADA')->where('movimiento_motivo','=','COMPRA')->orderBy('movimiento_fecha', 'desc')->first();
+                if($can > 0 ){
+                    $producto=Producto::findOrFail($producto->producto_id);
+                    $producto->producto_precio_costo = 0;
+                    if ($producto->producto_tipo=='1') {
+                        $producto->producto_stock = $can-$can2;
+                        //$producto->producto_precio_costo = (round(floatval($precio->movimiento_precio), 2));  
+                    }
+                    $producto->save();
+                   
+                }
+            }
+            return redirect('kardex')->with('success','Datos guardados exitosamente');
+        }catch(\Exception $ex){
+            return redirect('kardex')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
+    }
     public function datosProcesar(Request $request){
         try{
+            
             $datos = null;
             $count = 1;
             $saldo_cero = 0;
@@ -275,7 +307,7 @@ class kardexController extends Controller
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
             $saldo_cero = 0;
             if ($request->get('saldo_cero') == "on"){
                 $saldo_cero = 1; 

@@ -28,7 +28,7 @@ class Detalle_IB extends Model
         return $query->join('producto','producto.producto_id','=','detalle_ingreso_bodega.producto_id')->where('cabecera_ingreso_id','=', $ordenID)->orderBy('detalle_id','asc');
     }
     public function Ingresobodega(){
-        return $this->belongsTo(ingreso_Bodega::class, 'cabecera_ingreso_id', 'cabecera_ingreso_id');
+        return $this->belongsTo(Ingreso_Bodega::class, 'cabecera_ingreso_id', 'cabecera_ingreso_id');
     }
     public function movimiento(){
         return $this->belongsTo(Movimiento_Producto::class, 'movimiento_id', 'movimiento_id');

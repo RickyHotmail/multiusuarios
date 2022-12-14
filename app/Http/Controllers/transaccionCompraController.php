@@ -1031,6 +1031,11 @@ class transaccionCompraController extends Controller
                         $cxcobrar->delete();
                         $general->registrarAuditoria('Eliminacion de pago de cuenta por pagar por Transaccion compra:-> '.$transaccion->transaccion_numero, $transaccion->transaccion_numero, 'Registro de cuenta por pagar de factura -> '.$transaccion->transaccion_numero.' con proveedor -> '.$request->get('buscarProveedor').' con un total de -> '.$request->get('idTotal'));
                     }
+                    if (isset($transaccion->diario->movimientocaja)){
+                        $movimiento=Movimiento_Caja::findOrFail($transaccion->diario->movimientocaja->movimiento_id);
+                        $movimiento->delete();
+                        $general->registrarAuditoria('Eliminacion de Movimiento Caja por Transaccion compra:-> '.$transaccion->transaccion_numero, $transaccion->transaccion_numero, 'Registro de cuenta por pagar de factura -> '.$transaccion->transaccion_numero.' con proveedor -> '.$request->get('buscarProveedor').' con un total de -> '.$request->get('idTotal'));
+                    }
                 }
               
                 if (isset($transaccion->cuentaPagar)) {

@@ -30,6 +30,7 @@
                     <button type="submit" id="buscar" name="buscar" class="btn btn-primary"><i class="fa fa-search"></i></button>
                     <button type="submit" id="excel" name="excel" class="btn btn-success"><i class="fas fa-file-excel   "></i></button>
                     <button type="submit" id="pdf" name="pdf" class="btn btn-secondary"><i class="fas fa-print"></i></button>
+                    <button type="submit" id="actualizar" name="Actualizar" class="btn btn-success" onclick="girarGif();"><i class="fas fa-sync-alt"></i></button>
                 </div>
             </div>
             <div class="form-group row">
@@ -218,6 +219,15 @@
                     @endif
                 </tbody>
             </table>
+            <div id="div-gif" class="col-md-12 text-center" style="position: absolute;height: 300px; margin-top: 150px; display: none">
+            <img src="{{ url('img/loading.gif') }}" width=90px height=90px style="align-items: center">
+        </div>
+        <script>
+            function girarGif(){
+                document.getElementById("div-gif").style.display="inline"
+                console.log("girando")
+            }
+        </script>
         </form>
     </div>
 </div>
