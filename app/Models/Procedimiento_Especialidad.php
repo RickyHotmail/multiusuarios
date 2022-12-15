@@ -34,6 +34,7 @@ class Procedimiento_Especialidad extends Model
                     )->where('especialidad.empresa_id','=',Auth::user()->empresa_id
                     )->where('procedimiento_especialidad.procedimiento_estado','=','1'
                     )->where('grupo_producto.grupo_nombre','=','Laboratorio'
+                    )->where('grupo_producto.grupo_nombre','=','Imagen'
                     )->orwhere('grupo_producto.grupo_nombre','=','Procedimiento');
     }
     public function scopeProcedimientoEspecialidad($query, $id){
