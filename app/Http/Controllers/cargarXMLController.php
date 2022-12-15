@@ -275,8 +275,10 @@ class cargarXMLController extends Controller
                 for ($i = 2; $i < sizeof($registros); $i ++) {
                     $data[$i] = explode("\t", $registros[$i]);
                     if(count($data[$i])>1){
-                        $transaccion = Transaccion_Compra::TransaccionByAutorizacion($data[$i][9])->first();
-                        if(isset($transaccion->transaccion_id) == false){
+                        $electrocnico = new facturacionElectronicaController();
+                        $consultaDoc = $electrocnico->consultarDOC($data[$i][9]);
+                        if(isset($consultaDoc['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['estado'])){
+                        
                             if($data[$i][0] == 'Factura' or $data[$i][0] == 'Notas de Crédito' or $data[$i][0] == 'Notas de Débito'){
                                 $datos[$count]['proveedor'] = $data[$i][3];
                                 $datos[$count]['fecha'] = $data[$i][4];
@@ -288,20 +290,14 @@ class cargarXMLController extends Controller
                                 $total = 0;
                                 $impuesto0 = 0;
                                 $impuesto12 = 0;
-
-                                $electrocnico = new facturacionElectronicaController();
-                                $consultaDoc = $electrocnico->consultarDOC($data[$i][9]);
                                 if ($consultaDoc['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['estado'] == 'AUTORIZADO') {
                                     $xmlEnvio = simplexml_load_string($consultaDoc['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['comprobante']);
-                                    foreach($xmlEnvio->detalles->detalle as $adicional){ 
-                                        
-                                       
+                                    foreach ($xmlEnvio->detalles->detalle as $adicional) {
                                         $descuento=$descuento+$adicional->descuento;
                                         $subtotal=$subtotal+$adicional->precioTotalSinImpuesto;
-                                        if($adicional->impuestos->impuesto->tarifa=='0'){
+                                        if ($adicional->impuestos->impuesto->tarifa=='0') {
                                             $impuesto0=$impuesto0+$adicional->impuestos->impuesto->baseImponible;
-                                        }
-                                        else{
+                                        } else {
                                             $impuesto12=$impuesto12+$adicional->impuestos->impuesto->baseImponible;
                                             $impuesto=$impuesto+$adicional->impuestos->impuesto->valor;
                                         }
