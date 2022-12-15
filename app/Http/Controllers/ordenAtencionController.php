@@ -250,7 +250,7 @@ class ordenAtencionController extends Controller
         } 
     }
 
-    public function ordenAtencionBuscarConsolidado(Request $request){
+    /* public function ordenAtencionBuscarConsolidado(Request $request){
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
@@ -298,7 +298,7 @@ class ordenAtencionController extends Controller
     }
 
     public function crearArchivoConsolidado(Request $request, $id){
-        //return $id;
+        return $id;
         $empresa = Empresa::empresa()->first();
         $ordenAtencion=Orden_Atencion::findOrFail($id);
 
@@ -323,6 +323,7 @@ class ordenAtencionController extends Controller
         }
 
         if(count($documentos)>0){
+            return $documentos;
             foreach($documentos as $doc){
                 if($doc->doccita_url!=""){
                     $ext=explode($doc->doccita_url, ".");
@@ -335,9 +336,9 @@ class ordenAtencionController extends Controller
             }
         }  
 
+        return 0;
         
         if(isset($ordenExamen)){
-            /*comprobar si hay un analisis en */
             $analisisLaboratorio=Analisis_Laboratorio::analisisByOrden($ordenExamen->orden_id)->first();
             if($analisisLaboratorio){
                 if($analisisLaboratorio->analisis_estado == 3){
@@ -362,7 +363,6 @@ class ordenAtencionController extends Controller
         if($ordenAtencion->orden_id==149){
             if(isset($ordenImagen)){
 
-                /*comprobar si hay un analisis en */
                 if($ordenImagen->detalleImagen){
                     foreach($ordenImagen->detalleImagen as $det){
                         if($det->detalle_estado==2){
@@ -435,7 +435,7 @@ class ordenAtencionController extends Controller
         $fecha = (new DateTime("$ordenAtencion->orden_fecha"))->format('d-m-Y');
 
         //return $request;
-        //try{
+        try{
             //$sucursal=Sucursal::findOrFail($request->sucursal_id);
             $orden=Orden_Atencion::findOrFail($ordenAtencion->orden_id);
 
@@ -555,10 +555,11 @@ class ordenAtencionController extends Controller
 
             return $ruta.'/informeOrdenIndividual.pdf';
             //return Excel::download(new ViewExcel('admin.formatosExcel.individualPlano', $datos), 'NEOPAGUPA  Sistema Contable.xls');
-        //}catch(\Exception $ex){
+        }catch(\Exception $ex){
             return redirect('informehistoricoplano')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        //}
+        }
     }
+    */
 
     public function verificarDocumentosOrden(Request $request){
         $fecha_desde=date('Y-m-01');
@@ -586,7 +587,8 @@ class ordenAtencionController extends Controller
                 }
             }
 
-            $data = [
+            //return $medicos;
+            return view('admin.agendamientoCitas.ordenAtencion.verificarOrdenDocumentos2',[
                 'fecI'=>$fecha_desde,
                 'fecF'=>$fecha_actual,
                 'medicos'=>$medicos,
@@ -598,9 +600,7 @@ class ordenAtencionController extends Controller
                 'PE'=>Punto_Emision::puntos()->get(),
                 'gruposPermiso'=>$gruposPermiso,
                 'permisosAdmin'=>$permisosAdmin
-            ];
-
-            return view('admin.agendamientoCitas.ordenAtencion.verificarOrdenDocumentos',$data);
+            ]);
         }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
@@ -647,8 +647,7 @@ class ordenAtencionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         try {
             DB::beginTransaction();
             $empresa = Empresa::findOrFail(Auth::user()->empresa_id);
@@ -988,8 +987,12 @@ class ordenAtencionController extends Controller
             $ordenAtencion->orden_cobertura = $request->get('IdCobertura');
             $ordenAtencion->orden_descuento = $request->get('IdDescuentoPorcentaje');
             $ordenAtencion->orden_copago = $request->get('IdCopago');
+            $ordenAtencion->orden_estado  = 1;
 
-            if(isset($request->checkFacturar)) $ordenAtencion->factura_id = $factura->factura_id;
+            if(isset($request->checkFacturar)){
+                $ordenAtencion->factura_id = $factura->factura_id;
+                $ordenAtencion->orden_estado  = 2;
+            }
             
             $mespecialidad=Medico_Especialidad::findOrFail($request->get('idMespecialidad'));
             $ordenAtencion->medico_id = $mespecialidad->medico->medico_id;
@@ -997,7 +1000,6 @@ class ordenAtencionController extends Controller
             $ordenAtencion->tipod_id = $request->get('IdTipoDependencia');
             $ordenAtencion->entidad_id = $request->get('identidad');
 
-            $ordenAtencion->orden_estado  = 2;
             $ordenAtencion->cliente_id = $request->get('clienteID');
             $ordenAtencion->sucursal_id = $request->get('idSucursal');
             $ordenAtencion->paciente_id = $request->get('idPaciente');
@@ -1102,8 +1104,9 @@ class ordenAtencionController extends Controller
             
             if ($request->file('documento')) {
                 $empresa = Empresa::findOrFail(Auth::user()->empresa_id);
-
-                $ruta ='DocumentosOrdenAtencion/'.$empresa->empresa_ruc.'/'.$ordenAtencion->orden_fecha.'/'.$ordenAtencion->orden_numero.'/Documentos/DocumentosPesonales';
+                $ruta ='DocumentosOrdenAtencion/'.$empresa->empresa_ruc.'/'.(new DateTime($ordenAtencion->orden_fecha))->format('d-m-Y').'/'.$ordenAtencion->orden_numero.'/Documentos/DocumentosPesonales';
+                
+                
                 if (!is_dir(public_path().'/'.$ruta)) {
                     mkdir(public_path().'/'.$ruta, 0777, true);
                 }
@@ -1111,7 +1114,7 @@ class ordenAtencionController extends Controller
                     $documento=Documento_Orden_Atencion::findOrFail($request->documento_id);
 
                     $name = $documento->documento_nombre.'.'.$request->file('documento')->getClientOriginalExtension();
-                    $path = $request->file('documento')->move(public_path().$ruta, $name);
+                    $path = $request->file('documento')->move(public_path().'/'.$ruta, $name);
 
                     $documentos_cita_medica=new Documento_Cita_Medica();
                     $documentos_cita_medica->doccita_nombre=$name;
@@ -1163,7 +1166,7 @@ class ordenAtencionController extends Controller
         try{     
             $orden=Orden_Atencion::Orden($id)->get()->first();
             $empresa = Empresa::empresa()->first();
-            $ruta = public_path().'/'.$empresa->empresa_ruc.'/DocumentosOrdenAtencion/'.DateTime::createFromFormat('Y-m-d', $orden->orden_fecha)->format('d-m-Y').'/'.$orden->orden_numero.'/Documentos';
+            $ruta = public_path().'/'.$empresa->empresa_ruc.'/DocumentosOrdenAtencion/'.(new DateTime($orden->orden_fecha))->format('d-m-Y').'/'.$orden->orden_numero.'/Documentos';
             echo "$ruta";
             if (!is_dir($ruta)) {
                 mkdir($ruta, 0777, true);
@@ -1194,7 +1197,7 @@ class ordenAtencionController extends Controller
             $pacientes = Paciente::Pacientes()->get();  
             $empleados = Empleado::Empleados()->get();
             $proveedores = Proveedor::Proveedores()->get();
-            $ordenAtencion=Orden_Atencion::Orden($id)->first();
+            $ordenAtencion=Orden_Atencion::findOrFail($id);
             $secuencial = $ordenAtencion->orden_secuencial;
             if($ordenAtencion){
                 return view('admin.agendamientoCitas.ordenAtencion.ver',['empleados'=>$empleados,'proveedores'=>$proveedores,'ordenAtencion'=>$ordenAtencion,'pacientes'=>$pacientes,'especialidades'=>$especialidades,'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9),'sucursales'=>$sucursales, 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);

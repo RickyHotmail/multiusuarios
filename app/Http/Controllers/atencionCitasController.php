@@ -83,8 +83,7 @@ class atencionCitasController extends Controller
         //
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         try {
             DB::beginTransaction();
             $auditoria = new generalController();
@@ -718,7 +717,7 @@ class atencionCitasController extends Controller
     }
 
     public function informeCargaMasiva(Request $request){
-        try{   
+        //try{   
             $detalleConfig="";
             for($i=0; $i<40; $i++){
                 if(isset($_POST['chk'.($i+1)]))
@@ -806,9 +805,9 @@ class atencionCitasController extends Controller
             //return $datos;
 
             return Excel::download(new ViewExcel('admin.formatosExcel.cargamasiva', $datos), 'NEOPAGUPA-Sistema Contable Informe.xls');
-        }catch(\Exception $ex){
+        /* }catch(\Exception $ex){
             return redirect('informecargamasiva')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        }
+        } */
     }
 
 
