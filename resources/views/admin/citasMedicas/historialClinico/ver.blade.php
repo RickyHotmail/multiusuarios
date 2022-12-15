@@ -97,15 +97,13 @@
             <div class="col-8" style="height: 75vh; overflow-y: scroll"> 
                 <div class="form-group tab-group">
                     <div class="tab-pane col-12 oculto" id="adicional" role="tabpanel" aria-labelledby="adicional-tab">
-                    <div id="marco-expediente" class="col-12 col-sm-12">
-                            
-                            </div>
+                        <div id="marco-expediente" class="col-12 col-sm-12">
+                        </div>
                     </div>   
 
                     <div class="tab-pane col-12 oculto" id="signos" role="tabpanel" aria-labelledby="signos-tab">  
                         <br> 
                         <div id="marco-signos" class="col-12 col-sm-12">
-                            
                         </div>
                     </div>
 
@@ -291,7 +289,7 @@
                         if(item1){
                             setTimeout(function(){
                                 cargarConsultaMedica(item1)
-                                aditionalTab = document.getElementById("adicional-tab")
+                                aditionalTab = document.getElementById("adicional")
                                 aditionalTab.click()
                             }, 300)
                         }
@@ -312,7 +310,7 @@
     examenes = document.getElementById("examenes")
     imagenes = document.getElementById("imagenes")
 
-    aditionalTab = document.getElementById("adicional-tab")
+    //aditionalTab = document.getElementById("adicional-tab")
     signosTab = document.getElementById("signos-tab")
     diagnosticoTab = document.getElementById("diagnostico-tab")
     prescripcionTab = document.getElementById("prescripcion-tab")
@@ -322,10 +320,10 @@
     
 
 
-    aditionalTab.addEventListener("click", function(){
+    /* aditionalTab.addEventListener("click", function(){
         ocultarTodos();
         aditional.classList.remove("oculto")
-    });
+    }); */
 
     signosTab.addEventListener("click", function(){
         ocultarTodos();

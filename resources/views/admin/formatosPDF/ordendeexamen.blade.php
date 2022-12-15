@@ -28,7 +28,7 @@
     
     <table tyle="white-space: normal!important;" id="tabladetalle">
         <?php $c=0 ?>
-        @foreach($ordenes->detalle as $detalle)
+        @foreach($orden->detalle as $detalle)
             <?php $c++ ?>
             <tr style="border: 1px solid black;">
                 <td  style="border: 1px solid black;" class="letra14">{{ $c }}.- &nbsp;&nbsp; {{ $detalle->examen->producto->producto_codigo }} - {{$detalle->examen->producto->producto_nombre }}</td>

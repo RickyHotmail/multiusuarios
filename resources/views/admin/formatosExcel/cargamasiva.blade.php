@@ -167,17 +167,28 @@
                     @if( $orden->medico->empleado)
                         @if($datos['config'][8]) <td>{{ $orden->medico->empleado->empleado_cedula }}</td>@endif
                         @if($datos['config'][9])<td>{{ $orden->medico->empleado->empleado_nombre }}</td>@endif
+                    @elseif( $orden->medico->proveedor)
+                        @if($datos['config'][8]) <td>{{ $orden->medico->proveedor->proveedor_ruc }}</td>@endif
+                        @if($datos['config'][9])<td>{{ $orden->medico->proveedor->proveedor_nombre }}</td>@endif
                     @else
                         @if($datos['config'][8])<td></td>@endif
                         @if($datos['config'][9])<td></td>@endif
                     @endif
 
                     <td>1</td>
-                    <td>{{ $orden->orden_precio }}</td>
+                    <td style="text-align:right">{{ number_format($orden->orden_precio,2,'.','') }}</td>
 
-                    @if($datos['config'][17])<td>{{ $orden->orden_cobertura_porcentaje }} %</td>@endif
-                    <td>{{ $orden->orden_copago }}</td>
-                    <td>{{ $orden->orden_cobertura }}</td>
+                    @if($datos['config'][17])
+                        <td style="text-align:right">
+                            @if($orden->orden_cobertura_porcentaje)
+                                {{ $orden->orden_cobertura_porcentaje }} %
+                            @else
+                                0 %
+                            @endif
+                        </td>
+                    @endif
+                    <td style="text-align:right">{{ number_format($orden->orden_copago,2,'.','') }}</td>
+                    <td style="text-align:right">{{ number_format($orden->orden_cobertura,2,'.','') }}</td>
 
                     <td></td>
                     <td></td>
@@ -199,7 +210,7 @@
                         <?php }?>
                     @endif
 
-                    @if($datos['config'][15])<th style="font-weight: bold">0.00</th>@endif
+                    @if($datos['config'][15])<th style="font-weight: bold;text-align:right">0.00</th>@endif
 
                     <td></td>
                     <td></td>

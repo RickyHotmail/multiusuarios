@@ -28,7 +28,7 @@
                     <div class="form-group row">
                         <label for="fecha_desde" class="col-sm-2 col-form-label">Desde:</label>
                         <div class="col-sm-4">
-                            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde"  value='<?php if(isset($fecI)){echo $fecI;}else{ echo(date("Y")."-".date("m")."-".date("d"));} ?>'>
+                            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde"  value='<?php if(isset($fecI)){echo $fecI;}else{ echo(date("Y")."-".date("m")."-01");} ?>'>
                         </div>
                         <label for="fecha_desde" class="col-sm-2 col-form-label">Hasta:</label>
                         <div class="col-sm-4">
@@ -74,7 +74,7 @@
                             <td>
                                 <a href="{{ url("ordenAtencion/{$ordenAtencion->orden_id}")}}" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="top" title="Ver"><i class="fas fa-eye"></i></a>
 
-                                <a href="{{ url("ordenAtencion/{$ordenAtencion->orden_id}/consolidado")}}" class="btn btn-xs btn-info" data-toggle="tooltip" data-placement="top" title="Generar Archivo Conglomerado">&nbsp;&nbsp;<i class="fas fa-book"></i>&nbsp;<i class="fa fa-pencil-alt"></i>&nbsp;</a>
+                                <a href="{{ url("ordenAtencionConsolidado/{$ordenAtencion->orden_id}/consolidado")}}" class="btn btn-xs btn-info" data-toggle="tooltip" data-placement="top" title="Generar Archivo Conglomerado">&nbsp;&nbsp;<i class="fas fa-book"></i>&nbsp;<i class="fa fa-pencil-alt"></i>&nbsp;</a>
                             </td>
                             <td>
                                 {{ $ordenAtencion->orden_fecha }} <br>
