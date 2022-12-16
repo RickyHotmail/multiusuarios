@@ -16,7 +16,8 @@ class Grupo_empresa_users extends Model
     protected $fillable = [        
         'empresa_id',                    
         'user_id',
-        'grupo_estado',         
+        'grupo_estado',   
+        'grupo_duplicado',         
     ];
     protected $guarded =[
     ];   

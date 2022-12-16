@@ -170,6 +170,7 @@ class productoController extends Controller
             if(isset(Auth::user()->empresa->grupo)){
                 foreach(Auth::user()->empresa->grupo->usuarios->empresas as $empresas){
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $producto = new Producto();
                         $producto->producto_codigo = $request->get('producto_codigo');
                         $producto->producto_nombre = $request->get('producto_nombre');
@@ -278,7 +279,7 @@ class productoController extends Controller
                             $producto->save();
                             $auditoria = new generalController();
                             $auditoria->registrarAuditoria('Registro de producto -> '.$request->get('producto_nombre').'con codigo de ->'.$request->get('producto_codigo'),'0','');
-                           
+                        }
                     }   
                 }
             }
@@ -530,7 +531,8 @@ class productoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
-                        $productoaux=Producto::ProductoEmpresa($productoaux->producto_codigo,$empresas->empresa->empresa_id)->first();
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
+                            $productoaux=Producto::ProductoEmpresa($productoaux->producto_codigo,$empresas->empresa->empresa_id)->first();
                             $producto = Producto::findOrFail($productoaux->producto_id);
                             $producto->producto_codigo = $request->get('producto_codigo');
                             $producto->producto_nombre = $request->get('producto_nombre');
@@ -640,6 +642,7 @@ class productoController extends Controller
                                 $producto->sucursal_id=$sucursal->sucursal_id;    
                             }
                             $producto->save();
+                        }
                     }
                 }
             }
@@ -672,12 +675,13 @@ class productoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
-                            $productoaux=Producto::ProductoEmpresa($productoaux->producto_codigo,$empresas->empresa->empresa_id)->first();
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
+                            $productoaux=Producto::ProductoEmpresa($productoaux->producto_codigo, $empresas->empresa->empresa_id)->first();
                             $producto = Producto::findOrFail($productoaux->producto_id);
                             $producto->delete();
                             $auditoria = new generalController();
-                            $auditoria->registrarAuditoria('Eliminacion de producto -> '.$producto->producto_nombre.' con codigo de -> '.$producto->producto_codigo.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,$empresas->empresa->empresa_id,'0','0');
-           
+                            $auditoria->registrarAuditoria('Eliminacion de producto -> '.$producto->producto_nombre.' con codigo de -> '.$producto->producto_codigo.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial, $empresas->empresa->empresa_id, '0', '0');
+                        }
                     }
                 }
             }
@@ -1316,16 +1320,20 @@ class productoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
-                        $productoaux=Producto::ProductoEmpresa($productoaux->producto_codigo,$empresas->empresa->empresa_id)->first();
-                        $producto = Producto::findOrFail($productoaux->producto_id);
-                        $precio=Precio_Producto::where('producto_id','=',$producto->producto_id)->delete();
-                        for ($i=1; $i < count($dias); $i++) { 
-                            $precio = new Precio_Producto();
-                            $precio->precio_dias = $dias[$i];
-                            $precio->precio_valor = $valor[$i];
-                            $precio->precio_estado = 1;
-                            $precio->producto_id = $producto->producto_id;
-                            $precio->save();
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
+                           
+                                $productoaux=Producto::ProductoEmpresa($productoaux->producto_codigo,$empresas->empresa->empresa_id)->first();
+                                $producto = Producto::findOrFail($productoaux->producto_id);
+                                $precio=Precio_Producto::where('producto_id','=',$producto->producto_id)->delete();
+                                for ($i=1; $i < count($dias); $i++) { 
+                                    $precio = new Precio_Producto();
+                                    $precio->precio_dias = $dias[$i];
+                                    $precio->precio_valor = $valor[$i];
+                                    $precio->precio_estado = 1;
+                                    $precio->producto_id = $producto->producto_id;
+                                    $precio->save();
+                                }
+                            
                         }
                         
                     }

@@ -67,6 +67,7 @@ class listaPrecioController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $listaPrecio = new Lista_Precio();
                         $listaPrecio->lista_nombre = $request->get('idNombre');
                         $listaPrecio->lista_estado = 1;     
@@ -76,6 +77,7 @@ class listaPrecioController extends Controller
                         /*Inicio de registro de auditoria */
                         $auditoria = new generalController();
                         $auditoria->registrarAuditoria('Registro de lista de precios -> '.$request->get('idNombre').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        }
                     }
                 }
             }
@@ -193,6 +195,7 @@ class listaPrecioController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $listaPrecioaux = Lista_Precio::ListasPrecioseEmpresaNombre($listaPrecioaux->lista_nombre, $empresas->empresa->empresa_id)->first();
                         $listaPrecio = Lista_Precio::findOrFail($listaPrecioaux->lista_id);
                         $detalleLista = Detalle_Lista::where('lista_id', '=', $listaPrecio->lista_id)->where('producto_id', '=', $request->get('idProducto'))->delete(); 
@@ -213,6 +216,7 @@ class listaPrecioController extends Controller
                             $listaPrecio->detalles()->save($detalleLista);
                         }
                         /*Inicio de registro de auditoria */
+                        }
                     }
                 }
             }
@@ -249,6 +253,7 @@ class listaPrecioController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $listaPrecioaux = Lista_Precio::ListasPrecioseEmpresaNombre($listaaux->lista_nombre, $empresas->empresa->empresa_id)->first();
                         $listaPrecio = Lista_Precio::findOrFail($listaPrecioaux->lista_id);
                         Detalle_Lista::where('lista_id', '=', $lista->lista_id)->delete(); 
@@ -256,6 +261,7 @@ class listaPrecioController extends Controller
                         /*Inicio de registro de auditoria */
                         $auditoria = new generalController();
                         $auditoria->registrarAuditoria('Eliminacion de lista de precio -> '.$lista->lista_id.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        }
                     }
                 }
             }

@@ -62,6 +62,7 @@ class tipoClienteController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $tipoClien = new Tipo_Cliente();
                         $tipoClien->tipo_cliente_nombre = $request->get('tipo_cliente_nombre');
                         $tipoClien->empresa_id = $empresas->empresa->empresa_id;
@@ -70,6 +71,7 @@ class tipoClienteController extends Controller
                         /*Inicio de registro de auditoria */
                         $auditoria = new generalController();
                         $auditoria->registrarAuditoria('Registro de tipo cliente -> '.$request->get('tipo_cliente_nombre').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        }
                     }
                 }
             }
@@ -156,6 +158,7 @@ class tipoClienteController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $tipoClienaux = Tipo_Cliente::TipoClienteEmpresaNombre($tipoClienaux->tipo_cliente_nombre,$empresas->empresa->empresa_id)->first();
                         $tipoClien = Tipo_Cliente::findOrFail($tipoClienaux->tipo_cliente_id);
                         $tipoClien->tipo_cliente_nombre = $request->get('tipo_cliente_nombre');
@@ -166,7 +169,7 @@ class tipoClienteController extends Controller
                         }  
                         $tipoClien->save();
                         /*Inicio de registro de auditoria */
-                        
+                        }   
                     }
                 }
             }
@@ -198,6 +201,7 @@ class tipoClienteController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $tipoClienaux = Tipo_Cliente::TipoClienteEmpresaNombre($tipoClienaux->tipo_cliente_nombre,$empresas->empresa->empresa_id)->first();
                         $tipoClien = Tipo_Cliente::findOrFail($tipoClienaux->tipo_cliente_id);
                         $tipoClien->delete();
@@ -205,7 +209,7 @@ class tipoClienteController extends Controller
                         $auditoria = new generalController();
                         $auditoria->registrarAuditoria('Eliminacion de tipo cliente -> '.$tipoClien->tipo_cliente_nombre.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
                         /*Inicio de registro de auditoria */
-                        
+                        }
                     }
                 }
             }

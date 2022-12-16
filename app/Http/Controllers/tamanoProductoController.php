@@ -62,6 +62,7 @@ class tamanoProductoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $tamano = new Tamano_Producto();
                         $tamano->tamano_nombre = $request->get('tamano_nombre');
                         $tamano->empresa_id = $empresas->empresa->empresa_id;
@@ -71,7 +72,7 @@ class tamanoProductoController extends Controller
                         $auditoria = new generalController();
                         $auditoria->registrarAuditoria('Registro de tamaños de Producto -> '.$request->get('tamano_nombre').$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
                         /*Inicio de registro de auditoria */
-                        
+                        }
                     }
                 }
             }
@@ -158,6 +159,7 @@ class tamanoProductoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $tamanoaux = Tamano_Producto::TamanoEmpresaNombre($tamanoaux->tamano_nombre,$empresas->empresa->empresa_id)->first();
                         $tamano = Tamano_Producto::findOrFail($tamanoaux->tamano_id);
                         $tamano->tamano_nombre = $request->get('tamano_nombre');           
@@ -168,7 +170,7 @@ class tamanoProductoController extends Controller
                         }
                         $tamano->save();
                         /*Inicio de registro de auditoria */
-                        
+                        }
                     }
                 }
             }
@@ -200,6 +202,7 @@ class tamanoProductoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $tamanoaux = Tamano_Producto::TamanoEmpresaNombre($tamanoaux->tamano_nombre,$empresas->empresa->empresa_id)->first();
                         $tamano = Tamano_Producto::findOrFail($tamanoaux->tamano_id);
                         $tamano->delete();
@@ -207,7 +210,7 @@ class tamanoProductoController extends Controller
                         $auditoria = new generalController();
                         $auditoria->registrarAuditoria('Eliminacion de tamaños de Producto -> '.$tamano->tamano_nombre.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
                         /*Inicio de registro de auditoria */
-                        
+                        }
                     }
                 }
             }

@@ -62,6 +62,7 @@ class marcaProductoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $marca = new Marca_Producto();
                         $marca->marca_nombre = $request->get('marca_nombre');           
                         $marca->empresa_id = $empresas->empresa->empresa_id;
@@ -70,6 +71,7 @@ class marcaProductoController extends Controller
                         /*Inicio de registro de auditoria */
                         $auditoria = new generalController();
                         $auditoria->registrarAuditoria('Registro de marca -> '.$request->get('marca_nombre').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        }
                     }
                 }
             }
@@ -156,6 +158,7 @@ class marcaProductoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $marcaaux = Marca_Producto::MarcaEmpresaNombre($marcaaux->marca_nombre,$empresas->empresa->empresa_id)->first();
                         $marca = Marca_Producto::findOrFail($marcaaux->marca_id);
                         $marca->marca_nombre = $request->get('marca_nombre');
@@ -166,7 +169,7 @@ class marcaProductoController extends Controller
                         }
                         $marca->save();  
                         /*Inicio de registro de auditoria */
-                        
+                        }
                     }
                 }
             } 
@@ -198,11 +201,12 @@ class marcaProductoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $marcaaux = Marca_Producto::MarcaEmpresaNombre($marcaaux->marca_nombre,$empresas->empresa->empresa_id)->first();
                         $marca = Marca_Producto::findOrFail($marcaaux->marca_id);
                         $marca->delete();
                         /*Inicio de registro de auditoria */
-                        
+                        }
                     }
                 }
             } 

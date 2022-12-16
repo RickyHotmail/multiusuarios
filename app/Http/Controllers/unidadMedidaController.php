@@ -62,6 +62,7 @@ class unidadMedidaController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $medida = new Unidad_Medida_Producto();
                         $medida->unidad_medida_nombre = $request->get('unidad_medida_nombre');           
                         $medida->empresa_id = $empresas->empresa->empresa_id;
@@ -70,6 +71,7 @@ class unidadMedidaController extends Controller
                         /*Inicio de registro de auditoria */
                         $auditoria = new generalController();
                         $auditoria->registrarAuditoria('Registro de unidad medida -> '.$request->get('unidad_medida_nombre').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        }
                     }
                 }
             }
@@ -156,6 +158,7 @@ class unidadMedidaController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $medidaaux = Unidad_Medida_Producto::UnidadEmpresaNombre($medidaaux->unidad_medida_nombre,$empresas->empresa->empresa_id)->first();
                         $medida = Unidad_Medida_Producto::findOrFail($medidaaux->unidad_medida_id);
                         $medida->unidad_medida_nombre = $request->get('unidad_medida_nombre');
@@ -165,7 +168,7 @@ class unidadMedidaController extends Controller
                             $medida->unidad_medida_estado = 0;
                         }
                         $medida->save();   
-                        
+                        }
                     }
                 }
             } 
@@ -197,13 +200,14 @@ class unidadMedidaController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $medidaaux = Unidad_Medida_Producto::UnidadEmpresaNombre($medidaaux->unidad_medida_nombre,$empresas->empresa->empresa_id)->first();
                         $medida = Unidad_Medida_Producto::findOrFail($medidaaux->unidad_medida_id);
                         $medida->delete();
                         /*Inicio de registro de auditoria */
                         $auditoria = new generalController();
                         $auditoria->registrarAuditoria('Eliminacion de medida -> '.$medida->unidad_medida_nombre.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0',''); 
-                        
+                        }
                     }
                 }
             } 

@@ -37,12 +37,14 @@
                     @if(isset(Auth::user()->empresa->grupo))
                     @foreach(Auth::user()->empresa->grupo->usuarios->empresas as $empresas)
                         @if(Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id)
-                        <i class="fas fa-user"></i> {{$empresas->empresa->empresa_ruc}} {{$empresas->empresa->empresa_razonSocial}}
-                        <span class="float-right text-muted text-sm"></span>
-                        <a class="brand-link" href="{{ url("cambio/{$empresas->empresa->empresa_id}") }}" >                       
-                            <button class="btn btn-info btn-block" data-toggle="tooltip" data-placement="bottom" title="Cerrar Sesión"><i class="fas fa-sign-out-alt"> Iniciar Sesion</i></button>
-                        </a>
-                        <div class="dropdown-divider"></div>
+                            @if(Auth::user()->user_nombre == $empresas->usuarios->user_nombre)
+                                <i class="fas fa-user"></i> {{$empresas->empresa->empresa_ruc}} {{$empresas->empresa->empresa_razonSocial}}
+                                <span class="float-right text-muted text-sm"></span>
+                                <a class="brand-link" href="{{ url("cambio/{$empresas->empresa->empresa_id}") }}" >                       
+                                    <button class="btn btn-info btn-block" data-toggle="tooltip" data-placement="bottom" title="Cerrar Sesión"><i class="fas fa-sign-out-alt"> Iniciar Sesion</i></button>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                            @endif
                         @endif
                     @endforeach
                     @endif

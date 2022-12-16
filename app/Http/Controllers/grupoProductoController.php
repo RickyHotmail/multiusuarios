@@ -62,14 +62,16 @@ class grupoProductoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
-                        $grupo = new Grupo_Producto();
-                        $grupo->grupo_nombre = $request->get('grupo_nombre');
-                        $grupo->empresa_id = $empresas->empresa->empresa_id;
-                        $grupo->grupo_estado = 1;
-                        $grupo->save();
-                        /*Inicio de registro de auditoria */
-                        $auditoria = new generalController();
-                        $auditoria->registrarAuditoria('Registro de grupo Producto -> '.$request->get('grupo_nombre').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
+                            $grupo = new Grupo_Producto();
+                            $grupo->grupo_nombre = $request->get('grupo_nombre');
+                            $grupo->empresa_id = $empresas->empresa->empresa_id;
+                            $grupo->grupo_estado = 1;
+                            $grupo->save();
+                            /*Inicio de registro de auditoria */
+                            $auditoria = new generalController();
+                            $auditoria->registrarAuditoria('Registro de grupo Producto -> '.$request->get('grupo_nombre').' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        }
                     }
                 }
             }
@@ -156,16 +158,18 @@ class grupoProductoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
-                        $grupoaux = Grupo_Producto::GrupoEmpresaNombre($grupoaux->grupo_nombre,$empresas->empresa->empresa_id)->first();
-                        $grupo = Grupo_Producto::findOrFail($grupoaux->grupo_id);
-                        $grupo->grupo_nombre = $request->get('grupo_nombre');           
-                        if ($request->get('grupo_estado') == "on"){
-                            $grupo->grupo_estado = 1;
-                        }else{
-                            $grupo->grupo_estado = 0;
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
+                            $grupoaux = Grupo_Producto::GrupoEmpresaNombre($grupoaux->grupo_nombre,$empresas->empresa->empresa_id)->first();
+                            $grupo = Grupo_Producto::findOrFail($grupoaux->grupo_id);
+                            $grupo->grupo_nombre = $request->get('grupo_nombre');           
+                            if ($request->get('grupo_estado') == "on"){
+                                $grupo->grupo_estado = 1;
+                            }else{
+                                $grupo->grupo_estado = 0;
+                            }
+                            $grupo->save();
+                            /*Inicio de registro de auditoria */
                         }
-                        $grupo->save();
-                        /*Inicio de registro de auditoria */
                        
                     }
                 }
@@ -198,6 +202,7 @@ class grupoProductoController extends Controller
             if (isset(Auth::user()->empresa->grupo)) {
                 foreach (Auth::user()->empresa->grupo->usuarios->empresas as $empresas) {
                     if (Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id) {
+                        if (Auth::user()->empresa->grupo->grupo_duplicado == '1') {
                         $grupoaux = Grupo_Producto::GrupoEmpresaNombre($grupoaux->grupo_nombre,$empresas->empresa->empresa_id)->first();
                         $grupo = Grupo_Producto::findOrFail($grupoaux->grupo_id);
                      
@@ -205,6 +210,7 @@ class grupoProductoController extends Controller
                         $grupo->delete();
                         /*Inicio de registro de auditoria */
                         $auditoria->registrarAuditoria('Eliminacion de grupo de Producto -> '.$grupo->grupo_nombre.' Con empresa ruc '.$empresas->empresa->empresa_ruc.' Con razon social'.$empresas->empresa->empresa_razonSocial,'0','');
+                        }
                     }
                 }
             }
