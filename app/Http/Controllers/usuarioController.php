@@ -69,6 +69,7 @@ class usuarioController extends Controller
             $usuario->user_cedula = $request->get('idCedula');  
             $usuario->user_nombre = $request->get('idNombre');  
             $usuario->user_correo = $request->get('idCorreo');            
+            $usuario->user_cambio_clave  = '1';
             $usuario->user_tipo  = 1;
             $usuario->user_estado  = 1;
             $password=$this->generarPass();
