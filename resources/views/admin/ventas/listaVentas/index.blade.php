@@ -60,6 +60,20 @@
                             <button type="submit"  class="btn btn-primary btn-sm" data-toggle="modal"><i class="fa fa-search"></i></button>
                         </div>
                     </div>
+                    <div class="form-group row"> 
+                        <label for="sucursal" class="col-sm-2 col-form-label"><center>Vendedor:</center></label>
+                        <div class="col-sm-8">
+                            <select class="custom-select select2" id="vendedor" name="vendedor" >
+                                <option  value="0" label>--TODOS--</option>           
+                                @foreach($vendedores as $vendedor)
+                                    <option  value="{{$vendedor->vendedor_id}}">{{$vendedor->vendedor_nombre}}</option>
+                                @endforeach
+                            </select>                                       
+                        </div>
+                        <div class="col-sm-1">
+                            <button type="submit"  class="btn btn-primary btn-sm" data-toggle="modal"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-sm-5">
                 <div class="card">
@@ -235,6 +249,12 @@
        document.getElementById("sucursal").value='<?php echo($idsucursal); ?>';
         <?php
     }
+    if(isset($idsucursal)){  
+     ?>
+        document.getElementById("vendedor").value='<?php echo($idvendedor); ?>';
+    <?php
+    }
+    
      ?>
     
 </script>

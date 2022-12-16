@@ -527,7 +527,7 @@ class empleadoController extends Controller
                         $Excel_date2 = 25569 + ($unix_date2 / 86400);
                         $unix_date2 = ($Excel_date2 - 25569) * 86400;
                         $empleado->empleado_fecha_ingreso = gmdate("Y-m-d", $unix_date2);
-                        $empleado->empleado_estado = $array[0][$i][5];
+                        $empleado->empleado_estado = '1';
                         $empleado->empleado_sueldo = floatval($array[0][$i][7]);
                         $empleado->empleado_sexo = $array[0][$i][19];
                         $empleado->empleado_estatura = floatval($array[0][$i][20]);

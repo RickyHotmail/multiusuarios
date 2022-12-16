@@ -278,7 +278,6 @@ class cargarXMLController extends Controller
                         $electrocnico = new facturacionElectronicaController();
                         $consultaDoc = $electrocnico->consultarDOC($data[$i][9]);
                         if(isset($consultaDoc['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['estado'])){
-                        
                             if($data[$i][0] == 'Factura' or $data[$i][0] == 'Notas de Crédito' or $data[$i][0] == 'Notas de Débito'){
                                 $datos[$count]['proveedor'] = $data[$i][3];
                                 $datos[$count]['fecha'] = $data[$i][4];

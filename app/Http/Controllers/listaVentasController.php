@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Sucursal;
+use App\Models\Vendedor;
 
 class listaVentasController extends Controller
 {
@@ -24,9 +25,10 @@ class listaVentasController extends Controller
             $clientes = Factura_Venta::ClienteDistinsc()->select('cliente.cliente_id','cliente.cliente_nombre')->distinct()->get();
             $bodegas = Factura_Venta::BodegaDistinsc()->select('bodega.bodega_id','bodega.bodega_nombre')->distinct()->get();        
             $surcursal = Factura_Venta::SurcusalDistinsc()->select('sucursal.sucursal_id','sucursal.sucursal_nombre')->distinct()->get();
+            $vendedores = Factura_Venta::VendedorDistinsc()->select('vendedor.vendedor_id','vendedor.vendedor_nombre')->distinct()->get();
             $reporteVentas=null;
             $total=0;
-            return view('admin.ventas.listaVentas.index',['total'=>$total,'surcursal'=>$surcursal,'reporteVentas'=>$reporteVentas,'clientes'=>$clientes, 'bodegas'=>$bodegas,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+            return view('admin.ventas.listaVentas.index',['vendedores'=>$vendedores,'total'=>$total,'surcursal'=>$surcursal,'reporteVentas'=>$reporteVentas,'clientes'=>$clientes, 'bodegas'=>$bodegas,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
           }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
@@ -52,14 +54,15 @@ class listaVentasController extends Controller
                 $bodegas = Factura_Venta::BodegaDistinsc()->select('bodega.bodega_id','bodega.bodega_nombre')->distinct()->get();        
                 $surcursal = Factura_Venta::SurcusalDistinsc()->select('sucursal.sucursal_id','sucursal.sucursal_nombre')->distinct()->get();
                 $puntoEmisiones = Punto_Emision::puntos()->get();
+                $vendedores = Factura_Venta::VendedorDistinsc()->select('vendedor.vendedor_id','vendedor.vendedor_nombre')->distinct()->get();
                 $suma=null;
                 $fechatodo=0;
                 if($request->get('fecha_todo')){
                     $fechatodo=$request->get('fecha_todo');
                 }
                
-                $reporteVentas=Factura_Venta::busqueda($request->get('fecha_todo'),$request->get('fecha_desde'),$request->get('fecha_hasta'), $request->get('nombre_cliente'), $request->get('nombre_bodega'), $request->get('sucursal'))->get();
-                $reportedetalle=Factura_Venta::Busquedadetalle($request->get('fecha_todo'),$request->get('fecha_desde'),$request->get('fecha_hasta'), $request->get('nombre_cliente'), $request->get('nombre_bodega'), $request->get('sucursal'))->select('grupo_nombre',DB::raw("SUM(detalle_total) as total"))->groupBy('grupo_nombre')->get();
+                $reporteVentas=Factura_Venta::busqueda($request->get('fecha_todo'),$request->get('fecha_desde'),$request->get('fecha_hasta'), $request->get('nombre_cliente'), $request->get('nombre_bodega'), $request->get('sucursal'), $request->get('vendedor'))->get();
+                $reportedetalle=Factura_Venta::Busquedadetalle($request->get('fecha_todo'),$request->get('fecha_desde'),$request->get('fecha_hasta'), $request->get('nombre_cliente'), $request->get('nombre_bodega'), $request->get('sucursal'), $request->get('vendedor'))->select('grupo_nombre',DB::raw("SUM(detalle_total) as total"))->groupBy('grupo_nombre')->get();
                 $count=1;
                 $validar=false;
                 $datos=null;
@@ -71,7 +74,7 @@ class listaVentasController extends Controller
                             $count++;
                             $total=$total+$report->total;     
                 }            
-                return view('admin.ventas.listaVentas.index', ['total'=>$total,'idsucursal'=>$request->get('sucursal'),'surcursal'=>$surcursal,'datos'=>$datos,'fecha_desde'=>$request->get('fecha_desde'),'fecha_hasta'=>$request->get('fecha_hasta'),'valor_bodega'=>$valor_bodega,'nombre_emision'=>$request->get('nombre_emision'),'nombre_cliente'=>$request->get('nombre_cliente'),'fecha_todo'=>$request->get('fecha_todo'),'reporteVentas'=>$reporteVentas, 'puntoEmisiones'=>$puntoEmisiones, 'clientes'=>$clientes, 'bodegas'=>$bodegas, 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+                return view('admin.ventas.listaVentas.index', ['vendedores'=>$vendedores,'total'=>$total,'idvendedor'=>$request->get('vendedor'),'idsucursal'=>$request->get('sucursal'),'surcursal'=>$surcursal,'datos'=>$datos,'fecha_desde'=>$request->get('fecha_desde'),'fecha_hasta'=>$request->get('fecha_hasta'),'valor_bodega'=>$valor_bodega,'nombre_emision'=>$request->get('nombre_emision'),'nombre_cliente'=>$request->get('nombre_cliente'),'fecha_todo'=>$request->get('fecha_todo'),'reporteVentas'=>$reporteVentas, 'puntoEmisiones'=>$puntoEmisiones, 'clientes'=>$clientes, 'bodegas'=>$bodegas, 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
         }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');

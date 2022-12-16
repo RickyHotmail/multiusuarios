@@ -52,7 +52,7 @@ class kardexController extends Controller
     public function actualizar(Request $request){
         try{
             $productos=Producto::Productos()->get();
-            $fechaActual = date('d-m-Y');
+            $fechaActual = date('Y-m-d');
             foreach ($productos as $producto) {
                 $can=DB::table('movimiento_producto')->where('movimiento_producto.producto_id','=',$producto->producto_id)->where('movimiento_fecha','<=',$fechaActual)->where('movimiento_tipo','=','ENTRADA')->sum('movimiento_cantidad');
                 $prec=DB::table('movimiento_producto')->where('movimiento_producto.producto_id','=',$producto->producto_id)->where('movimiento_fecha','<=',$fechaActual)->where('movimiento_tipo','=','ENTRADA')->sum('movimiento_total');
