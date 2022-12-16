@@ -16,6 +16,7 @@
         text-align: center;
     }
 </style>
+
 <form class="form-horizontal" method="POST" action="{{ route('paciente.update', [$paciente->paciente_id]) }}" enctype="multipart/form-data">
 @method('PUT')
 @csrf
@@ -135,14 +136,17 @@
 
                 <div class="col-sm-3">
                     @if( $paciente->documento_paciente!=null && $paciente->documento_paciente!="" )
-                        <img style="width: 200px;" src="{{ url('') }}/{{$paciente->documento_paciente}}" id="fotoPacienteP"><br>
+                        <a target="_blank" id="fotoPacienteA" href="{{ url('') }}/{{$paciente->documento_paciente}}">
+                            <img style="width: 100px;" src="{{ url('/img/pdf_file.png') }}" id="fotoPacienteP"><br>
+                        </a>
                     @else
-                        <img style="width: 200px;" src="{{ url('img') }}/up_document.png" id="fotoPacienteP"><br>
+                        <a id="fotoPacienteA">
+                            <img style="width: 100px;" src="{{ url('img/no_file.png') }}" id="fotoPacienteP"><br>
+                        </a>
                     @endif
 
-
-                    <label for="fotoPaciente" ><i class='fa fa-upload' aria-hidden='true'></i> Cargar</label>
-                    <input class="foto" style="display: none;" id="fotoPaciente" name="fotoPaciente" type="file"  accept=".png, .jpg, .jpeg, .gif">
+                    <label style="margin-top:5px" for="fotoPaciente" ><i class='fa fa-upload' aria-hidden='true'></i> Cargar</label>
+                    <input class="foto" style="display: none;" id="fotoPaciente" name="fotoPaciente" type="file"  accept=".pdf">
                 </div>
             </div>
 
@@ -152,13 +156,17 @@
 
                 <div class="col-sm-3">
                     @if($paciente->documento_afiliado!=null && $paciente->documento_afiliado!="")
-                        <img style="width: 200px;" src="{{ url('') }}/{{$paciente->documento_afiliado}}" id="fotoAfiliadoP"><br>
+                        <a target="_blank" id="fotoAfiliadoA" href="{{ url('') }}/{{$paciente->documento_afiliado}}">
+                            <img style="width: 100px;" src="{{ url('/img/pdf_file.png') }}" id="fotoAfiliadoP"><br>
+                        </a>
                     @else
-                        <img style="width: 200px;" src="{{ url('img') }}/up_document.png" id="fotoAfiliadoP"><br>
+                        <a id="fotoAfiliadoA" href="{{ url('') }}/{{$paciente->documento_afiliado}}">
+                            <img style="width: 100px;" src="{{ url('img/no_file.png') }}" id="fotoAfiliadoP"><br>
+                        </a>
                     @endif
 
-                    <label for="fotoAfiliado"><i class='fa fa-upload' aria-hidden='true'></i> Cargar</label>
-                    <input class="foto" style="display: none;" id="fotoAfiliado" name="fotoAfiliado" type="file"  accept=".png, .jpg, .jpeg, .gif">
+                    <label style="margin-top:5px" for="fotoAfiliado"><i class='fa fa-upload' aria-hidden='true'></i> Cargar</label>
+                    <input class="foto" style="display: none;" id="fotoAfiliado" name="fotoAfiliado" type="file"  accept=".pdf">
                 </div>
             </div>
             
@@ -234,9 +242,8 @@
             <div class="form-group row">
                 <label for="idEntidad" class="col-sm-3 col-form-label">Empresa</label>
                 <div class="col-sm-9">
-                    <input type="hidden" id="entidadIDAux" value="{{ $paciente->entidada_id }}"/>
+                    <input type="hidden" id="entidadIDAux" value="{{ $paciente->entidad_id }}"/>
                     <select id="idEntidad" name="idEntidad"  class="form-control select2" required>
-                        <option value="" label>--Seleccione una opcion--</option>
                     </select>
                 </div>
             </div>
@@ -258,37 +265,22 @@
 </form>
 <script>
     document.getElementById("fotoAfiliado").addEventListener("change", function () {
-        readImage(this)
+        document.getElementById('fotoAfiliadoP').src="/img/pdf_file.png"
     });
     document.getElementById("fotoPaciente").addEventListener("change", function () {
-        readImage(this)
+        document.getElementById('fotoPacienteP').src="/img/pdf_file.png"
     });
-    
-
-    function readImage (input) {
-        console.log("input")
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                //console.log("dir " +e.target.result)
-                $('#'+input.name+'P').attr('src', e.target.result); // Renderizamos la imagen
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
 
     document.getElementById("id_dependiente").addEventListener("click", function(){
         if(document.getElementById("id_dependiente").checked){
             document.getElementById("marcoFotoAfiliado").style.display=""
-            document.getElementById("fotoAfiliadoP").src="/img/up_document.png"
+            document.getElementById("fotoAfiliadoP").src="/img/no_file.png"
         }
         else{
             document.getElementById("marcoFotoAfiliado").style.display="none"
             document.getElementById("fotoAfiliadoP").src=""
         }
     })
-
-    
 </script>
 
 @endsection
@@ -321,6 +313,7 @@
             success: function(data) {
                 document.getElementById("idEntidad").innerHTML = "<option value='' label>--Seleccione una opcion--</option>";
                 for (var i = 0; i < data.length; i++) {
+                    console.log(document.getElementById("entidadIDAux").value+"  -  "+data[i].entidad_id)
                     if(document.getElementById("entidadIDAux").value == data[i].entidad_id){
                         document.getElementById("idEntidad").innerHTML += "<option value='" + data[i].entidad_id + "' selected>" + data[i].entidad_nombre + "</option>";
                     }
@@ -330,7 +323,7 @@
                 }
             },
             error: function(data) {
-                document.getElementById("idEntidad").innerHTML = "<option value='' label>--Seleccione una opcion--</option>";
+                document.getElementById("idEntidad").innerHTML = "<option value='' label>--Seleccione una opcion ?--</option>";
                 document.getElementById("idEntidad").disabled = true;
             },
         });

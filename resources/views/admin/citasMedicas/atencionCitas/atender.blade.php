@@ -10,6 +10,22 @@
         height: 150px !important;
         width: 100%;
     }
+
+    label, input{
+        font-size: 12px !important;
+    }
+
+    .form-group{
+        margin-bottom: 2px !important;
+    }
+
+    .nav-item{
+        width: 100%;
+    }
+    .nav-link{
+        margin: 5px;
+        padding: 5px;
+    }
 </style>
 <form class="form-horizontal" method="POST" action="{{ url("atencionCitas") }}" enctype="multipart/form-data" onsubmit="return comprobarStockPrescripcion()">
 @csrf
@@ -33,24 +49,26 @@
                 <div class="form-group row">
                     <label for="sucursal" class="col-sm-1 col-form-label">Paciente:</label>
                     <div class="col-sm-3">
-                        <label  class="form-control" >{{$ordenAtencion->paciente->paciente_apellidos.' '.$ordenAtencion->paciente->paciente_nombres}}</label>
+                        <label  class="form-control-sm form-control" >{{$ordenAtencion->paciente->paciente_apellidos.' '.$ordenAtencion->paciente->paciente_nombres}}</label>
                     </div>
                     <div class="col-md-1">
-                        <a style="color: white" class="btn btn-warning" href="{{ url('historialClinico/'.$ordenAtencion->paciente->paciente_id.'/ver') }}"><i class="fa fa-calendar-check"></i> &nbsp; Historial</a>
+                        <a style="color: white; font-size:11px; font-weight:bold; padding-left: 6px; pading-right:6px" class="btn btn-warning" href="{{ url('historialClinico/'.$ordenAtencion->paciente->paciente_id.'/ver') }}">
+                            <i class="fa fa-calendar-check"></i> Historial
+                        </a>
                     </div>
 
                     <label for="fecha_hora" class="col-sm-1 col-form-label">Fecha/Hora:</label>
                     <div class="col-sm-2">
-                    <input type="date" class="form-control" id="fecha" name="fecha" value="{{$ordenAtencion->orden_fecha}}" readonly>
+                    <input type="date" class="form-control-sm form-control" id="fecha" name="fecha" value="{{$ordenAtencion->orden_fecha}}" readonly>
                     </div>
                     <div class="col-sm-1">
-                    <input type="time" class="form-control" id="hora" name="hora" value="{{$ordenAtencion->orden_hora}}" readonly>
+                    <input type="time" class="form-control-sm form-control" id="hora" name="hora" value="{{$ordenAtencion->orden_hora}}" readonly>
                     </div>
                     <label for="especialidad" class="col-sm-1 col-form-label">Especialidad:</label>
                     <div class="col-sm-2">
                         @foreach($especialidades as $especialidad)
                             @if($especialidad->especialidad_id == $ordenAtencion->especialidad_id)
-                                <label  class="form-control" >{{$especialidad->especialidad_nombre}}</label>
+                                <label  class="form-control-sm form-control" >{{$especialidad->especialidad_nombre}}</label>
                             @endif
                         @endforeach
                     </div>
@@ -58,21 +76,21 @@
                 <div class="form-group row">
                     <label for="Servicio" class="col-sm-1 col-form-label">Consulta:</label>
                     <div class="col-sm-4">
-                        <label class="form-control">{{$ordenAtencion->producto->producto_nombre}}</label>
+                        <label class="form-control-sm form-control">{{$ordenAtencion->producto->producto_nombre}}</label>
                     </div>
                     <label for="seguro" class="col-sm-1 col-form-label">Aseguradora:</label>
                     <div class="col-sm-3">
-                        <label class="form-control">{{$ordenAtencion->paciente->aseguradora->cliente_nombre}}</label>
+                        <label class="form-control-sm form-control">{{$ordenAtencion->paciente->aseguradora->cliente_nombre}}</label>
                     </div>
                     <label for="tipo_atencion" class="col-sm-1 col-form-label">Tipo Seguro:</label>
                     <div class="col-sm-2">
-                    <label class="form-control">{{$ordenAtencion->tipoSeguro->tipo_codigo}} - {{$ordenAtencion->tipoSeguro->tipo_nombre}}</label>
+                    <label class="form-control-sm form-control">{{$ordenAtencion->tipoSeguro->tipo_codigo}} - {{$ordenAtencion->tipoSeguro->tipo_nombre}}</label>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="tipo_atencion" class="col-sm-1 col-form-label"><center>Tipo de Atención :</center></label>
                     <div class="col-sm-2">
-                        <select name="tipo_atencion" class="form-control select2" required>
+                        <select name="tipo_atencion" class="form-control-sm form-control select2" required>
                             <option value="0" @if($ordenAtencion->orden_frecuencia==0) selected  @endif>Por Primera Vez</option>
                             <option value="1" @if($ordenAtencion->orden_frecuencia==1) selected  @endif>Subsecuente</option>
                         </select>
@@ -82,12 +100,12 @@
                 <div class="form-group row">
                     <div class="col-sm-12">
                         <label for="observacion" class="col-sm-5 col-form-label">Observación de la cita:</label>
-                        <textarea class="form-control" readonly>{{$ordenAtencion->orden_observacion}} </textarea>
+                        <textarea class="form-control-sm form-control" readonly>{{$ordenAtencion->orden_observacion}} </textarea>
                     </div>
                 </div> 
             </div>
-            <div class="col-sm-2">
-                <ul class="nav flex-column2 nav-tabs h-100" id="myTab" role="tablist" aria-orientation="vertical">
+            <div class="col-sm-2" style="height: 50vh;overflow-y: scroll;">
+                <ul class="nav nav-tabs h-100" id="myTab" role="tablist" aria-orientation="vertical">
                     <?php $primero=0 ?>
                     @foreach($tiposDetalles as $tipD)
                         <?php $primero++ ?>
@@ -157,7 +175,7 @@
                                                 @endif
                                                 <label for="id{{$signoVitales->signo_nombre}}" class="col-sm-2 col-form-label">{{$signoVitales->signo_nombre}}:</label>
                                                 <div class="col-sm-3">    
-                                                    <input @if($signoVitales->signo_tipo==1) type="text" @endif @if($signoVitales->signo_tipo==2) type="number" min="0"  step="0.01" required @endif class="form-control" id="id{{$signoVitales->signo_nombre}}" name="svalor[]" value="{{$signoVitales->signo_valor}}" required> 
+                                                    <input @if($signoVitales->signo_tipo==1) type="text" @endif @if($signoVitales->signo_tipo==2) type="number" min="0"  step="0.01" required @endif class="form-control-sm form-control" id="id{{$signoVitales->signo_nombre}}" name="svalor[]" value="{{$signoVitales->signo_valor}}" required> 
                                                     <input type="hidden" name="side[]" value="{{$signoVitales->signo_id}}">      
                                                 </div>  
                                                 <label for="id{{$signoVitales->signo_nombre}}" class="col-sm-1 col-form-label">{{$signoVitales->signo_medida}}</label>                   
@@ -189,7 +207,7 @@
                                             <div class="form-group row">
                                                 <div class="col-sm-12">
                                                     <label for="observacion" class="col-sm-5 col-form-label">Observación:</label>
-                                                    <textarea class="form-control" id="diagnostico_observacion"   name="diagnostico_observacion" > </textarea>
+                                                    <textarea class="form-control-sm form-control" id="diagnostico_observacion"   name="diagnostico_observacion" > </textarea>
                                                 </div>
                                             </div>     
                                         </div>
@@ -208,9 +226,9 @@
                                                         <label for="id{{$cespecialidades->configuracion_nombre}}" class="col-sm-6 col-form-label">{{$cespecialidades->configuracion_nombre}}:</label>
                                                         <div class="col-sm-12">
                                                             @if($cespecialidades->configuracion_tipo==1)
-                                                                <textarea class="form-control comment" id="id{{$cespecialidades->configuracion_nombre}}" name="valor[]" ></textarea>
+                                                                <textarea class="form-control-sm form-control comment" id="id{{$cespecialidades->configuracion_nombre}}" name="valor[]" ></textarea>
                                                             @else if($cespecialidades->configuracion_tipo==2)
-                                                                <input type="number" min="0"  step="0.01" class="form-control" id="id{{$cespecialidades->configuracion_nombre}}" name="valor[]" value="" required> 
+                                                                <input type="number" min="0"  step="0.01" class="form-control-sm form-control" id="id{{$cespecialidades->configuracion_nombre}}" name="valor[]" value="" required> 
                                                             @endif
                                                             <input type="hidden" name="nombre[]" value="{{$cespecialidades->configuracion_nombre}}">  
                                                             <input type="hidden" name="tipo[]" value="{{$cespecialidades->configuracion_tipo}}">
@@ -243,7 +261,7 @@
                                                 <input id="codigoProducto" name="idProducto" type="hidden">
                                                 <input id="idProductoID" name="idProductoID" type="hidden">
                                                 <input id="idmedicamento" name="idmedicamento" type="hidden">
-                                                <input id="buscarProducto" name="buscarProducto" type="text" class="form-control"
+                                                <input id="buscarProducto" name="buscarProducto" type="text" class="form-control-sm form-control"
                                                     placeholder="Buscar producto" >
                                                 <span id="errorStock" class="text-danger invisible">El producto no tiene stock
                                                     disponible.</span>
@@ -255,7 +273,7 @@
                                         <label>Disponible</label>
                                         <div class="form-group">
                                             <div class="form-line">
-                                                <input id="id_disponible" name="id_disponible" type="number" class="form-control"
+                                                <input id="id_disponible" name="id_disponible" type="number" class="form-control-sm form-control"
                                                     placeholder="Disponible" value="0" disabled>
                                             </div>
                                         </div>
@@ -265,7 +283,7 @@
                                         <div class="form-group">
                                             <div class="form-line">
                                                 <input id="id_cantidad"
-                                                    name="id_cantidad" type="number" class="form-control" placeholder="Cantidad"
+                                                    name="id_cantidad" type="number" class="form-control-sm form-control" placeholder="Cantidad"
                                                     value="1" min="1">
                                             </div>
                                         </div>
@@ -300,10 +318,10 @@
                                             </div>
                                             <div class="form-group row">
                                                 <div class="col-sm-6">                                
-                                                    <textarea type="text" class="form-control" id="recomendacion_prescripcion" name="recomendacion_prescripcion"  placeholder="Recomendaciones"></textarea>
+                                                    <textarea type="text" class="form-control-sm form-control" id="recomendacion_prescripcion" name="recomendacion_prescripcion"  placeholder="Recomendaciones"></textarea>
                                                 </div>
                                                 <div class="col-sm-6">                                
-                                                    <textarea type="text" class="form-control" id="observacion_prescripcion" name="observacion_prescripcion"  placeholder="Observaciones"></textarea>
+                                                    <textarea type="text" class="form-control-sm form-control" id="observacion_prescripcion" name="observacion_prescripcion"  placeholder="Observaciones"></textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -324,7 +342,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group row">
                                             <label for="observacion" class="col-sm-5 col-form-label">Otros:</label>
-                                            <textarea class="form-control" id="otros_examenes"   name="otros_examenes" > </textarea>
+                                            <textarea class="form-control-sm form-control" id="otros_examenes"   name="otros_examenes" > </textarea>
                                         </div>  
                                     </div>  
                                 </div>
@@ -346,7 +364,7 @@
                                                                 <buttom id="btAnadirImagen" class="btn btn-success btn-sm mt-1" onclick="agregarImagen()"><i class="fa fa-plus"></i></buttom>
                                                             </div>
                                                             <div class="col-md-10">
-                                                                <input id="buscarImagen" name="buscarImagen" type="text" class="form-control" placeholder="Buscar Imagen" >
+                                                                <input id="buscarImagen" name="buscarImagen" type="text" class="form-control-sm form-control" placeholder="Buscar Imagen" >
                                                             </div>
                                                         </div>
                                                     </div>
@@ -412,7 +430,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group row">
                                             <label for="observacion" class="col-sm-5 col-form-label">Otros:</label>
-                                            <textarea class="form-control" id="otros_imagen"   name="otros_imagen" > </textarea>
+                                            <textarea class="form-control-sm form-control" id="otros_imagen"   name="otros_imagen" > </textarea>
                                         </div>  
                                     </div> 
                                 </div>

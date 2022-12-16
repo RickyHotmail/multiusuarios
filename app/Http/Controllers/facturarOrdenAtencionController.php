@@ -57,7 +57,7 @@ class facturarOrdenAtencionController extends Controller
         if(isset($request->sucursal)) $sucursalSel=$request->sucursal;
 
         if($fecI!=null)
-            $ordenes=Orden_Atencion::ordenesByFechaSucParticulares($fecI, $fecF, $sucursalSel, $pacienteSel)->whereNull('orden_atencion.factura_id')->get();
+            $ordenes=Orden_Atencion::ordenesByFechaSucParticulares($fecI, $fecF, $sucursalSel, $pacienteSel)->where('orden_atencion.orden_estado', '=',1)->whereNull('orden_atencion.factura_id')->get();
         else
             $ordenes=[];
             
@@ -181,7 +181,16 @@ class facturarOrdenAtencionController extends Controller
         }
     }    
     public function facturarOrdenGuardar(Request $request){
-        try{            
+
+        foreach($request->orden as $ord){
+            $ordenAtencion=Orden_Atencion::findOrFail($ord);
+            $ordenAtencion->orden_estado=2;
+            $ordenAtencion->save();
+        }
+
+        return redirect('facturarOrdenAtencion')->with('success','Factura registrada exitosamente');
+        //return $request;
+        //try{            
             DB::beginTransaction();
             $cantidad = $request->get('Dcantidad');
             $isProducto = $request->get('DprodcutoID');
@@ -201,7 +210,7 @@ class facturarOrdenAtencionController extends Controller
             $general = new generalController();
             $cierre = $general->cierre($request->get('factura_fecha'),Rango_Documento::rango($request->get('rango_id'))->first()->puntoEmision->sucursal_id);          
             if($cierre){
-                return redirect('ordenAtencion')->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
+                return redirect('facturarOrdenAtencion')->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
             } 
             /**********************************************************************/
             /********************cabecera de factura de venta ********************/
@@ -493,16 +502,16 @@ class facturarOrdenAtencionController extends Controller
             $url = $general->pdfDiario($diario);
             DB::commit();
             if($facturaAux->factura_xml_estado == 'AUTORIZADO'){
-                return redirect('ordenAtencion')->with('success','Factura registrada y autorizada exitosamente')->with('diario',$url)->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $request->get('factura_fecha'))->format('d-m-Y').'/'.$factura->factura_xml_nombre.'.pdf');
+                return redirect('facturarOrdenAtencion')->with('success','Factura registrada y autorizada exitosamente')->with('diario',$url)->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $request->get('factura_fecha'))->format('d-m-Y').'/'.$factura->factura_xml_nombre.'.pdf');
             }elseif($factura->factura_emision != 'ELECTRONICA'){
-                return redirect('ordenAtencion')->with('success','Factura registrada exitosamente')->with('diario',$url);
+                return redirect('facturarOrdenAtencion')->with('success','Factura registrada exitosamente')->with('diario',$url);
             }else{
-                return redirect('ordenAtencion')->with('success','Factura registrada exitosamente')->with('diario',$url)->with('error2','ERROR SRI--> '.$facturaAux->factura_xml_estado.' : '.$facturaAux->factura_xml_mensaje);
+                return redirect('facturarOrdenAtencion')->with('success','Factura registrada exitosamente')->with('diario',$url)->with('error2','ERROR SRI--> '.$facturaAux->factura_xml_estado.' : '.$facturaAux->factura_xml_mensaje);
             }
-        }catch(\Exception $ex){
+        /* }catch(\Exception $ex){
             DB::rollBack();
-            return redirect('ordenAtencion')->with('error2','Oucrrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        }
+            return redirect('facturarOrdenAtencion')->with('error2','Oucrrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        } */
     }
 
 

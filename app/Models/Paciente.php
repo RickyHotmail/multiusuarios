@@ -40,6 +40,10 @@ class Paciente extends Model
     {
         return $this->belongsTo(Cliente::class, 'cliente_id', 'cliente_id');
     }
+    public function entidad()
+    {
+        return $this->belongsTo(Entidad::class, 'entidad_id', 'entidad_id');
+    }
     public function tipoDependencia()
     {
         return $this->belongsTo(Tipo_Dependencia::class, 'tipod_id', 'tipod_id');

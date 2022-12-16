@@ -18,7 +18,7 @@
 </style>
 <div class="card card-secondary">
     <div class="card-header">
-        <h3 class="card-title">Ordenes de Atencion - Verificador de Documentosrrrrrrrrrrrrrrrrrr</h3>
+        <h3 class="card-title">Ordenes de Atencion - Verificador de Documentos</h3>
     </div>
     <!-- /.card-header -->
     <div class="card-body">
@@ -145,7 +145,6 @@
                         @if($documentos!=null)
                             @foreach($documentos as $docEmp)
                                 <td>
-                                    rtrtr
                                     <?php $encontrado=false; ?>
                                     @foreach($ordenAtencion->documentos as $docOrden)
                                         @if($docEmp->documento_id==$docOrden->documento_id)

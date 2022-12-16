@@ -18,7 +18,15 @@
                             <option value=0 @if($seleccionado==0) selected @endif >Todos</option>
 
                             @foreach($medicos as $medico)
-                                <option value="{{ $medico->medico_id }}" @if($seleccionado==$medico->medico_id) selected @endif>@if(isset($medico->empleado)) {{$medico->empleado->empleado_nombre}} @else - @endif</option>
+                                <option value="{{ $medico->medico_id }}" @if($seleccionado==$medico->medico_id) selected @endif>
+                                    @if(isset($medico->empleado)) 
+                                        {{$medico->empleado->empleado_nombre}} 
+                                    @elseif(isset($medico->proveedor)) 
+                                        {{$medico->proveedor->proveedor_nombre}} 
+                                    @else 
+                                        - 
+                                    @endif
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -29,7 +37,7 @@
                     <div class="form-group row">
                         <label for="fecha_desde" class="col-sm-2 col-form-label">Desde:</label>
                         <div class="col-sm-4">
-                            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde"  value='<?php if(isset($fecI)){echo $fecI;}else{ echo(date("Y")."-".date("m")."-".date("d"));} ?>'>
+                            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde"  value='<?php if(isset($fecI)){echo $fecI;}else{ echo(date("Y")."-".date("m")."-01");} ?>'>
                         </div>
                         <label for="fecha_desde" class="col-sm-2 col-form-label">Hasta:</label>
                         <div class="col-sm-4">
@@ -41,7 +49,9 @@
                 <div class="col-lg-4 col-md-4">
                     <select class="custom-select select2" id="sucursal_id" name="sucursal_id" required>
                         @foreach($sucursales as $sucursal)
-                        <option value="{{$sucursal->sucursal_id}}" @if(isset($sucurslaC)) @if($sucurslaC == $sucursal->sucursal_id) selected @endif @endif>{{$sucursal->sucursal_nombre}}</option>
+                        <option value="{{$sucursal->sucursal_id}}" @if(isset($sucurslaC)) @if($sucurslaC == $sucursal->sucursal_id) selected @endif @endif>
+                            {{$sucursal->sucursal_nombre}}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -93,12 +103,14 @@
                             </td>
                             <td>@if(isset($ordenAtencion->especialidad->especialidad_nombre )) {{$ordenAtencion->especialidad->especialidad_nombre}} @endif</td>
                             <td>
+                                
                                 @if(isset($ordenAtencion->medico->proveedor))
                                     {{$ordenAtencion->medico->proveedor->proveedor_nombre}}
-                                @endif
-                                @if(isset($ordenAtencion->medico->empleado))
+                                @elseif(isset($ordenAtencion->medico->empleado))
                                     {{$ordenAtencion->medico->empleado->empleado_nombre}}
                                 @endif
+
+                                
                             </td>
                             <td>
                                 @if($ordenAtencion->orden_estado == 0 )

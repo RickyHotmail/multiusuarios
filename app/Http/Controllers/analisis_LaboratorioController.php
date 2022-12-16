@@ -143,8 +143,9 @@ class analisis_LaboratorioController extends Controller
     public function imprimiranalisis($id)
     { 
         //try{
-            $analisis = Analisis_Laboratorio::findOrFail( $orden->analisis->analisis_laboratorio_id);
+            
             $orden = Orden_Examen::findOrFail($id);
+            $analisis = Analisis_Laboratorio::findOrFail( $orden->analisis->analisis_laboratorio_id);
 
             $empresa =  Empresa::empresa()->first();
             $view =  \View::make('admin.formatosPDF.ordendeexamen', ['analisis'=>$analisis,'orden'=>$orden,'empresa'=>$empresa]);

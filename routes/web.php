@@ -934,6 +934,7 @@ Route::get('/buscarOrdenAtencionIess', [ordenAtencionIessController::class, 'ord
 Route::get('/ordenAtencionEditar', [ordenAtencionController::class, 'indexEditar'])->middleware('auth');
 
 Route::get('/ordenAtencionConsolidado', [ordenAtencionConsolidadoController::class, 'index'])->middleware('auth');
+Route::get('/buscarOrdenAtencionConsolidado', [ordenAtencionConsolidadoController::class, 'buscar'])->middleware('auth');
 Route::get('/ordenAtencionConsolidado/{id}/consolidado', [ordenAtencionConsolidadoController::class, 'crearArchivoConsolidado'])->middleware('auth');
 
 Route::get('/verificarDocumentos', [ordenAtencionController::class, 'verificarDocumentosOrden'])->middleware('auth');

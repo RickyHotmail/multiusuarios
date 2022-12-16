@@ -25,8 +25,12 @@
             </div>
             <div class="form-group row">
                 <label for="medico" class="col-sm-2 col-form-label">Médico tratante:</label>
-                <div class="col-sm-10"> 
-                    <input type="text" class="form-control" id="medico" name="medico"  placeholder="Médico" value="{{$orden->medico->empleado->empleado_nombre}}" readonly>
+                <div class="col-sm-10">
+                    @if($orden->medico->empleado)
+                        <input type="text" class="form-control" id="medico" name="medico"  placeholder="Médico" value="{{$orden->medico->empleado->empleado_nombre}}" readonly>
+                    @elseif($orden->medico->proveedor)
+                        <input type="text" class="form-control" id="medico" name="medico"  placeholder="Médico" value="{{$orden->medico->proveedor->proveedor_nombre}}" readonly>
+                    @endif
                 </div>
             </div>
             <div class="form-group row">

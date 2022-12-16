@@ -668,14 +668,9 @@ div.dataTables_wrapper div.dataTables_buscar input {
   text-align: center;
   border-color :#dee2e6 #dee2e6 #dee2e6;
 }
-
 .redondo:not(:disabled):not(.disabled) {
   cursor: pointer;
-  border-radius: 50%;
-}
-.redondo:not(:disabled):not(.disabled) {
-  cursor: pointer;
-  border-radius: 50%;
+  border-radius: 40%;
 }
 .btn-app2>.fa, .btn-app>.fab, .btn-app>.fad, .btn-app>.fal, .btn-app>.far, .btn-app>.fas, .btn-app>.ion, .btn-app>.svg-inline--fa {
   display: block;

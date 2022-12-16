@@ -52,18 +52,10 @@
         <div class="form-group row">
             <label for="idMespecialidad" class="col-sm-2 col-form-label">Medico</label>
             <div class="col-sm-10">
-                @if($ordenAtencion->empleado_id != null )
-                    @foreach($empleados as $empleado)
-                        @if($ordenAtencion->empleado_id == $empleado->empleado_id)
-                            <label class="form-control">{{$empleado->empleado_nombre}}</label>                                                                
-                        @endif
-                    @endforeach
-                @elseif($ordenAtencion->proveedor_id != null )
-                    @foreach($proveedores as $proveedor)
-                        @if($ordenAtencion->proveedor_id == $proveedor->proveedor_id)
-                            <label class="form-control"> {{$proveedor->proveedor_nombre}}</label>                                  
-                        @endif
-                    @endforeach
+                @if(isset($ordenAtencion->medico->proveedor))
+                    <label class="form-control">{{$ordenAtencion->medico->proveedor->proveedor_nombre}}</label>
+                @elseif(isset($ordenAtencion->medico->empleado))
+                    <label class="form-control">{{$ordenAtencion->medico->empleado->empleado_nombre}}</label>
                 @endif
             </div>
         </div>
