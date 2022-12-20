@@ -7,7 +7,7 @@
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-        <form class="form-horizontal" method="GET" action="{{ url("buscarOrdenAtencion") }}">
+        <form class="form-horizontal" method="GET" action="{{ url("ordenAtencion") }}">
         @csrf
             @if($rol->rol_nombre=="Administrador")
                 <div class="form-group row">

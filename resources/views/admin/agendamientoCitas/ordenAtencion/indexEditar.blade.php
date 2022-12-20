@@ -7,7 +7,7 @@
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-        <form class="form-horizontal" method="GET" action="{{ url("buscarOrdenAtencionEditar") }}">
+        <form class="form-horizontal" method="GET" action="{{ url("ordenAtencionEditar") }}">
         @csrf
             @if($rol->rol_nombre=="Administrador")
                 <div class="form-group row">
@@ -18,7 +18,13 @@
                             <option value=0 @if($seleccionado==0) selected @endif >Todos</option>
 
                             @foreach($medicos as $medico)
-                                <option value="{{ $medico->medico_id }}" @if($seleccionado==$medico->medico_id) selected @endif>{{ $medico->empleado->empleado_nombre }}</option>
+                                <option value="{{ $medico->medico_id }}" @if($seleccionado==$medico->medico_id) selected @endif>
+                                    @if($medico->empleado)
+                                        {{ $medico->empleado->empleado_nombre }}
+                                    @elseif($medico->proveedor)
+                                        {{ $medico->proveedor->proveedor_nombre }}
+                                    @endif
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -29,7 +35,7 @@
                     <div class="form-group row">
                         <label for="fecha_desde" class="col-sm-2 col-form-label">Desde:</label>
                         <div class="col-sm-4">
-                            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde"  value='<?php if(isset($fecI)){echo $fecI;}else{ echo(date("Y")."-".date("m")."-".date("d"));} ?>'>
+                            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde"  value='<?php if(isset($fecI)){echo $fecI;}else{ echo(date("Y")."-".date("m")."-01");} ?>'>
                         </div>
                         <label for="fecha_desde" class="col-sm-2 col-form-label">Hasta:</label>
                         <div class="col-sm-4">
@@ -53,8 +59,7 @@
         <table id="example1" class="table table-bordered table-hover">
             <thead>
                 <tr class="text-center  neo-fondo-tabla">
-                    <th></th>   
-                    <th>Fecha/Hora</th>
+                    <th></th>
                     <th>Cita</th>
                     <th>Paciente</th>
                     <th>Sucursal</th>
@@ -82,14 +87,17 @@
                                 @if($ordenAtencion->orden_estado == 4)
                                     <a href="{{ url("editarDiagnostico/{$ordenAtencion->orden_id}")}}" class="btn btn-xs btn-info text-dark" data-toggle="tooltip" data-placement="top" title="Editar Diagnóstico"><i class="fas fa-book"></i><i class="fa fa-pencil-alt"></i></a>                         
                                 @endif
+
+                                
+                                <a href="{{ url("editarDiagnostico/{$ordenAtencion->orden_id}")}}" class="btn btn-xs btn-info text-dark" data-toggle="tooltip" data-placement="top" title="Editar Diagnóstico"><i class="fas fa-book"></i><i class="fa fa-pencil-alt"></i></a>
+                                
                                 
                                 <a href="{{ url("ordenAtencion/{$ordenAtencion->orden_id}")}}" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="top" title="Ver"><i class="fas fa-eye"></i></a>
                             </td>
                             <td>
-                                {{ $ordenAtencion->orden_fecha }} <br>
-                                {{ $ordenAtencion->orden_hora }}
-                            </td>
-                            <td>{{ $ordenAtencion->orden_numero }}
+                                {{ $ordenAtencion->orden_fecha }} / {{ $ordenAtencion->orden_hora }} <br>
+                            
+                                {{ $ordenAtencion->orden_numero }}
                                 &nbsp;
                                 @if($ordenAtencion->orden_iess==1)
                                     <img src="{{ asset('img/iess.png')  }}" width="50px" style="background-color: white; border-radius: 6px; padding: 5px;">
@@ -106,8 +114,8 @@
                             <td>
                                 @if(isset($ordenAtencion->medico->empleado))
                                     {{$ordenAtencion->medico->empleado->empleado_nombre}}
-                                @else if(isset($ordenAtencion->medico->proveedor))
-                                    {{$ordenAtencion->medico->medico_id}}
+                                @elseif(isset($ordenAtencion->medico->proveedor))
+                                    {{$ordenAtencion->medico->proveedor_proveedor_nombre}}
                                 @endif
                             </td>
                             <td>

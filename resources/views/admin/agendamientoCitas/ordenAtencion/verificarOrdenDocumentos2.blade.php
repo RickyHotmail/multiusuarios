@@ -125,21 +125,22 @@
                                 <a class="btn btn-sm btn-primary" href="{{ $ordenAtencion->paciente->documento_paciente }}" target="_blank" data-toggle="tooltip" data-original-title="Ver Documento">Paciente &nbsp;&nbsp;<i class="fas fa-eye"></i></a>
                             @else
                                 <a class="btn btn-xs btn-danger">Paciente &nbsp;&nbsp;<i class="fas fa-exclamation-triangle"></i></a>
-
-                                <label for="documentoPaciente{{ $ordenAtencion->paciente_id }}"><i class='fa fa-upload' aria-hidden='true'></i></label>
-                                <input onchange="subirDocumentoPaciente('paciente',{{ $ordenAtencion->paciente_id }});" style="display: none" class="foto" id="documentoPaciente{{ $ordenAtencion->paciente_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
-                                <a class="btn btn-sm btn-primary" style="display: none" id="verPaciente{{ $ordenAtencion->paciente_id }}" target="_blank" data-toggle="tooltip" data-original-title="Ver Documento">Paciente &nbsp;&nbsp;<i class="fas fa-eye"></i></a>
                             @endif
+
+                            <label for="documentoPaciente{{ $ordenAtencion->paciente_id }}"><i class='fa fa-upload' aria-hidden='true'></i></label>
+                            <input onchange="subirDocumentoPaciente('paciente',{{ $ordenAtencion->paciente_id }});" style="display: none" class="foto" id="documentoPaciente{{ $ordenAtencion->paciente_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
+                            <!--a class="btn btn-sm btn-primary" style="display: none" id="verPaciente{{ $ordenAtencion->paciente_id }}" target="_blank" data-toggle="tooltip" data-original-title="Ver Documento">Paciente &nbsp;&nbsp;<i class="fas fa-eye"></i></a-->
+
                             @if($ordenAtencion->paciente->paciente_dependiente==1)
                                 @if($ordenAtencion->paciente->documento_afiliado!=null)
                                     <a class="btn btn-sm btn-primary" href="{{ $ordenAtencion->paciente->documento_afiliado }}" target="_blank" data-original-title="Ver Documento">Afiliado &nbsp;&nbsp;<i class="fas fa-eye"></i></a>
                                 @else
                                     <a class="btn btn-xs btn-danger">Afiliado &nbsp;&nbsp;<i class="fas fa-exclamation-triangle"></i></a>
-
-                                    <label for="documentoAfiliado{{ $ordenAtencion->paciente_id }}"><i class='fa fa-upload' aria-hidden='true'></i></label>
-                                    <input onchange="subirDocumentoPaciente('afiliado',{{ $ordenAtencion->paciente_id }});" style="display: none" class="foto" id="documentoAfiliado{{ $ordenAtencion->paciente_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
-                                    <a class="btn btn-sm btn-primary" target="_blank" id="verAfiliado{{ $ordenAtencion->paciente_id }}" data-original-title="Ver Documento">Afiliado &nbsp;&nbsp;<i class="fas fa-eye"></i></a>
                                 @endif
+
+                                <label for="documentoAfiliado{{ $ordenAtencion->paciente_id }}"><i class='fa fa-upload' aria-hidden='true'></i></label>
+                                <input onchange="subirDocumentoPaciente('afiliado',{{ $ordenAtencion->paciente_id }});" style="display: none" class="foto" id="documentoAfiliado{{ $ordenAtencion->paciente_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
+                                <!--a class="btn btn-sm btn-primary" target="_blank" id="verAfiliado{{ $ordenAtencion->paciente_id }}" data-original-title="Ver Documento">Afiliado &nbsp;&nbsp;<i class="fas fa-eye"></i></a-->
                             @endif
                         </td>
                         @if($documentos!=null)
@@ -154,12 +155,12 @@
                                         @endif
                                     @endforeach
                                     @if(!$encontrado)
-                                        <a class="btn btn-sm btn-danger" id="dangerButton{{ $docEmp->documento_id }}">&nbsp;&nbsp;<i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;</a>
-
-                                        <label for="docFile{{ $docEmp->documento_id }}"><i class='fa fa-upload' aria-hidden='true'></i></label>
-                                        <input onchange="subirDocumentoOrden({{$ordenAtencion->orden_id}}, {{ $docEmp->documento_id }});" style="display: none" class="foto" id="docFile{{ $docEmp->documento_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
-                                        <a class="btn btn-sm btn-success" style="display: none" id="verDoc{{$docEmp->documento_id}}" target="_blank">&nbsp;&nbsp;<i class="fas fa-eye"></i>&nbsp;&nbsp;</a>
+                                        <a id="verDoc{{$docEmp->documento_id}}" class="btn btn-sm btn-danger" id="dangerButton{{ $docEmp->documento_id }}">&nbsp;&nbsp;<i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;</a>
                                     @endif
+                                    
+                                    <label for="docFile{{ $docEmp->documento_id }}"><i class='fa fa-upload' aria-hidden='true'></i></label>
+                                    <input onchange="subirDocumentoOrden({{$ordenAtencion->orden_id}}, {{ $docEmp->documento_id }});" style="display: none" class="foto" id="docFile{{ $docEmp->documento_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
+                                    <!--a class="btn btn-sm btn-success" style="display: none" id="verDoc{{$docEmp->documento_id}}" target="_blank">&nbsp;&nbsp;<i class="fas fa-eye"></i>&nbsp;&nbsp;</a-->
                                 </td>
                             @endforeach
                         @endif

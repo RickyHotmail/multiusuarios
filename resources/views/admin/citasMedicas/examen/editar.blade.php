@@ -1,6 +1,6 @@
 @extends ('admin.layouts.admin')
 @section('principal')
-<form class="form-horizontal" method="POST" action="{{ url('ordenExamenEditar') }}/{{ $ordenExamen->orden_id }}/editar">
+<form class="form-horizontal" method="POST" action="{{ url('ordenExamenEditar') }}/@if($ordenExamen){{ $ordenExamen->orden_id }}@else{{ $ordenAtencion->orden_id.'_000' }}@endif/editar">
 
 @csrf
     <div class="card card-secondary">
@@ -32,7 +32,7 @@
             <div class="col-sm-12">
                 <div class="form-group row">
                     <label for="observacion" class="col-sm-5 col-form-label">Otros:</label>
-                    <textarea class="form-control" id="otros_examenes"   name="otros_examenes" >{{ $ordenExamen->orden_otros }}</textarea>
+                    <textarea class="form-control" id="otros_examenes"   name="otros_examenes" >@if($ordenExamen){{ $ordenExamen->orden_otros }}@endif</textarea>
                 </div>  
             </div>  
         </div>            

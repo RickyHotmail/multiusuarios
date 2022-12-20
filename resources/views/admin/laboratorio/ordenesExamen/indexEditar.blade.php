@@ -13,7 +13,7 @@
                     <div class="form-group row">
                         <label for="fecha_desde" class="col-sm-2 col-form-label">Desde:</label>
                         <div class="col-sm-4">
-                            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde"  value='<?php if(isset($fecI)){echo $fecI;}else{ echo(date("Y")."-".date("m")."-".date("d"));} ?>'>
+                            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde"  value='<?php if(isset($fecI)){echo $fecI;}else{ echo(date("Y")."-".date("m")."-01");} ?>'>
                         </div>
                         <label for="fecha_desde" class="col-sm-2 col-form-label">Hasta:</label>
                         <div class="col-sm-4">
@@ -38,10 +38,10 @@
             <thead>
                 <tr class="text-center neo-fondo-tabla">
                     <th></th>
-                    <th>Número</th> 
-                    <th>Paciente</th> 
-                    <th>Fecha</th> 
-                    <th>Otros Examenes</th>                                                                                       
+                    <th>Número</th>
+                    <th>Paciente</th>
+                    <th>Fecha</th>
+                    <th>Otros Examenes</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,13 +54,17 @@
                             <a class="btn btn-sm btn-success" data-toggle="tooltip" data-placement="top" title="En espera Resultados"><i class="fas fa-clock"></i></a>
                         @elseif($ordenExamen->orden_estado == 3)
                             <a class="btn btn-xs btn-primary " style="padding: 2px 8px;" data-toggle="tooltip" data-placement="top" title="Listo"><i class="fas fa-check"></i></a>
+                        @else
+                            <a href="{{ url("ordenExamenEditar/{$ordenExamen->orden_id}_000/editarOrden") }}" class="btn btn-xs btn-warning " style="padding: 2px 8px;" data-toggle="tooltip" data-placement="top" title="Editar Orden">&nbsp;&nbsp;<i class="fas fa-edit"></i></a>
                         @endif 
 
                     </td>    
                     <td>{{ $ordenExamen->orden_numero }} &nbsp;
-                        @if($ordenExamen->expediente->ordenatencion->orden_iess==1)
-                            <img src="{{ asset('img/iess.png')  }}" width="50px">
-                        @endif 
+                        @if($ordenExamen->expediente)
+                            @if($ordenExamen->expediente->ordenatencion->orden_iess==1)
+                                <img src="{{ asset('img/iess.png')  }}" width="50px">
+                            @endif
+                        @endif
                     </td>
                     <td>{{ $ordenExamen->paciente_apellidos}} <br>
                         {{ $ordenExamen->paciente_nombres }} </td>

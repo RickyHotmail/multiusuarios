@@ -7,7 +7,7 @@
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-        <form class="form-horizontal" method="GET" action="{{ url("buscarOrdenAtencionIess") }}">
+        <form class="form-horizontal" method="GET" action="{{ url("ordenAtencionIess") }}">
         @csrf
             @if($rol->rol_nombre=="Administrador")
                 <div class="form-group row">
@@ -27,9 +27,9 @@
             <div class="form-group row">
                 <div class="col-sm-6">
                     <div class="form-group row">
-                        <label for="fecha_desde" class="col-sm-2 col-form-label">Desde:</label>
+                        <label for="fecha_desde" class="col-sm-2 col-form-label">Desdeer:</label>
                         <div class="col-sm-4">
-                            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde"  value='<?php if(isset($fecI)){echo $fecI;}else{ echo(date("Y")."-".date("m")."-".date("d"));} ?>'>
+                            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde"  value='<?php if(isset($fecI)){echo $fecI;}else{ echo(date("Y")."-".date("m")."-01");} ?>'>
                         </div>
                         <label for="fecha_desde" class="col-sm-2 col-form-label">Hasta:</label>
                         <div class="col-sm-4">
