@@ -608,6 +608,7 @@ class examenController extends Controller
             
             
             ///////////enviar orden al Laboratorio externo/////////////////////////////////////////////////////////////////////////////
+            //return $orden->orden_id;
             $resultadoEnvio = $this->postCrearOrden($orden);
 
             if($resultadoEnvio->codigo==201){ //////exito
@@ -620,16 +621,16 @@ class examenController extends Controller
                 $this->sendMailNotifications($orden->orden_numero_referencia);
             }
             else{ ////////////no se pudo enviar al laboratorio
-
+                return json_encode($resultadoEnvio);
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             
             
-            $tipo= Orden_Examen::Ordenanalisis($request->get('orden_id'))->select('tipo_examen.tipo_id','tipo_examen.tipo_nombre')->distinct()->get();
-            $etiquetas= Orden_Examen::Ordenetiquetas($request->get('orden_id'))->select('tipo_recipiente.tipo_recipiente_id','tipo_recipiente.tipo_nombre')->distinct()->get();
+            //$tipo= Orden_Examen::Ordenanalisis($request->get('orden_id'))->select('tipo_examen.tipo_id','tipo_examen.tipo_nombre')->distinct()->get();
+            //$etiquetas= Orden_Examen::Ordenetiquetas($request->get('orden_id'))->select('tipo_recipiente.tipo_recipiente_id','tipo_recipiente.tipo_nombre')->distinct()->get();
 
             $empresa =  Empresa::empresa()->first();
-            $view =  \View::make('admin.formatosPDF.ordendeexamen', ['etiquetas'=>$etiquetas,'analisis'=>$analisis,'ordenes'=>$ordenes,'tipo'=>$tipo,'orden'=>$orden,'empresa'=>$empresa]);
+            $view =  \View::make('admin.formatosPDF.ordendeexamen', ['analisis'=>$analisis,'ordenes'=>$ordenes,'orden'=>$orden,'empresa'=>$empresa]);
             $ruta = public_path().'/ordenesExamenes/'.$empresa->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d',$analisis->analisis_fecha)->format('d-m-Y');
             if (!is_dir($ruta)) {
                 mkdir($ruta, 0777, true);
@@ -702,7 +703,6 @@ class examenController extends Controller
     
     public function postCrearOrden($orden_examen){
         $examenes = [];
-
         $detalle_examen=$orden_examen->detalle;
         //echo $orden_examen->orden_id.'<br>';
 
@@ -734,7 +734,7 @@ class examenController extends Controller
             //"usuario_ingresa_id"=> 0,
             //"usuario_ingresa_id_externo"=> "string",
             //"embarazada"=> true,
-            "numero_orden_externa"=> $orden_examen->orden_id,
+            "numero_orden_externa"=> "".$orden_examen->orden_id,
             "fecha_orden"=> date("Y-m-d h:m:s", strtotime($orden_examen->created_at)),
             //"valor_total"=> 0,
             //"valor_descuento"=> 0,

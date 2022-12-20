@@ -26,13 +26,13 @@ use App\Models\Vendedor;
 use App\Models\Tipo_Examen;
 use App\Models\Examen;
 use App\Models\Detalle_Examen;
+use App\Models\Orden_Atencion;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class ordenExamenEditarController extends Controller
-{
+class ordenExamenEditarController extends Controller{
     public function index(){
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
@@ -66,15 +66,16 @@ class ordenExamenEditarController extends Controller
     }
     
     public function buscar(Request $request){
-        try{
+        //try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
             $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
             $ordenesExamenes = Orden_Examen::OrdenesByFechaSuc($request->get('fecha_desde'),$request->get('fecha_hasta'),$request->get('sucursal_id')
                                     )->select('orden_examen.orden_id as orden_examen_id', 'orden_atencion.orden_id', 'orden_fecha','orden_codigo','orden_numero', 'paciente_apellidos','paciente_nombres','orden_otros','orden_examen.orden_estado', 'expediente.expediente_id'
-                                    )->orderBy('orden_numero','asc'
+                                    )->orderBy('orden_numero','desc'
                                     )->get();
             
+            //return $ordenesExamenes;
             $medicos = Medico::medicos()->get();
             $rol=User::findOrFail(Auth::user()->user_id)->roles->first();
 
@@ -99,10 +100,10 @@ class ordenExamenEditarController extends Controller
             ];
 
             return view('admin.laboratorio.ordenesExamen.indexEditar', $data);
-        }
+        /* }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        } 
+        }  */
     }
     
     public function create()
@@ -111,8 +112,7 @@ class ordenExamenEditarController extends Controller
     }
 
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
@@ -152,8 +152,7 @@ class ordenExamenEditarController extends Controller
         } 
     }
 
-    public function show($id)
-    {
+    public function show($id){
         try{
             $orden = Orden_Examen::OrdenExamen($id)->first();
             $orden->orden_estado='2';
@@ -181,43 +180,65 @@ class ordenExamenEditarController extends Controller
         }
     }
 
-    public function edit(Request $request, $id)
-    {
-        //$examenes = Examen::Examenes()->get();
+    public function edit(Request $request, $idExamen){
+        $ordenExamen=[];
+        if(str_ends_with($idExamen, '_000')){
+            $id=substr($idExamen,0,-4);
+            $ordenAtencion=Orden_Atencion::findOrFail($id);
+        }
+        else{
+            $ordenExamen=Orden_Examen::find($idExamen);
+            $ordenAtencion=$ordenExamen->expediente->ordenatencion;
+        }
+
         $tipoExamenes = Tipo_Examen::TipoExamenes()->get();
         //$productos = Producto::Productos()->get();
         
-        $ordenExamen=Orden_Examen::findOrFail($id);
-        $expediente=$ordenExamen->expediente;
-        $ordenAtencion=$expediente->ordenatencion;
+        
+        $expediente=$ordenAtencion->expediente;
+        //return $expediente;
+        //$ordenAtencion=$expediente->ordenatencion;
         $examenes = Examen::buscarProductosProcedimiento($ordenAtencion->paciente_id, $ordenAtencion->especialidad_id)->get();
+        $detalleExamen=[];
 
-        $detalleExamen=$ordenExamen->detalle;
+        if($ordenExamen){
+            $detalleExamen=$ordenExamen->detalle;
 
-        foreach($detalleExamen as $detalle){
-            $examen=$detalle->examen;
-            $producto=$examen->producto;
-        }   
+            foreach($detalleExamen as $detalle){
+                $examen=$detalle->examen;
+                $producto=$examen->producto;
+            }
+        }
         
         $data = [
             'examenesDetalle' => $detalleExamen,
             'examenes' => $examenes,
             'ordenExamen'=>$ordenExamen,
             'tipoExamenes'=>$tipoExamenes,
+            'ordenAtencion'=>$ordenAtencion
             //'productos'=>$productos
         ];
 
-        //return $detalleExamen;
         return view('admin.citasMedicas.examen.editar', $data);
     }
 
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id){
         try {
             DB::beginTransaction();
             $auditoria = new generalController();
 
-            $ordenExamen=Orden_Examen::findOrFail($id);
+            if(str_ends_with($id,'_000')){
+                $idOrdenAtencion=substr($id, 0,-4);
+                $ordenAtencion=Orden_Atencion::findOrFail($idOrdenAtencion);
+                $ordenExamen=new Orden_Examen();
+                $ordenExamen->expediente_id=$ordenAtencion->expediente->expediente_id;
+                $ordenExamen->orden_estado=1;
+                $ordenExamen->save();
+            }
+            else
+                $ordenExamen=Orden_Examen::findOrFail($id);
+
+
             $detalleExamen=$ordenExamen->detalle;
 
             $borrados="";
@@ -226,23 +247,26 @@ class ordenExamenEditarController extends Controller
                 $borrados.=$detalle->examen_id.',';
                 $detalle->delete();
             }
-            $auditoria->registrarAuditoria('Eliminación de Examenes por modificación con expediente -> ' .   $ordenExamen->expediente->expediente_id, $id, 'Con examenes Ids '.$borrados);
+            $auditoria->registrarAuditoria('Eliminación de Examenes por modificación con expediente -> ' .   $ordenExamen->expediente->expediente_id, $ordenExamen->orden_id, 'Con examenes Ids '.$borrados);
 
 
             $laboratorio = $request->get('laboratorio');
 
-            for ($i = 0; $i < count($laboratorio); ++$i) {
-                $detalleExamen = new Detalle_Examen();
-                $detalleExamen->detalle_estado="1";
-                $detalleExamen->examen_id=$laboratorio[$i];
-                $detalleExamen->orden_id=$id;
-                $detalleExamen->save();
+            
+            if($laboratorio){
+                for ($i = 0; $i < count($laboratorio); ++$i) {
+                    $detalleExamen = new Detalle_Examen();
+                    $detalleExamen->detalle_estado="1";
+                    $detalleExamen->examen_id=$laboratorio[$i];
+                    $detalleExamen->orden_id=$ordenExamen->orden_id;
+                    $detalleExamen->save();
+                }
             }
             
             $ordenExamen->orden_otros=$request->otros_examenes;
             $ordenExamen->save();
 
-            $auditoria->registrarAuditoria('Modificación de Examenes con expediente -> ' .   $ordenExamen->expediente->expediente_id, $id, 'Con examenes Ids '.json_encode($laboratorio));
+            $auditoria->registrarAuditoria('Modificación de Examenes con expediente -> ' .   $ordenExamen->expediente->expediente_id, $ordenExamen->orden_id, 'Con examenes Ids '.json_encode($laboratorio));
 
             DB::commit();
             return $redirect = redirect('ordenExamenEditar')->with('success', 'Datos guardados exitosamente');

@@ -28,75 +28,35 @@ use Illuminate\Support\Facades\DB;
 use PDF;
 use DateTime;
 
-class ordenAtencionIessController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
+class ordenAtencionIessController extends Controller{
+    public function index(Request $request){
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
-            $empleados = Empleado::Empleados()->get();
-            $proveedores = Proveedor::Proveedores()->get();        
-            $pacientes = Paciente::Pacientes()->get();
-            $medicos = Medico::medicos()->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            
+            $ordenesAtencion=[];
+            if(isset($request->fecha_desde) && isset($request->fecha_hasta)){
+                $ordenesAtencion = Orden_Atencion::OrdenesByFechaSucIess($request->fecha_desde,$request->fecha_hasta,$request->get('sucursal_id'))->get();
 
-            $rol=User::findOrFail(Auth::user()->user_id)->roles->first();
-
-            $data = [
-                "seleccionado"=>0,
-                "medicos"=>$medicos,
-                "rol"=>$rol,
-                'sucursales'=>Sucursal::Sucursales()->get(),
-                'empleados'=>$empleados,
-                'proveedores'=>$proveedores,
-                'pacientes'=>$pacientes,
-                'PE'=>Punto_Emision::puntos()->get(),
-                'gruposPermiso'=>$gruposPermiso,
-                'permisosAdmin'=>$permisosAdmin
-            ];
-
-            return view('admin.agendamientoCitas.ordenAtencionIess.index', $data);
-        }
-        catch(\Exception $ex){      
-            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        } 
-    }
-
-    public function ordenAtencionIessBuscar(Request $request){
-        try{
-            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
-            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
-            $ordenesAtencion = Orden_Atencion::OrdenesByFechaSucIess($request->get('fecha_desde'),$request->get('fecha_hasta'),$request->get('sucursal_id'))->get();
-            $empleados = Empleado::Empleados()->get();
-            $proveedores = Proveedor::Proveedores()->get();        
-            $pacientes = Paciente::Pacientes()->get();
-
-            $medicos = Medico::medicos()->get();
-            $rol=User::findOrFail(Auth::user()->user_id)->roles->first();
-
-            //return Auth::user()->user_id;
-
-            foreach($ordenesAtencion as $orden){
-                $expediente = $orden->expediente;
-
-                if($expediente){
-                    $signosVitales=$expediente->signosVitales;
+                foreach($ordenesAtencion as $orden){
+                    $expediente = $orden->expediente;
+                    if($expediente)  $signosVitales=$expediente->signosVitales;
                 }
             }
+            $empleados = Empleado::Empleados()->get();
+            $proveedores = Proveedor::Proveedores()->get();        
+            $pacientes = Paciente::Pacientes()->get();
 
-            $data = [
-                "seleccionado"=>$request->medico_id,
+            $medicos = Medico::medicos()->get();
+            $rol=User::findOrFail(Auth::user()->user_id)->roles->first();
+
+            return view('admin.agendamientoCitas.ordenAtencionIess.index', [
+                "seleccionado"=>$request->medico_id ?? 0,
                 "medicos"=>$medicos,
                 "rol"=>$rol,
-                'fecI'=>$request->get('fecha_desde'),
-                'fecF'=>$request->get('fecha_hasta'),
+                'fecI'=>$request->fecha_desde,
+                'fecF'=>$request->fecha_hasta,
                 'sucurslaC'=>$request->get('sucursal_id'),
                 'sucursales'=>Sucursal::Sucursales()->get(),
                 'ordenesAtencion'=>$ordenesAtencion,
@@ -106,9 +66,7 @@ class ordenAtencionIessController extends Controller
                 'PE'=>Punto_Emision::puntos()->get(),
                 'gruposPermiso'=>$gruposPermiso,
                 'permisosAdmin'=>$permisosAdmin
-            ];
-
-            return view('admin.agendamientoCitas.ordenAtencionIess.index',$data);
+            ]);
         }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
@@ -121,7 +79,7 @@ class ordenAtencionIessController extends Controller
         try{ 
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
             $sucursales=Sucursal::Sucursales()->get();
             $cajaAbierta=Arqueo_Caja::arqueoCajaxuser(Auth::user()->user_id)->first(); 
             $pacientes = Paciente::Pacientes()->get();    
@@ -139,24 +97,12 @@ class ordenAtencionIessController extends Controller
         } 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         try {
             DB::beginTransaction();
            

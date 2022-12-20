@@ -150,11 +150,13 @@ class ordenExamenController extends Controller
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
-    public function facturarOrden($id)
-    {
+    public function facturarOrden($id){
+        
         try{
             $count=1;
             $orden = Orden_Examen::findOrFail($id);
+            //return $orden->expediente->ordenatencion->paciente;
+
             if($orden){
                 $puntoEmision = Punto_Emision::PuntoSucursalUser($orden->expediente->ordenatencion->sucursal_id, Auth::user()->user_id)->first();
                 $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
@@ -164,15 +166,17 @@ class ordenExamenController extends Controller
                 $cajaAbierta=Arqueo_Caja::arqueoCajaxuser(Auth::user()->user_id)->first();
                 $rangoDocumento=Rango_Documento::PuntoRango($puntoEmision->punto_id, 'Analisis de Laboratorio')->first();
                 $Paciente=Paciente::Paciente($orden->expediente->ordenatencion->paciente->paciente_id)->first();
-                $especialidad=Especialidad::EspecialidadBuscar('Laboratorio')->first();
+                $especialidad=$orden->expediente->ordenatencion->especialidad;
                 $total=0;
 
                 foreach($orden->detalle as $ordenes){
                     $tcopago=0;
                     $procedimiento=Procedimiento_Especialidad::ProcedimientoProductoEspecialidad($ordenes->examen->producto->producto_id,$especialidad->especialidad_id)->first();
+
+                    //return $ordenes->examen->producto->producto_id.'  '.$especialidad->especialidad_id;
                     $producto=Aseguradora_Procedimiento::ProcedimientosAsignados($procedimiento->procedimiento_id,$Paciente->cliente_id)->first();
 
-                    return $procedimiento->procedimiento_id.'    '.$Paciente->cliente_id;
+                    //return $procedimiento->procedimiento_id.'    '.$Paciente->cliente_id;
                     
                     $datos[$count]['idproducto']=$ordenes->examen->producto->producto_id;
                     $datos[$count]['codigo']=$producto->procedimientoA_codigo;

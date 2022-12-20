@@ -84,7 +84,7 @@ class atencionCitasController extends Controller
     }
 
     public function store(Request $request){
-        try {
+        //try {
             DB::beginTransaction();
             $auditoria = new generalController();
             $atencion=Orden_Atencion::findOrFail($request->get('orden_id'));
@@ -307,20 +307,20 @@ class atencionCitasController extends Controller
                     $auditoria->registrarAuditoria('Ingreso de Detalle Examenes con expediente -> ' .  $request->get('expediente_id'),$atencion->orden_id, 'Con examen Id '.$laboratorio[$i]);
                 }
 
-                $ExamenController=new examenController();
-                $resultadoEnvio = $ExamenController->postCrearOrden($ordenExamen);
+                if($atencion->orden_iess == '1'){
+                    $ExamenController=new examenController();
+                    $resultadoEnvio = $ExamenController->postCrearOrden($ordenExamen);
 
-                if($resultadoEnvio->codigo==201){ //////éxito
-                    $analisis->analisis_estado = '2';
-                    $analisis->save();
-                    $ordenExamen->orden_id_referencia=$resultadoEnvio->resultado['data']['id'];
-                    $ordenExamen->orden_numero_referencia=$resultadoEnvio->resultado['data']['numero_orden'];
-                    $ordenExamen->update();
+                    
+                    if($resultadoEnvio->codigo==201){ //////éxito
+                        $analisis->analisis_estado = '2';
+                        $analisis->save();
+                        $ordenExamen->orden_id_referencia=$resultadoEnvio->resultado['data']['id'];
+                        $ordenExamen->orden_numero_referencia=$resultadoEnvio->resultado['data']['numero_orden'];
+                        $ordenExamen->update();
 
-                    //$this->sendMailNotifications($orden->orden_numero_referencia);
-                }
-                else{ //no se pudo enviar al laboratorio
-
+                        //$this->sendMailNotifications($orden->orden_numero_referencia);
+                    }
                 }
 
                 $OrdenExamenPdfDir=$this->crearOrdenExamenPdf($atencion, $ordenExamen);
@@ -381,10 +381,10 @@ class atencionCitasController extends Controller
             if(isset($AnexoPdfDir)) $redirect->with('diario', $AnexoPdfDir);
 
             return $redirect;
-        } catch (\Exception $ex) {
+        /* } catch (\Exception $ex) {
             DB::rollBack();
             return redirect('atencionCitas')->with('error', 'Ocurrio un error en el procedimiento. Vuelva a intentar.('.$ex->getMessage().')');
-        }
+        } */
     }
 
     public function informeHistoricoIndex(Request $request){
@@ -904,8 +904,7 @@ class atencionCitasController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
+    public function show($id){
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
@@ -923,8 +922,7 @@ class atencionCitasController extends Controller
         }
     }
 
-    public function atender($id)
-    {
+    public function atender($id){
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
@@ -942,24 +940,20 @@ class atencionCitasController extends Controller
             $tipoExamenes = Tipo_Examen::TipoExamenes()->get();
             $productos = Producto::Productos()->get();
             
+            //return $productos;
 
-            $medicos = Medico::medicos()->get();
-            $medicoId = 0;
-
-            foreach($medicos as $medico){
-                if($medico->user_id == Auth::user()->user_id){
-                    $medicoId = $medico->medico_id;
-                }
-            }
-            $medico = Medico::medico($medicoId)->first();
-            $mespecialidadM = Medico_Especialidad::mespecialidadM($medicoId)->first();
+            //$medicos = Medico::medicos()->get();
             $ordenAtencion = Orden_Atencion::findOrFail($id);
+            
+            $medico = $ordenAtencion->medico;
             $cespecialidad=Configuracion_Especialidad::configuracionEspecialidades()->get();
             $tiposDetalles=Tipo_Detalle_Consulta::tiposDetalles()->get();
-     
+            
             $signoVital=Signos_Vitales::SignoVitalOrdenId($ordenAtencion->orden_id)->get();
             $examenes= Examen::buscarProductosProcedimiento($ordenAtencion->paciente->paciente_id, $ordenAtencion->especialidad_id)->get();
 
+            //return $examenes;
+            
             $data=[
                 'cespecialidad'=>$cespecialidad,
                 'medico'=>$medico,
@@ -974,7 +968,6 @@ class atencionCitasController extends Controller
                 'diagnosticos'=>$diagnosticos,
                 'signoVital'=>$signoVital,
                 'ordenAtencion'=>$ordenAtencion,
-                'mespecialidadM'=>$mespecialidadM,
                 'PE'=>Punto_Emision::puntos()->get(),
                 'tipoPermiso'=>$tipoPermiso,
                 'gruposPermiso'=>$gruposPermiso,
@@ -1191,247 +1184,5 @@ class atencionCitasController extends Controller
         if($result->codigo="200"){ //mostrar pdf en una ventana
             return $result->resultado;
         }
-    }
-
-    
-
-    private function postCrearOrden($orden_numero, $fecha, $paciente, $medico, $examenes){
-        $sucursal_id=1;
-        $categoria_id=6;
-
-        $json_fields = array(
-            "sucursal_id"=> $sucursal_id,
-            "categoria_id"=> $categoria_id,
-            //"plan_salud_id"=> 0,
-            //"usuario_ingresa_id"=> 0,
-            //"usuario_ingresa_id_externo"=> "string",
-            //"embarazada"=> true,
-            "numero_orden_externa"=> $orden_numero,
-            "fecha_orden"=> $fecha,
-            //"valor_total"=> 0,
-            //"valor_descuento"=> 0,
-            //"valor_abono"=> 0,
-            //"forma_pago_abono"=> "string",
-            "paciente"=> array(
-                "tipo_identificacion"=> $paciente->tipo,
-                "numero_identificacion"=> $paciente->numero_identificacion,
-                "nombres"=> $paciente->nombres,
-                "apellidos"=> $paciente->apellidos,
-                "fecha_nacimiento"=> $paciente->fecha_nacimiento,
-                "sexo"=> $paciente->sexo,
-                //"numero_historia_clinica"=> "string",
-                "correo"=> $paciente->correo,
-                "telefono_celular"=> $paciente->telefono
-            ),
-            "medico"=> array(
-                "ìd_externo"=> $medico->id_externo,
-                "numero_identificacion"=> $medico->numero_identificacion,
-                "nombres"=> $medico->nombres,
-                "apellidos"=> $medico->apellidos
-            ),
-            "examenes"=> $examenes
-            /*[
-                array(
-                "id_externo"=> "string",
-                "muestra_pendiente"=> true,
-                "precio"=> 0
-                )
-            ]*/
-        );
-
-        //return $json_fields;
-
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, 'https://demo.orion-labs.com/api/v1/ordenes');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($json_fields));
-
-        $headers = array();
-        $headers[] = 'Accept: application/json';
-        $headers[] = 'Content-Type: application/json';
-        $headers[] ='Authorization: Bearer SUHeKxqVgrz8Pu97U3nQJEPTHGO43Ym4ip7FQa6D1DldHic3Deij4r09R9b7';
-
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            echo 'Error:' . curl_error($ch);
-        }
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        $mensaje = $this->agregarCodigo($httpcode);
-
-        
-        return (Object) array('codigo'=>$httpcode, 'mensaje'=>$mensaje,'resultado'=>$result);
-    }
-
-    private function getOrdenes($orden_numero_externo = null, $fecha1=null, $fecha2=null, $identificacion=null, $estado=null){
-        $filtro='';
-
-        if(isset($orden_numero_externo)) $filtro='&filtrar[numero_orden_externa]='.$orden_numero_externo;
-
-        if(isset($fecha1)){
-            if(strlen($filtro)>0)
-                $filtro.='&filtrar[fecha_orden_desde]='.$fecha1;
-            else
-                $filtro='filtrar[fecha_orden_desde]='.$fecha1;
-        }
-
-        if(isset($fecha2)){
-            if(strlen($filtro)>0)
-                $filtro.='&filtrar[fecha_orden_hasta]='.$fecha2;
-            else
-                $filtro='filtrar[fecha_orden_hasta]='.$fecha2;
-        }
-
-        if(isset($identificacion)){
-            if(strlen($filtro)>0)
-                $filtro.='&filtrar[paciente.numero_identificacion]='.$identificacion;
-            else
-                $filtro='filtrar[paciente.numero_identificacion]='.$identificacion;
-        }
-
-        if(isset($estado)){
-            if(strlen($filtro)>0)
-                $filtro.='&filtrar[examenes.estado]='.$estado;
-            else
-                $filtro='filtrar[examenes.estado]='.$estado;
-        }
-
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, 'https://demo.orion-labs.com/api/v1/ordenes?incluir=paciente,examenes'.$filtro);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-        $headers = array();
-        $headers[] = 'Accept: application/json';
-        $headers[] = 'Content-Type: application/json';
-        $headers[] ='Authorization: Bearer SUHeKxqVgrz8Pu97U3nQJEPTHGO43Ym4ip7FQa6D1DldHic3Deij4r09R9b7';
-
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            echo 'Error:' . curl_error($ch);
-        }
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        $mensaje = $this->agregarCodigo($httpcode);
-
-        return array('codigo'=>$httpcode, 'mensaje'=>$mensaje,'resultado'=>json_decode($result));
-    }
-
-    private function getOrden($orden_numero_id){
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, 'https://demo.orion-labs.com/api/v1/ordenes/'.$orden_numero_id.'?incluir=paciente,examenes');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-        $headers = array();
-        $headers[] = 'Accept: application/json';
-        $headers[] = 'Content-Type: application/json';
-        $headers[] ='Authorization: Bearer SUHeKxqVgrz8Pu97U3nQJEPTHGO43Ym4ip7FQa6D1DldHic3Deij4r09R9b7';
-
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            echo 'Error:' . curl_error($ch);
-        }
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        $mensaje = $this->agregarCodigo($httpcode);
-
-        return array('codigo'=>$httpcode, 'mensaje'=>$mensaje,'resultado'=>json_decode($result));
-    }
-
-    private function getOrdenPdf($orden_numero_id){
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, 'https://demo.orion-labs.com/api/v1/ordenes/'.$orden_numero_id.'/resultados/pdf');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-        $headers = array();
-        $headers[] = 'Accept: application/pdf';
-        //$headers[] = 'Content-Type: application/json';
-        $headers[] ='Authorization: Bearer SUHeKxqVgrz8Pu97U3nQJEPTHGO43Ym4ip7FQa6D1DldHic3Deij4r09R9b7';
-
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            echo 'Error:' . curl_error($ch);
-        }
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        $mensaje = $this->agregarCodigo($httpcode);
-
-        return (Object) array('codigo'=>$httpcode, 'mensaje'=>$mensaje,'resultado'=>json_decode($result));
-    }
-
-
-
-    private function agregarCodigo($httpcode){
-        $mensaje='';
-
-        switch ($httpcode){
-            case 200:{
-                $mensaje='OK - Peticion exitosa';
-                break;
-            }
-            case 201:{
-                $mensaje='OK - Peticion Creada Exitosamente';
-                break;
-            }
-            case 204:{
-                $mensaje='OK - Peticion fué exitosa (eliminar/anular)';
-                break;
-            }
-            case 401:{
-                $mensaje='ERROR - No Autorizado';
-                break;
-            }
-            case 404:{
-                $mensaje='ERROR - No Encontrado';
-                break;
-            }
-            case 422:{
-                $mensaje='ERROR - Fallo en la Validación';
-                break;
-            }
-            case 429:{
-                $mensaje='ERROR - Límite de Peticiones excedido, intente más tarde';
-                break;
-            }
-            case 500:{
-                $mensaje='ERROR - Error Interno (API)';
-                break;
-            }
-            case 503:{
-                $mensaje='ERROR - Servidor en Mantenimiento';
-                break;
-            }
-        }
-
-        return $mensaje;
-    }
-
-    public function getNotifications(Request $request){
-        $token = $request->bearerToken();
-
-        return $token;
     }
 }

@@ -8,20 +8,11 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Empresa;
 use App\Models\Parametrizar_Empresa;
 
-class loginController extends Controller
-{
-    /**
-     * Handle an authentication attempt.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function __construct()
-    {
+class loginController extends Controller{
+    public function __construct(){
         $this->middleware('guest')->except('logout');
     }
-    public function index()
-    {
+    public function index(){
         try{
             $paramEmpresa= Parametrizar_Empresa::buscarConfiguracion("REQUERIR RUC")->first();
             $REQUERIR_RUC=1;
@@ -36,8 +27,7 @@ class loginController extends Controller
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
-    public function authenticate(Request $request)
-    {
+    public function authenticate(Request $request){
         try{
             $userdata = array(
                 'user_username' => $request->get('idUsername'),
@@ -77,8 +67,7 @@ class loginController extends Controller
         }
     }
 
-    public function logout(Request $request)
-    {
+    public function logout(Request $request){
         Auth::logout();
 
         $request->session()->invalidate();
@@ -87,8 +76,7 @@ class loginController extends Controller
 
         return redirect('/login');
     }
-    public function cambio(Request $request)
-    {
+    public function cambio(Request $request){
         $usuario=User::findOrFail(14);
         Auth::login($usuario);
         return redirect('/denegado');
