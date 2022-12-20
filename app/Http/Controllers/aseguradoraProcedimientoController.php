@@ -61,25 +61,20 @@ class aseguradoraProcedimientoController extends Controller
     }
 
     public function guardarProcedimiento(Request $request, $id){
-        //return $request;
         try{
             DB::beginTransaction();
-            $procedimiento = $request->get('Pprocedimiento');
             $check = $request->get('Pcheckbox');
             $Pcosto = $request->get('Pcosto');
             $PcodigoT = $request->get('PcodigoT');
             
             $idProducto = $request->get('ide');
             $auditoria = new generalController();
-
-
             $asegProcedEsp = Aseguradora_Procedimiento::aseguradoraProcedimientoEspecialidad($request->cliente_id, $request->especialidad_id)->get();
 
             
             foreach ($asegProcedEsp as $APE){
                 $encontro=false;
                 for ($i = 0; $i < count($check); ++$i) {
-                    //echo $idProducto[$check[$i]].'   '.$APE->producto_id.'<br>';
                     if($idProducto[$check[$i]]==$APE->producto_id){
                         $encontro=true;
                         break;
@@ -87,10 +82,6 @@ class aseguradoraProcedimientoController extends Controller
                 }
 
                 if(!$encontro){
-                    /* $aseguradoras = Procedimiento_Especialidad::ProcedimientoProductoEspecialidad($idProducto[$i],$request->get('especialidad_id'))->first();
-                    $procedimientos=Aseguradora_Procedimiento::ProcedimientosAsignados($aseguradoras->procedimiento_id, $request->get('cliente_id'))->get();
-                    */
-
                     echo 'borrado '.$APE->procedimientoA_id.', '.$APE->procedimientoA_codigo.', '.$APE->procedimientoA_valor.', '.$APE->procedimiento_id.', '.$APE->cliente_id.'<br>';
                     $procedimiento=$APE;
 
@@ -98,69 +89,21 @@ class aseguradoraProcedimientoController extends Controller
                     $auditoria->registrarAuditoria('Eliminacion de Aseg. Procedimientos objeto '.$APE->procedimientoA_id.', '.$APE->procedimientoA_codigo.', '.$APE->procedimientoA_valor.', '.$APE->procedimiento_id.', '.$APE->cliente_id, $procedimiento->procedimientoA_id, '');
                 }
             }
-
-            //return $idProducto[$check[$i]];
             
             for($i=0; $i<count($check); ++$i){
                 $aseguradora = Procedimiento_Especialidad::ProcedimientoProductoEspecialidad($idProducto[$check[$i]],$request->get('especialidad_id'))->first();
                 $Aprocedimiento=Aseguradora_Procedimiento::ProcedimientosAsignados($aseguradora->procedimiento_id, $request->get('cliente_id'))->first();
 
                 if(!$Aprocedimiento) $Aprocedimiento = new Aseguradora_Procedimiento();
-                    $Aprocedimiento->procedimientoA_valor = $Pcosto[$check[$i]];
-                    $Aprocedimiento->procedimientoA_codigo = $PcodigoT[$check[$i]];
-                    $Aprocedimiento->procedimientoA_estado = 1;
-                    $Aprocedimiento->procedimiento_id = $aseguradora->procedimiento_id;
-                    $Aprocedimiento->cliente_id =  $request->get('cliente_id');
-                    $Aprocedimiento->save();
-                    $auditoria->registrarAuditoria('Registro de procedimientos con id -> ' .$aseguradora->procedimiento_id.' Con cliente id'.$request->get('cliente_id'), '0', 'Los procedimientos con Codigo-> ' . $PcodigoT[$check[$i]].' Con costo -> ' . $Pcosto[$check[$i]]);           
 
-                    //echo 'agregado '.$aseguradora_procedimiento.'<br>';
-                
-                //else
-                    //echo 'si existe '.$procedimiento.'<br>';
-
-
-                /* foreach ($procedimientos as $procedimiento){
-                    $encontro=false;
-
-                    if(isset($request->Pcheckbox)){
-                        
-        
-                        for ($i = 0; $i < count($check); ++$i) {
-
-                        }
-                    }
-
-                    $procedimientoA_id=$procedimiento->procedimientoA_id;
-                    $procedimientoA_codigo=$procedimiento->procedimientoA_codigo;
-
-                    echo json_encode($procedimientos).'<br><br>';
-
-                    if(!$encontro){
-                        $procedimiento->delete();
-                        $auditoria->registrarAuditoria('Eliminacion de procedimientos con id -> ' . $procedimientoA_id.' y codigo '.$procedimientoA_codigo, $aseguradoras->procedimiento_id, '');
-                    }
-                } */
+                $Aprocedimiento->procedimientoA_valor = $Pcosto[$check[$i]];
+                $Aprocedimiento->procedimientoA_codigo = $PcodigoT[$check[$i]];
+                $Aprocedimiento->procedimientoA_estado = 1;
+                $Aprocedimiento->procedimiento_id = $aseguradora->procedimiento_id;
+                $Aprocedimiento->cliente_id =  $request->get('cliente_id');
+                $Aprocedimiento->save();
+                $auditoria->registrarAuditoria('Registro de procedimientos con id -> ' .$aseguradora->procedimiento_id.' Con cliente id'.$request->get('cliente_id'), '0', 'Los procedimientos con Codigo-> ' . $PcodigoT[$check[$i]].' Con costo -> ' . $Pcosto[$check[$i]]);           
             }
-
-            //return 1000000;
-
-            /*
-            if(isset($request->Pcheckbox)){
-                $check = $request->get('Pcheckbox');
-
-                for ($i = 0; $i < count($check); ++$i) {
-                    $aseguradoras = Procedimiento_Especialidad::ProcedimientoProductoEspecialidad($idProducto[$check[$i]],$request->get('especialidad_id'))->first();
-                    $aseguradora_procedimiento = new Aseguradora_Procedimiento();
-                    $aseguradora_procedimiento->procedimientoA_valor = $Pcosto[$check[$i]];
-                    $aseguradora_procedimiento->procedimientoA_codigo = $PcodigoT[$check[$i]];
-                    $aseguradora_procedimiento->procedimientoA_estado = 1;
-                    $aseguradora_procedimiento->procedimiento_id = $aseguradoras->procedimiento_id;
-                    $aseguradora_procedimiento->cliente_id =  $request->get('cliente_id');
-                    $aseguradora_procedimiento->save();
-                    $auditoria->registrarAuditoria('Registro de procedimientos con id -> ' .$aseguradoras->procedimiento_id.' Con cliente id'.$request->get('cliente_id'), '0', 'Los procedimientos con Codigo-> ' . $PcodigoT[$check[$i]].' Con costo -> ' . $Pcosto[$check[$i]]);           
-                }
-            } */
 
             DB::commit();
             return redirect('aseguradoraProcedimiento')->with('success', 'Datos guardados exitosamente');

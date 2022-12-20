@@ -4,7 +4,7 @@
 <form class="form-horizontal" onsubmit="return comprobarDatos();" method="POST" action="{{ route('entidadProcedimiento.guardarProcedimientos', [$cliente->cliente_id]) }}">
 @csrf
     <div class="card card-secondary">
-        <div class="card-header">
+        <div class="card-header" style="position:sticky; top:0; z-index:99999">
             <h3 class="card-title">Asignar Procedimmiento</h3>
             <div class="float-right">
                 <button type="submit" class="btn btn-success btn-sm"><i class="fa fa-save"></i>&nbsp;Guardar</button>

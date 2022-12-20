@@ -3,7 +3,7 @@
 <form method="post" action="{{ url('procedimiento/actualizarGrupo') }}">
     @csrf
     <div class="card card-secondary">
-        <div class="card-header">
+        <div class="card-header" style="position:sticky; top:0; z-index:99999">
             <h3 class="card-title">Procedimiento Especialidad</h3>
             <div class="float-right">
                 <button type="submit" class="btn btn-success btn-sm"><i class="fa fa-save"></i>&nbsp;Guardar</button>
