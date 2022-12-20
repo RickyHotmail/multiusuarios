@@ -30,7 +30,7 @@ class Orden_Examen extends Model
     }
     public function scopeOrdenExamenesHOY($query){
         return $query->join('expediente','expediente.expediente_id','=','orden_examen.expediente_id'
-                    )->join('orden_atencion','orden_atencion.orden_id','=','expediente.orden_id'
+                    )->leftJoin('orden_atencion','orden_atencion.orden_id','=','expediente.orden_id'
                     )->join('paciente','paciente.paciente_id','=','orden_atencion.paciente_id'
                     )->join('sucursal','sucursal.sucursal_id','=','orden_atencion.sucursal_id'
                     )->where(DB::raw('DATE(orden_examen.created_at)'), '=', date("Y-m-d")
@@ -68,13 +68,14 @@ class Orden_Examen extends Model
     } 
     public function scopeOrdenesByFechaSuc($query,$fechaI,$fechaF,$sucursal){
         return $query->join('expediente','expediente.expediente_id','=','orden_examen.expediente_id'
-                    )->join('orden_atencion','orden_atencion.orden_id','=','expediente.orden_id'
+                    )->rightJoin('orden_atencion','orden_atencion.orden_id','=','expediente.orden_id'
                     )->join('paciente','paciente.paciente_id','=','orden_atencion.paciente_id'
                     )->join('sucursal', 'sucursal.sucursal_id','=','orden_atencion.sucursal_id'
                     )->where('orden_fecha','>=',$fechaI
                     )->where('orden_fecha','<=',$fechaF
                     )->where('orden_atencion.sucursal_id','=',$sucursal
                     )->where('sucursal.empresa_id','=',Auth::user()->empresa_id
+                    )->where('orden_atencion.orden_estado','>=', 3
                     )->orderBy('orden_atencion.orden_fecha','desc');
     }
     public function expediente()
