@@ -42,6 +42,9 @@ class Sucursal extends Model
     public function scopeSucursales($query){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('sucursal_estado','=','1')->orderBy('sucursal_codigo','asc');
     }
+    public function scopeSucursales2($query){
+        return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('sucursal_estado','=','1')->orderBy('sucursal_id','asc');
+    }
     public function scopeSucursalesEmpresaNombre($query, $nombre,$empresa){
         return $query->where('empresa_id','=',$empresa)->where('sucursal_nombre','=',$nombre)->where('sucursal_estado','=','1');
     }

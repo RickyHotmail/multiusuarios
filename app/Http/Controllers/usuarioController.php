@@ -14,7 +14,11 @@ use Illuminate\Support\Facades\DB;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use App\Libraries\verifyEmail;
+use App\Models\Arqueo_Caja;
+use App\Models\Caja;
+use App\Models\Caja_Usuario;
 use App\Models\Servidor_Correo;
+use App\Models\Sucursal;
 use PHPMailer\PHPMailer\SMTP;
 
 class usuarioController extends Controller
@@ -76,6 +80,48 @@ class usuarioController extends Controller
             $usuario->password  = bcrypt($password);
             $usuario->empresa_id = Auth::user()->empresa_id;
             $usuario->save();
+
+            $cajaPagupa=Caja::findOrFail(8);
+            $empresa=Auth::user()->empresa;
+            $sucursal=Sucursal::sucursales2()->first();
+
+            $caja = new Caja();
+                $caja->caja_nombre = 'Efectivo';            
+                $caja->empresa_id = $empresa->empresa_id;
+                $caja->sucursal_id = $sucursal->sucursal_id;
+                $caja->cuenta_id=$cajaPagupa->cuenta_id;
+                $caja->caja_estado = 1;
+            $caja->save();
+
+            $CajaUsuario = new Caja_Usuario();
+                $CajaUsuario->caja_id = $caja->caja_id;
+                $CajaUsuario->user_id = $usuario->user_id;
+            $CajaUsuario->save();
+
+            $arqueoCaja = new Arqueo_Caja();
+                $arqueoCaja->arqueo_fecha= date("Y")."-".date("m")."-".date("d");
+                $arqueoCaja->arqueo_hora=date("H:i:s");
+                $arqueoCaja->arqueo_observacion= '';
+                $arqueoCaja->arqueo_tipo="APERTURA";
+                $arqueoCaja->arqueo_saldo_inicial=0;
+                $arqueoCaja->arqueo_monto= 0;
+                $arqueoCaja->arqueo_billete1= 0;
+                $arqueoCaja->arqueo_billete5= 0;
+                $arqueoCaja->arqueo_billete10= 0;
+                $arqueoCaja->arqueo_billete20= 0;
+                $arqueoCaja->arqueo_billete50= 0;
+                $arqueoCaja->arqueo_billete100= 0;
+                $arqueoCaja->arqueo_moneda01= 0;
+                $arqueoCaja->arqueo_moneda05= 0;
+                $arqueoCaja->arqueo_moneda10= 0;
+                $arqueoCaja->arqueo_moneda25= 0;
+                $arqueoCaja->arqueo_moneda50= 0;
+                $arqueoCaja->arqueo_moneda1= 0;
+                $arqueoCaja->arqueo_estado='1';
+                $arqueoCaja->empresa_id =  $empresa->empresa_id;
+                $arqueoCaja->caja_id= $caja->caja_id;
+                $arqueoCaja->user_id=$usuario->user_id;
+            $arqueoCaja->save();
             
             DB::afterCommit(function () use($usuario, $password){
                 $generalController=new generalController();
