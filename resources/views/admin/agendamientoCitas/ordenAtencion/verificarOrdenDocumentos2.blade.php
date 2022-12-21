@@ -2,7 +2,7 @@
 @section('principal')
 
 <style>
-    .fa-upload{
+     .fa-upload{
         font-size: 14px;
         font-weight: 600;
         color: #fff;
@@ -15,10 +15,42 @@
         width: fit-content;
         text-align: center;
     }
+
+    .lbl-cargar{
+        height: 33px;
+        margin: 0px
+    }
+    
+    .td-paciente, .td-documento{
+        display: flex;
+        justify-items: center;
+        height: 100%;
+    }
+
+    .ver-paciente, .ver-afiliado, .ver-documento{
+        border-radius: 5px 0px 0px 5px;
+    }
+
+
+    /*
+    .lbl-cargar{
+        position: absolute;
+        top: 50px;
+        top: 100%;
+        left: 100%;
+        transform: translate(-100%, -100%);
+        border-radius: 5px 0px 0px 0px;
+        width: 100%;
+    }
+    */
+    .fa-upload{
+        border-radius: 0px 5px 5px 0px;
+        height: 33px;
+    }
 </style>
 <div class="card card-secondary">
     <div class="card-header">
-        <h3 class="card-title">Ordenes de Atencion - Verificador de Documentos</h3>
+        <h3 class="card-title">Ordenes de Atencion - Verificador de Documentosjj</h3>
     </div>
     <!-- /.card-header -->
     <div class="card-body">
@@ -80,7 +112,7 @@
                     <th>Fecha/Hora</th>
                     <th>Paciente</th>
                     <th>Especialidad</th>
-                    <th>Medico</th>
+                    <!--th>Medico</th-->
                     <th>Personales</th>
 
                     @if($documentos!=null)
@@ -103,64 +135,66 @@
                             {{ $ordenAtencion->orden_fecha }} <br>
                             {{ $ordenAtencion->orden_hora }}
                         </td>
-                        <!--td>{{-- $ordenAtencion->orden_numero --}}</td-->
                         <td>
                             {{ $ordenAtencion->paciente->paciente_apellidos}} <br>
                             {{ $ordenAtencion->paciente->paciente_nombres }}
                         </td>
-                        <!--td>
-                            {{ $ordenAtencion->sucursal_nombre }}  
-                        </td-->
                         <td>@if(isset($ordenAtencion->especialidad->especialidad_nombre )) {{$ordenAtencion->especialidad->especialidad_nombre}} @endif</td>
                         <td>
-                            @if(isset($ordenAtencion->medico->proveedor))
-                                {{$ordenAtencion->medico->proveedor->proveedor_nombre}}
-                            @endif
-                            @if(isset($ordenAtencion->medico->empleado))
-                                {{$ordenAtencion->medico->empleado->empleado_nombre}}
-                            @endif
-                        </td>
-                        <td>
-                            @if($ordenAtencion->paciente->documento_paciente!=null)
-                                <a class="btn btn-sm btn-primary" href="{{ $ordenAtencion->paciente->documento_paciente }}" target="_blank" data-toggle="tooltip" data-original-title="Ver Documento">Paciente &nbsp;&nbsp;<i class="fas fa-eye"></i></a>
-                            @else
-                                <a class="btn btn-xs btn-danger">Paciente &nbsp;&nbsp;<i class="fas fa-exclamation-triangle"></i></a>
-                            @endif
-
-                            <label for="documentoPaciente{{ $ordenAtencion->paciente_id }}"><i class='fa fa-upload' aria-hidden='true'></i></label>
-                            <input onchange="subirDocumentoPaciente('paciente',{{ $ordenAtencion->paciente_id }});" style="display: none" class="foto" id="documentoPaciente{{ $ordenAtencion->paciente_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
-                            <!--a class="btn btn-sm btn-primary" style="display: none" id="verPaciente{{ $ordenAtencion->paciente_id }}" target="_blank" data-toggle="tooltip" data-original-title="Ver Documento">Paciente &nbsp;&nbsp;<i class="fas fa-eye"></i></a-->
-
-                            @if($ordenAtencion->paciente->paciente_dependiente==1)
-                                @if($ordenAtencion->paciente->documento_afiliado!=null)
-                                    <a class="btn btn-sm btn-primary" href="{{ $ordenAtencion->paciente->documento_afiliado }}" target="_blank" data-original-title="Ver Documento">Afiliado &nbsp;&nbsp;<i class="fas fa-eye"></i></a>
+                            <div class="td-paciente">
+                                @if($ordenAtencion->paciente->documento_paciente!=null)
+                                    <a class="btn btn-sm btn-primary ver-paciente" id="verPaciente{{ $ordenAtencion->paciente_id }}" href="{{ $ordenAtencion->paciente->documento_paciente }}" target="_blank" data-toggle="tooltip" data-original-title="Ver Documento">Paciente &nbsp;&nbsp;<i class="fas fa-eye"></i></a>
                                 @else
-                                    <a class="btn btn-xs btn-danger">Afiliado &nbsp;&nbsp;<i class="fas fa-exclamation-triangle"></i></a>
+                                    <a class="btn btn-xs btn-danger ver-paciente" id="verPaciente{{ $ordenAtencion->paciente_id }}" target="_blank">Paciente &nbsp;&nbsp;<i id="i-paciente{{ $ordenAtencion->paciente_id }}" class="fas fa-exclamation-triangle"></i></a>
                                 @endif
 
-                                <label for="documentoAfiliado{{ $ordenAtencion->paciente_id }}"><i class='fa fa-upload' aria-hidden='true'></i></label>
-                                <input onchange="subirDocumentoPaciente('afiliado',{{ $ordenAtencion->paciente_id }});" style="display: none" class="foto" id="documentoAfiliado{{ $ordenAtencion->paciente_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
-                                <!--a class="btn btn-sm btn-primary" target="_blank" id="verAfiliado{{ $ordenAtencion->paciente_id }}" data-original-title="Ver Documento">Afiliado &nbsp;&nbsp;<i class="fas fa-eye"></i></a-->
-                            @endif
+                                <label for="documentoPaciente{{ $ordenAtencion->paciente_id }}" class="lbl-cargar">
+                                    <i class='fa fa-upload' aria-hidden='true'></i>
+                                </label>
+                                <input onchange="subirDocumentoPaciente('paciente',{{ $ordenAtencion->paciente_id }});" style="display: none" class="foto" id="documentoPaciente{{ $ordenAtencion->paciente_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
+
+                                @if($ordenAtencion->paciente->paciente_dependiente==1)
+                                    @if($ordenAtencion->paciente->documento_afiliado!=null)
+                                        <a class="btn btn-sm btn-primary ver-afiliado" href="{{ $ordenAtencion->paciente->documento_afiliado }}" target="_blank" data-original-title="Ver Documento">
+                                            Afiliado &nbsp;&nbsp;
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    @else
+                                        <a class="btn btn-xs btn-danger ver-afiliado">
+                                            Afiliado &nbsp;&nbsp;
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </a>
+                                    @endif
+
+                                    <label for="documentoAfiliado{{ $ordenAtencion->paciente_id }}"><i class='fa fa-upload lbl-cargar' aria-hidden='true'></i></label>
+                                    <input onchange="subirDocumentoPaciente('afiliado',{{ $ordenAtencion->paciente_id }});" style="display: none" class="foto" id="documentoAfiliado{{ $ordenAtencion->paciente_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
+                                @endif
+                            </div>
                         </td>
                         @if($documentos!=null)
                             @foreach($documentos as $docEmp)
                                 <td>
-                                    <?php $encontrado=false; ?>
-                                    @foreach($ordenAtencion->documentos as $docOrden)
-                                        @if($docEmp->documento_id==$docOrden->documento_id)
-                                            <a class="btn btn-sm btn-success" href="{{ $docOrden->doccita_url }}" id="doc{{$docEmp->documento_id}}" target="_blank">&nbsp;&nbsp;<i class="fas fa-eye"></i>&nbsp;&nbsp;</a>
-                                            <?php $encontrado=true; ?>
-                                            @break
+                                    <div class="td-documento">
+                                        <?php $encontrado=false; ?>
+                                        @foreach($ordenAtencion->documentos as $docOrden)
+                                            @if($docEmp->documento_id==$docOrden->documento_id)
+                                                <a class="btn btn-sm btn-success ver-documento" href="{{ $docOrden->doccita_url }}" id="verDoc{{$docEmp->documento_id}}{{$ordenAtencion->orden_id}}" target="_blank">
+                                                    &nbsp;&nbsp;<i class="fas fa-eye" id="i-doc{{$docEmp->documento_id}}{{$ordenAtencion->orden_id}}"></i>&nbsp;&nbsp;
+                                                </a>
+                                                <?php $encontrado=true; ?>
+                                                @break
+                                            @endif
+                                        @endforeach
+                                        @if(!$encontrado)
+                                            <a id="verDoc{{$docEmp->documento_id}}{{$ordenAtencion->orden_id}}" class="btn btn-sm btn-danger ver-documento" target="_blank">
+                                                &nbsp;&nbsp;<i class="fas fa-exclamation-triangle" id="i-doc{{$docEmp->documento_id}}{{$ordenAtencion->orden_id}}"></i>&nbsp;&nbsp;
+                                            </a>
                                         @endif
-                                    @endforeach
-                                    @if(!$encontrado)
-                                        <a id="verDoc{{$docEmp->documento_id}}" class="btn btn-sm btn-danger" id="dangerButton{{ $docEmp->documento_id }}">&nbsp;&nbsp;<i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;</a>
-                                    @endif
-                                    
-                                    <label for="docFile{{ $docEmp->documento_id }}"><i class='fa fa-upload' aria-hidden='true'></i></label>
-                                    <input onchange="subirDocumentoOrden({{$ordenAtencion->orden_id}}, {{ $docEmp->documento_id }});" style="display: none" class="foto" id="docFile{{ $docEmp->documento_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
-                                    <!--a class="btn btn-sm btn-success" style="display: none" id="verDoc{{$docEmp->documento_id}}" target="_blank">&nbsp;&nbsp;<i class="fas fa-eye"></i>&nbsp;&nbsp;</a-->
+                                        
+                                        <label for="docFile{{ $docEmp->documento_id }}{{$ordenAtencion->orden_id}}" class="lbl-cargar"><i class='fa fa-upload' aria-hidden='true'></i></label>
+                                        <input onchange="subirDocumentoOrden({{$ordenAtencion->orden_id}}, {{ $docEmp->documento_id }});" style="display: none" class="foto" id="docFile{{ $docEmp->documento_id }}{{$ordenAtencion->orden_id}}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
+                                        <!--a class="btn btn-sm btn-success" style="display: none" id="verDoc{{$docEmp->documento_id}}" target="_blank">&nbsp;&nbsp;<i class="fas fa-eye"></i>&nbsp;&nbsp;</a-->
+                                    </div>
                                 </td>
                             @endforeach
                         @endif
@@ -201,13 +235,24 @@
                     if(tipo=="paciente"){
                         document.getElementById("verPaciente"+id).style.display="initial"
                         document.getElementById("verPaciente"+id).href=data.documento
+
+                        document.getElementById("verPaciente"+id).classList.remove("btn-danger")
+                        document.getElementById("verPaciente"+id).classList.add("btn-primary")
+
+                        document.getElementById("i-paciente"+id).classList.remove("fa-exclamation-triangle")
+                        document.getElementById("i-paciente"+id).classList.add("fa-eye")
                     }
                     else{
                         document.getElementById("verAfiliado"+id).style.display="initial"
                         document.getElementById("verAfiliado"+id).href=data.documento
-                    }
-                    alert("Documento subido correctamente")
 
+                        document.getElementById("verAfiliado"+id).classList.remove("btn-danger")
+                        document.getElementById("verAfiliado"+id).classList.add("btn-primary")
+
+                        document.getElementById("i-afiliado"+id).classList.remove("fa-exclamation-triangle")
+                        document.getElementById("i-afiliado"+id).classList.add("fa-eye")
+                    }
+                    //alert("Documento subido correctamente")
                     console.log(data)
                 }
             }
@@ -217,7 +262,7 @@
     function subirDocumentoOrden(orden_id, documento_id){
         var formData = new FormData();
         
-        formData.append('documento', document.getElementById("docFile"+documento_id).files[0]);
+        formData.append('documento', document.getElementById("docFile"+documento_id+orden_id).files[0]);
         formData.append("_token","{{ csrf_token() }}")
         formData.append("orden_id", orden_id)
         formData.append("documento_id", documento_id)
@@ -233,13 +278,15 @@
                 console.log(data)
 
                 if(data.result="OK"){
-                    document.getElementById("verDoc"+documento_id).style.display="initial"
-                    document.getElementById("dangerButton"+documento_id).style.display="none"
-                    document.getElementById("verDoc"+documento_id).href=data.documento
-                    
-                    alert("Documento subido correctamente")
+                    document.getElementById("verDoc"+documento_id+orden_id).style.display="initial"
+                    document.getElementById("verDoc"+documento_id+orden_id).href=data.documento
 
-                    console.log(data)
+
+                    document.getElementById("verDoc"+documento_id+orden_id).classList.remove("btn-danger")
+                    document.getElementById("verDoc"+documento_id+orden_id).classList.add("btn-success")
+
+                    document.getElementById("i-doc"+documento_id+orden_id).classList.remove("fa-exclamation-triangle")
+                    document.getElementById("i-doc"+documento_id+orden_id).classList.add("fa-eye")
                 }
             }
         });
