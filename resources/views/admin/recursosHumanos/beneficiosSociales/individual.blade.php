@@ -32,7 +32,7 @@
                             <label for="idTipo" class="col-sm-2 col-form-label">Movimento</label>
                             <div class="col-sm-10">
                                 
-                                <select class="custom-select" id="Tipo_id" name="Tipo_id"   >
+                                <select class="custom-select" id="Tipo_id" name="Tipo_id"  onchange="empleado();" required >
                                 <option value='' label>--Seleccione una opcion--</option>
                                     @foreach($movimientos as $movimiento)
                                                 <option value="{{$movimiento->tipo_id}}">{{$movimiento->tipo_nombre}}</option>
@@ -166,13 +166,14 @@ function cargarmetodo() {
 }
 function empleado(){
      var combo = document.getElementById("empleado_id");
+     var combo2 = document.getElementById("Tipo_id");
      document.getElementById("idBeneficiario").value="";
      if(combo.options[combo.selectedIndex].text != '--Seleccione una opcion--')    {
         document.getElementById("idBeneficiario").value =  combo.options[combo.selectedIndex].text;
      }
     
-     document.getElementById("idMensaje").value ="Decimo Cuarto de Empleado : "+ combo.options[combo.selectedIndex].text;
-     document.getElementById("descripcion").value ="Decimo Cuarto Empleado : "+ combo.options[combo.selectedIndex].text;
+     document.getElementById("idMensaje").value =combo2.options[combo.selectedIndex].text+" : "+ combo.options[combo.selectedIndex].text;
+     document.getElementById("descripcion").value =combo2.options[combo.selectedIndex].text+" : "+ combo.options[combo.selectedIndex].text;
      
     
 }

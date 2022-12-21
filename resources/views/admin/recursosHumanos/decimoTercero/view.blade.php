@@ -2,12 +2,12 @@
 @section('principal')
 <div class="card card-secondary">
     <div class="card-header">
-        <h3 class="card-title">BENEFICIOS SOCIAL</h3>
+        <h3 class="card-title">DECIMO CUARTO</h3>
     </div>
     <!-- /.card-header -->
     <div class="card-body">
         <h5 class="form-control" style="color:#fff; background:#17a2b8;">Datos</h5>
-            <form class="form-horizontal" method="POST" action="{{ url("beneficioSocial") }} ">
+            <form class="form-horizontal" method="POST" action="{{ url("individualdecimoCuarto") }} ">
             @csrf
             <div class="card-body">     
                                         <input id="punto_id" name="punto_id"
@@ -21,23 +21,11 @@
                         <div class="form-group row">
                             <label for="idSucursal" class="col-sm-2 col-form-label">Mes y Año</label>
                             <div class="col-sm-2">
-                                <input type="month" name="fecha_desde" id="fecha_desde" class="form-control" value='<?php echo((date("Y"))."-".date("01")); ?>'>
+                                <input type="month" name="fecha_desde" id="fecha_desde" class="form-control" value='<?php echo((date("Y")-1)."-".date("03")); ?>'>
                                 
                             </div>
                             <div class="col-sm-2">
-                            <input type="month" name="fecha_hasta" id="fecha_desde" class="form-control" value='<?php echo((date("Y"))."-".date("12")); ?>'>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="idTipo" class="col-sm-2 col-form-label">Movimento</label>
-                            <div class="col-sm-10">
-                                
-                                <select class="custom-select" id="Tipo_id" name="Tipo_id"   onchange="empleado();" required>
-                                <option value='' label>--Seleccione una opcion--</option>
-                                    @foreach($movimientos as $movimiento)
-                                                <option value="{{$movimiento->tipo_id}}">{{$movimiento->tipo_nombre}}</option>
-                                    @endforeach                                          
-                                </select>
+                            <input type="month" name="fecha_hasta" id="fecha_desde" class="form-control" value='<?php echo((date("Y"))."-".date("02")); ?>'>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -52,7 +40,6 @@
                             </div>
                            
                         </div>
-                        
                         <div class="form-group row">
                             <label for="" class="col-sm-2 col-form-label">Fecha de Emision</label>
                             <div class="col-sm-10">
@@ -70,8 +57,8 @@
                         <div class="form-group row">
                             <label for="idMensaje" class="col-sm-2 col-form-label">Descripcion</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="idMensaje" name="idMensaje" value="Utilidades del Empleado : " required>
-                                <input type="hidden" class="form-control" id="descripcion" name="descripcion" value="Utilidades del Empleado : " required>
+                                <input type="text" class="form-control" id="idMensaje" name="idMensaje" value="Decimo Cuarto de Empleado : " required>
+                                <input type="hidden" class="form-control" id="descripcion" name="descripcion" value="Decimo Cuarto de Empleado : " required>
                             </div>
                         </div>  
                         
@@ -167,14 +154,13 @@ function cargarmetodo() {
 }
 function empleado(){
      var combo = document.getElementById("empleado_id");
-     var combo2 = document.getElementById("Tipo_id");
      document.getElementById("idBeneficiario").value="";
      if(combo.options[combo.selectedIndex].text != '--Seleccione una opcion--')    {
         document.getElementById("idBeneficiario").value =  combo.options[combo.selectedIndex].text;
      }
     
-     document.getElementById("idMensaje").value =combo2.options[combo.selectedIndex].text+" : "+ combo.options[combo.selectedIndex].text;
-     document.getElementById("descripcion").value =combo2.options[combo.selectedIndex].text+" : "+ combo.options[combo.selectedIndex].text;
+     document.getElementById("idMensaje").value ="Decimo Cuarto de Empleado : "+ combo.options[combo.selectedIndex].text;
+     document.getElementById("descripcion").value ="Decimo Cuarto Empleado : "+ combo.options[combo.selectedIndex].text;
      
     
 }

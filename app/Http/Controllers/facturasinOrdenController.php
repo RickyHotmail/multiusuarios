@@ -27,7 +27,7 @@ use App\Models\Parametrizacion_Impresion;
 use App\Models\Producto;
 use App\Models\Punto_Emision;
 use App\Models\Rango_Documento;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use App\Models\Tamano_Producto;
 use App\Models\Tarifa_Iva;
 use App\Models\Unidad_Medida_Producto;
@@ -56,21 +56,21 @@ class facturasinOrdenController extends Controller
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
             $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
             $rangoDocumento=Rango_Documento::PuntoRango($id, 'Factura')->first();
-            $cajaAbierta=Arqueo_Caja::arqueoCajaxuser(Auth::user()->user_id)->first();
+            $cajaAbierta=Arqueo_Caja::ArqueoCajaxuser(Auth::user()->user_id)->first();
             $secuencial=1;    
 
-            $productosGastos=Producto::productos()->where('producto_compra_venta','=','1')->get();
+            $productosGastos=Producto::Productos()->where('producto_compra_venta','=','1')->get();
             $cuentas=Cuenta::CuentasMovimiento()->get();
-            $categorias=Categoria_Producto::categorias()->get();
-            $marcas=Marca_Producto::marcas()->get();
-            $unidadMedidas=Unidad_Medida_Producto::unidadMedidas()->get();
-            $tamanos=Tamano_Producto::tamanos()->get();
-            $grupos=Grupo_Producto::grupos()->get();
+            $categorias=Categoria_Producto::Categorias()->get();
+            $marcas=Marca_Producto::Marcas()->get();
+            $unidadMedidas=Unidad_Medida_Producto::UnidadMedidas()->get();
+            $tamanos=Tamano_Producto::Tamanos()->get();
+            $grupos=Grupo_Producto::Grupos()->get();
 
 
             if($rangoDocumento){
                 $secuencial=$rangoDocumento->rango_inicio;
-                $secuencialAux=Factura_Venta::secuencial($rangoDocumento->rango_id)->max('factura_secuencial');
+                $secuencialAux=Factura_Venta::Secuencial($rangoDocumento->rango_id)->max('factura_secuencial');
                 if($secuencialAux){$secuencial=$secuencialAux+1;}
                 $general = new generalController();
                 if($general->documentos()){
@@ -78,11 +78,11 @@ class facturasinOrdenController extends Controller
                         'vendedores'=>Vendedor::Vendedores()->get(),
                         'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),
                         'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9), 
-                        'bodegas'=>Bodega::bodegasSucursal($id)->get(),
-                        'formasPago'=>Forma_Pago::formaPagos()->get(), 
+                        'bodegas'=>Bodega::BodegasSucursal($id)->get(),
+                        'formasPago'=>Forma_Pago::FormaPagos()->get(), 
                         'cajaAbierta'=>$cajaAbierta, 
                         'rangoDocumento'=>$rangoDocumento,
-                        'PE'=>Punto_Emision::puntos()->get(),
+                        'PE'=>Punto_Emision::Puntos()->get(),
                         'tipoPermiso'=>$tipoPermiso,
                         'gruposPermiso'=>$gruposPermiso, 
                         'permisosAdmin'=>$permisosAdmin,
@@ -91,18 +91,18 @@ class facturasinOrdenController extends Controller
                         'unidadMedidas'=>$unidadMedidas,
                         'tamanos'=>$tamanos,
                         'grupos'=>$grupos,
-                        'sucursales'=>Sucursal::sucursales()->get(),
+                        'sucursales'=>Sucursal::Sucursales()->get(),
                         'cuentas'=>$cuentas])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
                 }
                 return view('admin.ventas.facturaSinOrden.nuevo',[
                     'vendedores'=>Vendedor::Vendedores()->get(),
                     'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),
                     'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9),
-                    'bodegas'=>Bodega::bodegasSucursal($id)->get(),
-                    'formasPago'=>Forma_Pago::formaPagos()->get(),
+                    'bodegas'=>Bodega::BodegasSucursal($id)->get(),
+                    'formasPago'=>Forma_Pago::FormaPagos()->get(),
                     'cajaAbierta'=>$cajaAbierta,
                     'rangoDocumento'=>$rangoDocumento,
-                    'PE'=>Punto_Emision::puntos()->get(),
+                    'PE'=>Punto_Emision::Puntos()->get(),
                     'tipoPermiso'=>$tipoPermiso,
                     'gruposPermiso'=>$gruposPermiso,
                     'permisosAdmin'=>$permisosAdmin,
@@ -111,7 +111,7 @@ class facturasinOrdenController extends Controller
                     'unidadMedidas'=>$unidadMedidas,
                     'tamanos'=>$tamanos,
                     'grupos'=>$grupos,
-                    'sucursales'=>Sucursal::sucursales()->get(),
+                    'sucursales'=>Sucursal::Sucursales()->get(),
                     'cuentas'=>$cuentas
                 ]);
             }else{

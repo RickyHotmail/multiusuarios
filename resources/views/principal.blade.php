@@ -37,7 +37,9 @@
                     @if(isset(Auth::user()->empresa->grupo))
                     @foreach(Auth::user()->empresa->grupo->usuarios->empresas as $empresas)
                         @if(Auth::user()->empresa->empresa_id != $empresas->empresa->empresa_id)
-                            @if(Auth::user()->user_nombre == $empresas->usuarios->user_nombre)
+                        @foreach($empresas->empresa->usuarios as $usuario)
+                        
+                            @if(Auth::user()->user_username == $usuario->user_username)
                                 <i class="fas fa-user"></i> {{$empresas->empresa->empresa_ruc}} {{$empresas->empresa->empresa_razonSocial}}
                                 <span class="float-right text-muted text-sm"></span>
                                 <a class="brand-link" href="{{ url("cambio/{$empresas->empresa->empresa_id}") }}" >                       
@@ -45,6 +47,8 @@
                                 </a>
                                 <div class="dropdown-divider"></div>
                             @endif
+                        
+                        @endforeach
                         @endif
                     @endforeach
                     @endif
