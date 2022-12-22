@@ -64,7 +64,7 @@ use App\Http\Controllers\conceptoRetencionController;
 use App\Http\Controllers\proformaController;
 use App\Http\Controllers\tipoTransaccionController;
 use App\Http\Controllers\tipoEmpleadoController;
-use App\Http\Controllers\movimientoCuentaController;
+use App\Http\Controllers\MovimientoCuentaController;
 use App\Http\Controllers\transaccionIdentificacionController;
 use App\Http\Controllers\transaccionCompraController;
 use App\Http\Controllers\empleadoController;
@@ -451,7 +451,7 @@ Route::resource('indirecto', costoIndirectoController::class)->middleware('auth'
 
 Route::resource('tipoPiscina', tipoPiscinaController::class)->middleware('auth');
 Route::resource('tipoEmpleado', tipoEmpleadoController::class)->middleware('auth');
-Route::resource('movimientoCuenta', movimientoCuentaController::class)->middleware('auth');
+Route::resource('movimientoCuenta', MovimientoCuentaController::class)->middleware('auth');
 Route::resource('transaccionIdentificacion', transaccionIdentificacionController::class)->middleware('auth');
 Route::resource('transaccionCompra', transaccionCompraController::class)->middleware('auth');
 Route::resource('empleado', empleadoController::class)->middleware('auth');
