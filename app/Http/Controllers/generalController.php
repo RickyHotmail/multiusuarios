@@ -55,7 +55,7 @@ class generalController extends Controller
         return number_format(round($numero, 2), 2,".","");
     }
     public function documentos(){
-        $suscripcion=Suscripcion::suscripcion()->first();
+        $suscripcion=Suscripcion::Suscripcion()->first();
         $fechaactual=date('Y-m-d');
         if($suscripcion->suscripcion_ilimitada == '1'){
             return false;

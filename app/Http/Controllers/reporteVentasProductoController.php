@@ -7,7 +7,7 @@ use App\Models\Bodega;
 use App\Models\Cliente;
 use App\Models\Factura_Venta;
 use App\Models\Producto;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

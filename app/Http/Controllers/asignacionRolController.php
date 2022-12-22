@@ -7,7 +7,7 @@ use App\Models\Asignacion_Rol;
 use App\Models\Empleado;
 use App\Models\Punto_Emision;
 use App\Models\Rol_Movimiento;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

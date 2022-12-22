@@ -9,7 +9,7 @@ use App\Models\Detalle_Diario;
 use App\Models\Diario;
 use App\Models\Parametrizacion_Contable;
 use App\Models\Punto_Emision;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

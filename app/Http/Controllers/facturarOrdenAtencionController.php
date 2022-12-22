@@ -25,7 +25,7 @@ use App\Models\Procedimiento_Especialidad;
 use App\Models\Producto;
 use App\Models\Punto_Emision;
 use App\Models\Rango_Documento;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use App\Models\Tarifa_Iva;
 use App\Models\User;
 use App\Models\Vendedor;

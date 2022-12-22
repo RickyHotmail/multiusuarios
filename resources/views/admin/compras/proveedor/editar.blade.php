@@ -112,6 +112,11 @@
                         <option value="Microempresas" @if($proveedor->proveedor_tipo == 'Microempresas') selected @endif>Microempresas</option>
                         <option value="Agente de Retención" @if($proveedor->proveedor_tipo == 'Agente de Retención') selected @endif>Agente de Retención</option>
                         <option value="Contribuyente Especial" @if($proveedor->proveedor_tipo == 'Contribuyente Especial') selected @endif>Contribuyente Especial</option>
+                        <option value="Contribuyente Especial" @if($proveedor->proveedor_tipo == 'Contribuyente Régimen Rimpe') selected @endif>Contribuyente Régimen Rimpe</option>
+                        <option value="Contribuyente Especial" @if($proveedor->proveedor_tipo == 'Contribuyente Rimpe y Agente de Retención') selected @endif>Contribuyente Rimpe y Agente de Retención</option>
+                        <option value="Contribuyente Especial" @if($proveedor->proveedor_tipo == 'Contribuyente Negocio Popular - Régimen Rimpe') selected @endif>Contribuyente Negocio Popular - Régimen Rimpe</option>
+                        <option value="Contribuyente Especial" @if($proveedor->proveedor_tipo == 'Contribuyente Régimen General') selected @endif>Contribuyente Régimen General</option>
+                        <option value="Contribuyente Especial" @if($proveedor->proveedor_tipo == 'Contribuyente Régimen General y Agente de Retención') selected @endif>Contribuyente Régimen General y Agente de Retención</option>
                     </select>
                 </div>
             </div>

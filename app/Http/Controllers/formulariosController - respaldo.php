@@ -8,7 +8,7 @@ use App\Models\Empresa;
 use App\Models\Factura_Venta;
 use App\Models\Nota_Credito;
 use App\Models\Reporte_Tributario;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use App\Models\Transaccion_Compra;
 use DateTime;
 use Illuminate\Http\Request;

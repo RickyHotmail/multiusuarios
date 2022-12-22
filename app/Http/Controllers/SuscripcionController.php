@@ -31,7 +31,7 @@ use App\Models\Punto_Emision;
 use App\Models\Rango_Documento;
 use App\Models\Rol;
 use App\Models\Rol_Permiso;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use App\Models\Sustento_Tributario;
 use App\Models\Tamano_Producto;
 use App\Models\Tarifa_Iva;

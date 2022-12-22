@@ -11,7 +11,7 @@ use App\Models\Documento_Anulado;
 use App\Models\Empresa;
 use App\Models\Punto_Emision;
 use App\Models\Rubro;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;

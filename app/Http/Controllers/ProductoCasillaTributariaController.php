@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Casillero_tributario;
 use App\Models\Producto;
 use App\Models\Punto_Emision;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

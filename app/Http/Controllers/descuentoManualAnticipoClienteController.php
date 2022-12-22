@@ -14,7 +14,7 @@ use App\Models\Detalle_Diario;
 use App\Models\Diario;
 use App\Models\Movimiento_Caja;
 use App\Models\Parametrizacion_Contable;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use App\Models\Tipo_Movimiento_Banco;
 use App\Models\Tipo_Movimiento_Caja;
 use App\Models\Transferencia;

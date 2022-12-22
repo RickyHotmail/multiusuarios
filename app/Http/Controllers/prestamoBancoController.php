@@ -7,7 +7,7 @@ use App\Models\Banco;
 use App\Models\Cuenta;
 use App\Models\Prestamo_Banco;
 use App\Models\Punto_Emision;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

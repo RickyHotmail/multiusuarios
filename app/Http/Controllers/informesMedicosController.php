@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Especialidad;
 use App\Models\Orden_Atencion;
 use App\Models\Procedimiento_Especialidad;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use App\NEOPAGUPA\MultipleViewExcel;
 use PDF;
 use Excel;

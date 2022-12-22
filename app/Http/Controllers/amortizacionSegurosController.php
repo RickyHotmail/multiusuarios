@@ -9,7 +9,7 @@ use App\Models\Detalle_Amortizacion;
 use App\Models\Detalle_Seguro;
 use App\Models\Proveedor;
 use App\Models\Punto_Emision;
-use App\Models\sucursal;
+use App\Models\Sucursal;
 use App\Models\Transaccion_Compra;
 use DateTime;
 use Illuminate\Http\Request;
