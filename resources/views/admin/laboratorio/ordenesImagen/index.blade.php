@@ -39,34 +39,39 @@
                 <tr class="text-center neo-fondo-tabla">
                     <th>Acción</th>
                     <th>Estado</th> 
-                    <th>Codigo</th>
                     <th>Número</th>
                     <th>Paciente</th> 
-                    <th>Fecha</th> 
                     <th>Otros Examenes</th>                                                                                       
                 </tr>
             </thead>
             <tbody>
 
             @foreach($ordenesImagen as $ordenImagen)
+                <?php
+                    $iess=false;
+                    if($ordenImagen->expediente)
+                        if($ordenImagen->expediente->ordenatencion->orden_iess==1) $iess=true;
+                ?>
                 <tr class="text-center">
                     <td>
-                        @if($ordenImagen->orden_estado == 1)
+                        @if($ordenImagen->orden_estado == 1  &&  !$iess)
                             <a href="{{ url("ordenImagen/{$ordenImagen->orden_id}/facturarOrden") }}" class="btn btn-xs btn-primary " style="padding: 2px 8px; border-radius: 6px" data-toggle="tooltip" data-placement="top" title="NO FACTURADO">
                                 <i class="fas fa-edit"></i> Facturar
                             </a>
-                        @elseif($ordenImagen->orden_estado==2)
+                        @endif
+                        @if($ordenImagen->orden_estado==2 || ($ordenImagen->orden_estado==3 && $iess))
                             <a href="{{ url("ordenImagen/{$ordenImagen->orden_id}/subirImagenes") }}" class="btn btn-xs btn-primary " style="padding: 2px 8px; border-radius: 6px" data-toggle="tooltip" data-placement="top" title="Subir Resultados">
                                 <i class="fas fa-upload"></i> &nbsp;&nbsp;&nbsp; Subir
                             </a>
-                        @else
+                        @endif
+                        @if($ordenImagen->orden_estado==3)
                             <a href="{{ url("ordenImagen/{$ordenImagen->orden_id}/verResultadosImagen") }}" class="btn btn-xs btn-primary " style="padding: 2px 8px; border-radius: 6px" data-toggle="tooltip" data-placement="top" title="ver Resultados">
-                                <i class="fa fa-eye"></i>&nbsp;&nbsp;&nbsp; Mostrar
+                                <i class="fa fa-eye"></i>
                             </a>
                         @endif
                     </td>
                     <td>
-                    @if($ordenImagen->orden_estado == 1)
+                        @if($ordenImagen->orden_estado == 1)
                             <a class="btn btn-xs btn-outline-danger " style="padding: 2px 8px;" data-toggle="tooltip" data-placement="top">
                                 PENDIENTE
                             </a>
@@ -81,11 +86,20 @@
                         @endif
                     </td>
                         
-                    <td>{{ $ordenImagen->expediente->ordenAtencion->orden_codigo }}</td>
-                    <td>{{ $ordenImagen->expediente->ordenAtencion->orden_numero }}</td>
+                    <td style="text-align: left">
+                        <i class="fas fa-clock" style="color: #2062b4" ></i>
+                        {{ date('d/m/Y', strtotime($ordenImagen->expediente->ordenAtencion->orden_fecha)) }}
+                        <br>
+                        {{ $ordenImagen->expediente->ordenAtencion->orden_numero }}
+                        @if($iess)
+                            @if($ordenImagen->expediente->ordenatencion->orden_iess==1)
+                                <img src="{{ asset('img/iess.png')  }}" width="50px">
+                            @endif
+                        @endif
+                    </td>
                     <td>{{ $ordenImagen->expediente->ordenAtencion->paciente->paciente_apellidos}} <br>
-                        {{ $ordenImagen->expediente->ordenAtencion->paciente->paciente_nombres }} </td>
-                    <td>{{ $ordenImagen->expediente->ordenAtencion->orden_fecha }}</td>
+                        {{ $ordenImagen->expediente->ordenAtencion->paciente->paciente_nombres }}
+                    </td>
                     <td>{{ $ordenImagen->expediente->ordenAtencion->orden_otros }}</td>                                         
                 </tr>
                  
