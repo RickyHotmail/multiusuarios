@@ -231,6 +231,7 @@ use App\Http\Controllers\facturarOrdenAtencionController;
 use App\Http\Controllers\facturarOrdenesAtencionController;
 use App\Http\Controllers\facturasinOrdenController;
 use App\Http\Controllers\formulariosController;
+use App\Http\Controllers\IdentificacionController;
 use App\Http\Controllers\informesMedicosController;
 use App\Http\Controllers\ingresoPrestamoProductoController;
 use App\Http\Controllers\inicializarCuentasCobrarController;
@@ -1559,6 +1560,8 @@ Route::get('/configurarImpresion',  [empresaController::class, 'configurarImpres
 Route::post('/configurarImpresion',  [empresaController::class, 'guardarConfiguracionImpresion'])->middleware('auth');
 
 
+Route::get('/comprobarIdentificacion/{ced}', [IdentificacionController::class, 'comprobarIdentificacion'])->middleware('auth');
+//Route::post('/comprobarIdentificacion/{ced}', [FuncionesController::class, 'comprobarIdentificacion']);
 
 Route::post('/verificarEstadoCompra',  [verificarComprasSriController::class, 'verificarCompra'])->middleware('auth');
 
