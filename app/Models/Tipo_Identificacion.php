@@ -26,12 +26,13 @@ class Tipo_Identificacion extends Model
     
     }
     public function scopeTipoIdentificacion($query, $id){
-        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->orderBy('tipo_identificacion_nombre','asc');
+        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('tipo_identificacion_id','=',$id)->orderBy('tipo_identificacion_nombre','asc');
     
     }  
     public function scopeTipoIdentificacionNombre($query, $nombre){
-        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->orderBy('tipo_identificacion_nombre','asc');
+        return $query->where(function ($query){ $query->whereNull('empresa_id')->orwhere('empresa_id','=',Auth::user()->empresa_id); })->where('tipo_identificacion_nombre','=',$nombre)->orderBy('tipo_identificacion_nombre','asc');
     
     } 
+
 
 }

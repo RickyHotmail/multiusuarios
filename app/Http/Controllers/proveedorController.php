@@ -459,7 +459,7 @@ class proveedorController extends Controller
                         }
                         
                       
-                        $proveedor->proveedor_fecha_ingreso = date('d-m-Y');
+                        $proveedor->proveedor_fecha_ingreso = date('Y-m-d');
                         
                         $proveedor->proveedor_tipo = $array[0][$i][10];
                         
