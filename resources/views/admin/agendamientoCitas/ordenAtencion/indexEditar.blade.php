@@ -89,16 +89,18 @@
                                 @endif
 
                                 
-                                <a href="{{ url("editarDiagnostico/{$ordenAtencion->orden_id}")}}" class="btn btn-xs btn-info text-dark" data-toggle="tooltip" data-placement="top" title="Editar Diagnóstico"><i class="fas fa-book"></i><i class="fa fa-pencil-alt"></i></a>
+                                    <!--a href="{{ url("editarDiagnostico/{$ordenAtencion->orden_id}")}}" class="btn btn-xs btn-info text-dark" data-toggle="tooltip" data-placement="top" title="Editar Diagnóstico"><i class="fas fa-book"></i><i class="fa fa-pencil-alt"></i></a-->
                                 
                                 
                                 <a href="{{ url("ordenAtencion/{$ordenAtencion->orden_id}")}}" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="top" title="Ver"><i class="fas fa-eye"></i></a>
                             </td>
-                            <td>
-                                {{ $ordenAtencion->orden_fecha }} / {{ $ordenAtencion->orden_hora }} <br>
-                            
+                            <td style="text-align: left">
+                                <i class="fas fa-clock" style="color: #2062b4" ></i>
+                                {{ date('d/m/Y', strtotime($ordenAtencion->orden_fecha)) }}
+                                {{ $ordenAtencion->orden_hora }}
+                                <br>
                                 {{ $ordenAtencion->orden_numero }}
-                                &nbsp;
+                                
                                 @if($ordenAtencion->orden_iess==1)
                                     <img src="{{ asset('img/iess.png')  }}" width="50px" style="background-color: white; border-radius: 6px; padding: 5px;">
                                 @endif
@@ -116,6 +118,8 @@
                                     {{$ordenAtencion->medico->empleado->empleado_nombre}}
                                 @elseif(isset($ordenAtencion->medico->proveedor))
                                     {{$ordenAtencion->medico->proveedor_proveedor_nombre}}
+                                @else
+                                    -
                                 @endif
                             </td>
                             <td>

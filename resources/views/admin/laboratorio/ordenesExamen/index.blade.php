@@ -40,7 +40,6 @@
                     <th></th>
                     <th>Número</th> 
                     <th>Paciente</th> 
-                    <th>Fecha</th> 
                     <th>Otros Examenes</th>                                                                                       
                 </tr>
             </thead>
@@ -59,15 +58,18 @@
                         @endif 
 
                     </td>    
-                    <!--td>{{ $ordenExamen->orden_codigo }}</td-->
-                    <td>{{ $ordenExamen->orden_numero }} &nbsp;
+                    <td style="text-align: left">
+                        <i class="fas fa-clock" style="color: #2062b4" ></i>
+                        {{ date('d/m/Y', strtotime($ordenExamen->orden_fecha)) }}
+                        <br>
+                        {{ $ordenExamen->orden_numero }} &nbsp;
                         @if($ordenExamen->expediente->ordenatencion->orden_iess==1)
                             <img src="{{ asset('img/iess.png')  }}" width="50px">
                         @endif 
                     </td>
-                    <td>{{ $ordenExamen->paciente_apellidos}} <br>
+                    <td>{{ $ordenExamen->paciente_apellidos}}<br>
                         {{ $ordenExamen->paciente_nombres }} </td>
-                    <td>{{ $ordenExamen->orden_fecha }}</td>
+                    
                     <td>{{ $ordenExamen->orden_otros }}</td>                                         
                 </tr>
                  

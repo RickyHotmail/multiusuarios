@@ -42,25 +42,14 @@
                                             @endif
                                         </div>
 
-                                        @if($det->detalle_estado=='1')
-                                            <div class="row ml-5 mb-5">
-                                                <img class="mr-3" src="{{ asset('/img/no_file.png') }}" style="width: 80px; height: 80px">
-                                                
-                                                <div style="margin-top: auto; margin-bottom: auto;">
-                                                    <input name="imagenes_{{ $det->detalle_id }}[]" type="file" class="btn btn-sm btn-success" accept="application/pdf">
-                                                </div>
+                                        
+                                        <div class="row ml-5 mb-5">
+                                            <img class="mr-3" src="{{ asset('/img/no_file.png') }}" style="width: 80px; height: 80px">
+                                            
+                                            <div style="margin-top: auto; margin-bottom: auto;">
+                                                <input name="imagenes_{{ $det->detalle_id }}[]" type="file" class="btn btn-sm btn-success" accept="application/pdf">
                                             </div>
-                                        @else
-                                            <div class="row ml-5 mb-5">
-                                                <img class="mr-3" src="{{ asset('/img/pdf_file.png') }}" style="width: 80px; height: 80px">
-                                                <div style="margin-top: auto; margin-bottom: auto;">
-                                                    <a class="btn btn-sm  btn-success">
-                                                        <i class="fa fa-search"></i>
-                                                        Ver Documento
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        @endif
+                                        </div>
                                     </td>
                                 </tr>
                                 @endforeach

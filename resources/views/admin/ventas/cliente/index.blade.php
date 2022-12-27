@@ -107,7 +107,7 @@
                         <div class="form-group row">
                             <label for="idTidentificacion" class="col-sm-3 col-form-label">Tipo de Identificacion</label>
                             <div class="col-sm-9">
-                                <select class="custom-select select2" id="idTidentificacion" name="idTidentificacion" require>
+                                <select onchange="verificarIdentificacion()" class="custom-select select2" id="idTidentificacion" name="idTidentificacion" require>
                                     @foreach($tipoIdentificacion as $tipoIdentificacion)
                                         <option value="{{$tipoIdentificacion->tipo_identificacion_id}}">{{$tipoIdentificacion->tipo_identificacion_nombre}}</option>
                                     @endforeach
@@ -117,7 +117,8 @@
                         <div class="form-group row">
                             <label for="idCedula" class="col-sm-3 col-form-label">Cedula/Ruc/Pasaporte</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="idCedula" name="idCedula" placeholder="9999999999" required>
+                                <input onkeyup="verificarIdentificacion()" type="text" class="form-control" id="idCedula" name="idCedula" placeholder="9999999999" maxlength="13" required>
+                                <i style="font-size:16px; display: none; margin:5px; padding-left:5px" id="lbl-verificacion" class="fa fa-check-circle"></i>
                             </div>
                         </div>
                                                 
@@ -273,23 +274,61 @@
 <!-- /.modal -->
 
 <script type="text/javascript">
-        
-        function tipo(){
-            var combo = document.getElementById("idTipoCliente");
-            var idTipoCliente = combo.options[combo.selectedIndex].text;
-            div = document.getElementById('tiposeguro');
-            if(idTipoCliente=="Aseguradora"){
-                div.style.display = '';  
-                $('#idAbreviatura').prop("required", true);     
-            }
-            else{
-                document.getElementById('idAbreviatura').value=" ";
-                div.style.display = 'none';
-                $('#idAbreviatura').removeAttr("required");  
-                
-                 
-            }   
+    function verificarIdentificacion(){
+        control=document.getElementById('idCedula')
+        tam=control.value.length
+        tipo=document.getElementById('idTidentificacion').value
+        $("#lbl-verificacion").css('display','none')
+        console.log("tipo "+tipo)
+
+        if(((tipo==1 || (tipo==4 && control.value=='9999999999999')) && tam==13) || (tipo==2 && tam==10) || (tipo==3 && tam>=8)){
+            $.ajax({
+                url: "{{ url('comprobarIdentificacion') }}/"+control.value,
+                data: '',            
+                dataType: "json",
+                type: "get",
+                success: function (data) {
+                    $("#lbl-verificacion").css('display','flex')
+
+                    if(data.result || (tipo==4 && control.value=='9999999999999') || tipo==3){
+                        $("#lbl-verificacion").css('color','green')
+                        $("#lbl-verificacion").text(' Correcto')
+                    }
+                    else{
+                        $("#lbl-verificacion").css('color','red')
+                        $("#lbl-verificacion").text(' Identificación inválida')
+                    }
+                    
+                    console.log("comp "+data.result)
+                }
+            });
         }
-        
+        else if(tam>0){
+            $("#lbl-verificacion").css('display','flex')
+            $("#lbl-verificacion").css('color','grey')
+
+            if(tipo==1) $("#lbl-verificacion").text('El RUC debe tener 13 dígitos')
+            if(tipo==2) $("#lbl-verificacion").text('La cédula debe tener 10 dígitos')
+            if(tipo==3) $("#lbl-verificacion").text('El Pasaporte debe tener mínimo 8 dígitos')
+            if(tipo==4) $("#lbl-verificacion").text('El Consumidor Final debe contener 13 dígitos: 9999999999999')
+        }
+        else
+            $("#lbl-verificacion").css('display','none')
+    }
+
+    function tipo(){
+        var combo = document.getElementById("idTipoCliente");
+        var idTipoCliente = combo.options[combo.selectedIndex].text;
+        div = document.getElementById('tiposeguro');
+        if(idTipoCliente=="Aseguradora"){
+            div.style.display = '';
+            $('#idAbreviatura').prop("required", true);
+        }
+        else{
+            document.getElementById('idAbreviatura').value=" ";
+            div.style.display = 'none';
+            $('#idAbreviatura').removeAttr("required");  
+        }
+    }
 </script>
 @endsection

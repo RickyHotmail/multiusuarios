@@ -55,10 +55,8 @@
                 <tr class="text-center  neo-fondo-tabla">
                     <th></th>   
                     <th>Fecha/Hora</th>
-                    <th>Cita</th>
                     <th>Paciente</th>
                     <th>Sucursal</th>
-                    <th>Especialidad</th>
                     <th>Medico</th>
                     <th>Estatus</th>
                     <th>AG</th>
@@ -94,11 +92,13 @@
                                     <a class="btn btn-xs btn-danger" style="padding: 2px 8px;"  data-toggle="tooltip" title="Cancelar cita"><i class="fas fa-times"></i></a>
                                 @endif     
                             </td>
-                            <td>
-                                {{ $ordenAtencion->orden_fecha }} <br>
+                            <td style="text-align: left">
+                                <i class="fas fa-clock" style="color: #2062b4" ></i>
+                                {{ date('d/m/Y', strtotime($ordenAtencion->orden_fecha)) }}
                                 {{ $ordenAtencion->orden_hora }}
+                                <br>
+                                {{ $ordenAtencion->orden_numero }}
                             </td>
-                            <td>{{ $ordenAtencion->orden_numero }}</td>
                             <td>
                                 {{ $ordenAtencion->paciente->paciente_apellidos}} <br>
                                 {{ $ordenAtencion->paciente->paciente_nombres }}                   
@@ -106,8 +106,11 @@
                             <td>
                                 {{ $ordenAtencion->sucursal_nombre }}  
                             </td>
-                            <td>@if(isset($ordenAtencion->especialidad->especialidad_nombre )) {{$ordenAtencion->especialidad->especialidad_nombre}} @endif</td>
                             <td>
+                                @if(isset($ordenAtencion->especialidad->especialidad_nombre ))
+                                    {{$ordenAtencion->especialidad->especialidad_nombre}}
+                                @endif
+                                <br>
                                 @if(isset($ordenAtencion->medico->proveedor))
                                     {{$ordenAtencion->medico->proveedor->proveedor_nombre}}
                                 @endif

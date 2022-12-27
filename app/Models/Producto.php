@@ -114,14 +114,18 @@ class Producto extends Model
     public function scopeExisteCodigo($query, $id){
         return $query->where('producto.empresa_id','=',Auth::user()->empresa_id)->where('producto_codigo','=',$id);
     }
-    public function scopeProductosG($query){
+    public function scopeProductosG($query, $especialidad=null){
+        //$sql_nombre="";
+        //if($especialidad) $sql_nombre= "'".strtolower($especialidad)."' like '%' || LOWER(grupo_producto.grupo_nombre) || '%'";
+
         return $query->join('grupo_producto','grupo_producto.grupo_id','=','producto.grupo_id'
-                    )->orwhere('grupo_producto.grupo_nombre','=','Laboratorio'
-                    )->orwhere('grupo_producto.grupo_nombre','=','Procedimiento'
-                    )->orwhere('grupo_producto.grupo_nombre','=','LABORATORIO'
-                    )->orwhere('grupo_producto.grupo_nombre','=','PROCEDIMIENTO'
-                    )->orwhere('grupo_producto.grupo_nombre','=','laboratorio'
-                    )->orwhere('grupo_producto.grupo_nombre','=','procedimiento'
+                    )->orWhereRaw("'".strtolower($especialidad)."' like '%' || LOWER(grupo_producto.grupo_nombre) || '%'"
+                    //)->orwhere('grupo_producto.grupo_nombre','contains','Laboratorio'
+                    //)->orwhere('grupo_producto.grupo_nombre','=','LABORATORIO'
+                    //)->orwhere('grupo_producto.grupo_nombre','=','laboratorio'
+                    )->orwhere('grupo_producto.grupo_nombre','like','PROCEDIMIENTO%'
+                    )->orwhere('grupo_producto.grupo_nombre','like','Procedimiento%'
+                    )->orwhere('grupo_producto.grupo_nombre','like','procedimiento%'
                     )->where('producto.empresa_id','=',Auth::user()->empresa_id
                     )->where('producto.producto_estado','=','1'
                     )->orderBy('producto.producto_nombre','asc');
