@@ -175,6 +175,8 @@ use App\Http\Controllers\cargarXMLController;
 use App\Http\Controllers\CasilleroTributarioController;
 use App\Http\Controllers\categoriaCostoController;
 use App\Http\Controllers\categoriaRolController;
+use App\Http\Controllers\centroConsumo2Controller;
+use App\Http\Controllers\centroConsumoController2;
 use App\Http\Controllers\cierreAnualController;
 use App\Http\Controllers\cierreMesController;
 use App\Http\Controllers\contabilizacionMensualController;
@@ -406,6 +408,7 @@ Route::resource('rubro', rubroController::class)->middleware('auth');
 Route::resource('bancoLista', bancoListaController::class)->middleware('auth');
 Route::resource('parametrizacionContable', parametrizacionContableController::class)->middleware('auth');
 Route::resource('centroConsumo', centroConsumoController::class)->middleware('auth');
+Route::resource('centroConsumo2', centroConsumo2Controller::class)->middleware('auth');
 Route::resource('tarifaIva', tarifaIvaController::class)->middleware('auth');
 Route::resource('departamento', empresaDepartamentoController::class)->middleware('auth');
 Route::resource('tamanoProducto', tamanoProductoController::class)->middleware('auth');
@@ -1306,6 +1309,9 @@ Route::get('/ciudad/searchN/{buscar}', [pacienteController::class, 'buscarByProv
 Route::get('/aseguradoraProcedimiento/searchN/{buscar}', [aseguradoraProcedimientoController::class, 'buscarByNombre'])->middleware('auth');
 Route::get('/cuentaBancaria/searchN/{buscar}', [cuentaBancariaController::class, 'buscarByBanco'])->middleware('auth');
 Route::get('/cargarCentroConsumo/searchN/{buscar}', [reporteComprasProductoController::class, 'buscarBySustento'])->middleware('auth');
+
+Route::get('/centroConsumo2/{id}/subcuenta', [centroConsumo2Controller::class, 'agregarCentro'])->middleware('auth');
+Route::post('/centroConsumo2/{id}/agregarSubCuenta', [centroConsumo2Controller::class, 'guardarCentroC2'])->middleware('auth');
 
 Route::get('/Siembra/searchN/{buscar}', [SiembraController::class, 'buscarBy'])->middleware('auth');
 Route::get('/SiembraM/searchN/{buscar}', [SiembraController::class, 'buscarByM'])->middleware('auth');
