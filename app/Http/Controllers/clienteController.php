@@ -543,7 +543,7 @@ class clienteController extends Controller
                     $datos[$count]['telefono'] = $array[0][$i][3];
                     $datos[$count]['celular'] = $array[0][$i][4];
                     $datos[$count]['email'] = $array[0][$i][5];
-                    $datos[$count]['fecha'] = date('d-m-Y');
+                    $datos[$count]['fecha'] = date('Y-m-d');
                     $datos[$count]['llevaContabilidad'] = $array[0][$i][6];
                     $datos[$count]['tieneCredito'] = $array[0][$i][7];
                     $datos[$count]['ciudad'] = $array[0][$i][8];
@@ -600,7 +600,7 @@ class clienteController extends Controller
                         else{
                             $cliente->cliente_email = ' ';
                         }
-                        $cliente->cliente_fecha_ingreso = date('d-m-Y');
+                        $cliente->cliente_fecha_ingreso = date('Y-m-d');
                         $cliente->cliente_lleva_contabilidad = $array[0][$i][6];
                         $cliente->cliente_tiene_credito =  $array[0][$i][7];
                         
