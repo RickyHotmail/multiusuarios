@@ -29,16 +29,22 @@ class procedimientoEspecialidadController extends Controller
             $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
             $especialidades=Especialidad::especialidades()->get();
 
-            if($request->get('especialidad_id')!=null)
+            if($request->get('especialidad_id')!=null){
                 $procedimientoEspecialidades=Procedimiento_Especialidad::procedimientoEspecialidadbyEspecialidad($request->especialidad_id)->get();
-            else
-                $procedimientoEspecialidades=Procedimiento_Especialidad::procedimientoEspecialidadbyEspecialidad($especialidades[0]->especialidad_id)->get();
 
-            $productos=Producto::productosG()->get();
+                $especialidad=Especialidad::findOrFail($request->especialidad_id);
+                $productos=Producto::productosG($especialidad->especialidad_nombre)->get();
+            }
+            else{
+                $procedimientoEspecialidades=Procedimiento_Especialidad::procedimientoEspecialidadbyEspecialidad($especialidades[0]->especialidad_id)->get();
+                $productos=Producto::productosG($especialidades[0]->especialidad_nombre)->get();
+            }
+
 
             $data=[
                 'procedimientoEspecialidades'=>$procedimientoEspecialidades,
-                'productos'=>$productos, 'especialidades'=>$especialidades,
+                'productos'=>$productos,
+                'especialidades'=>$especialidades,
                 'PE'=>Punto_Emision::puntos()->get(),
                 'tipoPermiso'=>$tipoPermiso,
                 'gruposPermiso'=>$gruposPermiso,
