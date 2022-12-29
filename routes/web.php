@@ -408,7 +408,7 @@ Route::resource('rubro', rubroController::class)->middleware('auth');
 Route::resource('bancoLista', bancoListaController::class)->middleware('auth');
 Route::resource('parametrizacionContable', parametrizacionContableController::class)->middleware('auth');
 Route::resource('centroConsumo', centroConsumoController::class)->middleware('auth');
-Route::resource('centroConsumo2', centroConsumo2Controller::class)->middleware('auth');
+Route::resource('plancentroConsumo', centroConsumo2Controller::class)->middleware('auth');
 Route::resource('tarifaIva', tarifaIvaController::class)->middleware('auth');
 Route::resource('departamento', empresaDepartamentoController::class)->middleware('auth');
 Route::resource('tamanoProducto', tamanoProductoController::class)->middleware('auth');
@@ -648,6 +648,7 @@ Route::get('/firmaElectronica/{id}/eliminar', [firmaElectronicaController::class
 Route::get('/transportista/{id}/eliminar', [transportistaController::class, 'delete'])->middleware('auth');
 Route::get('/rangoDocumento/{id}/eliminar', [rangoDocumentoController::class, 'delete'])->middleware('auth');
 Route::get('/cuenta/{id}/eliminar', [cuentaController::class, 'delete'])->middleware('auth');
+Route::get('/plancentroConsumo/{id}/eliminar', [centroConsumo2Controller::class, 'delete'])->middleware('auth');
 Route::get('/categoriaProducto/{id}/eliminar', [categoriaProductoController::class, 'delete'])->middleware('auth');
 Route::get('/categoriaRol/{id}/eliminar', [categoriaRolController::class, 'delete'])->middleware('auth');
 Route::get('/marcaProducto/{id}/eliminar', [marcaProductoController::class, 'delete'])->middleware('auth');
@@ -842,6 +843,9 @@ Route::post('/updateEmpleado', [empleadoController::class, 'UpdateExcelEmpleado'
 Route::get('/excelCuenta', [cuentaController::class, 'subir'])->middleware('auth');
 Route::post('/excelCuenta', [cuentaController::class, 'cargarguardar'])->middleware('auth');
 
+Route::get('/excelCentroC', [centroConsumo2Controller::class, 'subir'])->middleware('auth');
+Route::post('/excelCentroC', [centroConsumo2Controller::class, 'cargarguardar'])->middleware('auth');
+
 Route::get('/excelCliente', [clienteController::class, 'excelCliente'])->middleware('auth');
 Route::post('/excelCliente', [clienteController::class, 'CargarExcelCliente'])->middleware('auth');
 
@@ -853,6 +857,7 @@ Route::get('/PlanCuentaUp', [cuentaController::class, 'subir'])->middleware('aut
 Route::get('/denegado', [generalController::class, 'denegado'])->middleware('auth');
 Route::get('/usuario/{id}/restablecer', [usuarioController::class, 'restablecePass'])->middleware('auth');
 Route::get('/cuenta/{id}/subcuenta', [cuentaController::class, 'agregarCuenta'])->middleware('auth');
+Route::get('/plancentroConsumo/{id}/subcuenta', [centroConsumo2Controller::class, 'agregarCentro'])->middleware('auth');
 Route::post('/cuenta/guardarCuentas/{id}', [cuentaController::class, 'guardarCuenta'])->name('cuenta.guardarCuentas')->middleware('auth');
 Route::get('/factura/new/{id}', [facturaVentaController::class, 'nuevo'])->middleware('auth');
 Route::get('/facturacionsinOrden/new/{id}', [facturasinOrdenController::class, 'nuevo'])->middleware('auth');
@@ -1311,7 +1316,7 @@ Route::get('/cuentaBancaria/searchN/{buscar}', [cuentaBancariaController::class,
 Route::get('/cargarCentroConsumo/searchN/{buscar}', [reporteComprasProductoController::class, 'buscarBySustento'])->middleware('auth');
 
 Route::get('/centroConsumo2/{id}/subcuenta', [centroConsumo2Controller::class, 'agregarCentro'])->middleware('auth');
-Route::post('/centroConsumo2/{id}/agregarSubCuenta', [centroConsumo2Controller::class, 'guardarCentroC2'])->middleware('auth');
+Route::post('/plancentroConsumo/{id}/agregarSubCuenta', [centroConsumo2Controller::class, 'guardarCentroC2'])->middleware('auth');
 
 Route::get('/Siembra/searchN/{buscar}', [SiembraController::class, 'buscarBy'])->middleware('auth');
 Route::get('/SiembraM/searchN/{buscar}', [SiembraController::class, 'buscarByM'])->middleware('auth');

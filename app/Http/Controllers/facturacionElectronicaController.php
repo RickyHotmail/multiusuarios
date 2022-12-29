@@ -2140,16 +2140,16 @@ class facturacionElectronicaController extends Controller
 
                         xmlwriter_start_element($xml, 'totalSinImpuestos');
                             if($retencion->transaccionCompra)
-                                xmlwriter_text($xml, number_format($retencion->transaccionCompra->transaccion_subtotal,2));
+                                xmlwriter_text($xml, number_format($retencion->transaccionCompra->transaccion_subtotal,2,'.',''));
                             else
-                                xmlwriter_text($xml, number_format($retencion->liquidacionCompra->lc_subtotal,2));
+                                xmlwriter_text($xml, number_format($retencion->liquidacionCompra->lc_subtotal,2,'.',''));
                         xmlwriter_end_element($xml);
 
                         xmlwriter_start_element($xml, 'importeTotal');
                             if($retencion->transaccionCompra)
-                                xmlwriter_text($xml, number_format($retencion->transaccionCompra->transaccion_total,2));
+                                xmlwriter_text($xml, number_format($retencion->transaccionCompra->transaccion_total,2,'.',''));
                             else
-                                xmlwriter_text($xml, number_format($retencion->liquidacionCompra->lc_total,2));
+                                xmlwriter_text($xml, number_format($retencion->liquidacionCompra->lc_total,2,'.',''));
                         xmlwriter_end_element($xml);
 
                         $compra= $retencion->transaccionCompra;
@@ -2166,7 +2166,7 @@ class facturacionElectronicaController extends Controller
                                     xmlwriter_end_element($xml);
 
                                     xmlwriter_start_element($xml, 'baseImponible');
-                                        xmlwriter_text($xml, number_format($compra->transaccion_tarifa0,2));
+                                        xmlwriter_text($xml, number_format($compra->transaccion_tarifa0,2,'.',''));
                                     xmlwriter_end_element($xml);
 
                                     xmlwriter_start_element($xml, 'tarifa');
@@ -2189,7 +2189,7 @@ class facturacionElectronicaController extends Controller
                                     xmlwriter_end_element($xml);
 
                                     xmlwriter_start_element($xml, 'baseImponible');
-                                        xmlwriter_text($xml, number_format($compra->transaccion_tarifa12,2));
+                                        xmlwriter_text($xml, number_format($compra->transaccion_tarifa12,2,'.',''));
                                     xmlwriter_end_element($xml);
 
                                     xmlwriter_start_element($xml, 'tarifa');
@@ -2197,7 +2197,7 @@ class facturacionElectronicaController extends Controller
                                     xmlwriter_end_element($xml);
 
                                     xmlwriter_start_element($xml, 'valorImpuesto');
-                                        xmlwriter_text($xml, number_format($compra->transaccion_iva,2));
+                                        xmlwriter_text($xml, number_format($compra->transaccion_iva,2,'.',''));
                                     xmlwriter_end_element($xml);
                                 xmlwriter_end_element($xml);
                             }

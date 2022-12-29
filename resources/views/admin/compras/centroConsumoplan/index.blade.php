@@ -3,7 +3,10 @@
 <div class="card card-secondary">
     <div class="card-header">
         <h3 class="card-title">Centros de Consumo</h3>
+        <div class="float-right">
         <button class="btn btn-default btn-sm float-right" data-toggle="modal" data-target="#modal-nuevo"><i class="fa fa-plus"></i>&nbsp;Nuevo</button>
+        <a class="btn btn-success btn-sm" href="{{ url("excelCentroC")}}"><i class="fas fa-file-excel"></i>&nbsp;Cargar Excel</a> 
+        </div>
     </div>
     <!-- /.card-header -->
     <div class="card-body">
@@ -16,16 +19,25 @@
             </thead> 
             <tbody>
                 @foreach($centroCons as $centroCon)
-                <tr class="text-center">
-                    <td>
-                        <a href="{{ url("centroConsumo2/{$centroCon->centroc2_id}/edit") }}" class="btn btn-xs btn-primary"  data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-edit" aria-hidden="true"></i></a>
-                        <!--a href="{{ url("centroConsumo2/{$centroCon->centroc2_id}") }}" class="btn btn-xs btn-success"  data-toggle="tooltip" data-placement="top" title="Ver"><i class="fa fa-eye" aria-hidden="true"></i></a-->
-                        <a href="{{ url("centroConsumo2/{$centroCon->centroc2_id}/eliminar") }}" class="btn btn-xs btn-danger"  data-toggle="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-trash" aria-hidden="true"></i></a>
-                        <a href="{{ url("centroConsumo2/{$centroCon->centroc2_id}/subcuenta") }}" class="btn btn-xs btn-secondary"  data-toggle="tooltip" data-placement="top" title="Añadir Cuenta"><i class="fa fa-tasks" aria-hidden="true"></i></a>
-                    </td>
-                    <td  class="espacio{{$centroCon->centroc2_nivel}}" style="text-align:left">{{ $centroCon->centroc2_secuencial}}.- {{ $centroCon->centroc2_nombre}}</td>
+                <tr style="background: @if($centroCon->centro_consumo_nivel == 1) #C9FABE; @endif @if($centroCon->centro_consumo_nivel == 2) #AFFFFB; @endif  @if($centroCon->centro_consumo_nivel == 3) #D6AEF8; @endif  @if($centroCon->centro_consumo_nivel == 4) #F9FA87; @endif  @if($centroCon->centro_consumo_nivel == 5) #F9D07A; @endif">
+                    @if($centroCon->centro_consumo_nivel <=5)
+                        <td ><b>
+                         <a href="{{ url("plancentroConsumo/{$centroCon->centro_consumo_id}/edit") }}" class="btn btn-xs btn-primary"  data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-edit" aria-hidden="true"></i></a> 
+                        <a href="{{ url("plancentroConsumo/{$centroCon->centro_consumo_id}/eliminar") }}" class="btn btn-xs btn-danger"  data-toggle="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-trash" aria-hidden="true"></i></a> 
+                            @if($centroCon->detallescontable == 0) <a href="{{ url("plancentroConsumo/{$centroCon->centro_consumo_id}/subcuenta") }}" class="btn btn-xs btn-secondary"  data-toggle="tooltip" data-placement="top" title="Añadir Cuenta"><i class="fa fa-tasks" aria-hidden="true"></i></a>@endif
+                        </b></td>
+                        <td class="espacio{{$centroCon->centro_consumo_nivel}}"><b>{{ $centroCon->centro_consumo_numero.'  - '.$centroCon->centro_consumo_nombre}}</b></td>   
+                    @else
+                        <td >
+                        <a href="{{ url("plancentroConsumo/{$centroCon->centro_consumo_id}/edit") }}" class="btn btn-xs btn-primary"  data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-edit" aria-hidden="true"></i></a> 
+                        <a href="{{ url("plancentroConsumo/{$centroCon->centro_consumo_id}/eliminar") }}" class="btn btn-xs btn-danger"  data-toggle="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-trash" aria-hidden="true"></i></a> 
+                            @if($centroCon->detallescontable == 0) <a href="{{ url("plancentroConsumo/{$centroCon->centro_consumo_id}/subcuenta") }}" class="btn btn-xs btn-secondary"  data-toggle="tooltip" data-placement="top" title="Añadir Cuenta"><i class="fa fa-tasks" aria-hidden="true"></i></a>@endif
+                        </td>
+                        <td class="espacio{{$centroCon->centro_consumo_nivel}}">{{ $centroCon->centro_consumo_numero.'  - '.$centroCon->centro_consumo_nombre}}</td> 
+                    @endif                                
                 </tr>
                 @endforeach
+                
             </tbody>
         </table>
     </div>
@@ -41,7 +53,7 @@
                 <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form class="form-horizontal" method="POST" action="{{ url("centroConsumo2") }} "> 
+            <form class="form-horizontal" method="POST" action="{{ url("plancentroConsumo") }} "> 
                 @csrf
                 <div class="modal-body">
                     <div class="card-body">

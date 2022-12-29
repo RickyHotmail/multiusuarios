@@ -4,7 +4,7 @@
     <div class="card-header">
         <h3 class="card-title">¿Esta seguro de eliminar esta centro de consumo?</h3>
         <div class="float-right">
-            <form class="form-horizontal" method="POST" action="{{ route('centroConsumo.destroy', [$centroCon->centro_consumo_id]) }}">
+            <form class="form-horizontal" method="POST" action="{{ route('plancentroConsumo.destroy', [$centroCon->centro_consumo_id]) }}">
                 @method('DELETE')
                 @csrf
                 <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i>&nbsp;Eliminar</button>
@@ -19,31 +19,42 @@
     <div class="card-body">
         <div class="card-body">
             <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Nivel</label>
+                <div class="col-sm-10">
+                    <label class="form-control">{{$centroCon->centro_consumo_nivel}}</label>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Numero</label>
+                <div class="col-sm-4">
+                    <label class="form-control">{{$centroCon->cuentapadre->centro_consumo_numero.'.'}}</label>
+                </div>
+                <div class="col-sm-6">
+                <label class="form-control">{{$centroCon->centro_consumo_secuencial}}</label>
+                </div>
+            </div>
+            <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Nombre</label>
                 <div class="col-sm-10">
                     <label class="form-control">{{$centroCon->centro_consumo_nombre}}</label>
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-sm-2 col-form-label">Fecha Ingreso</label>
-                <div class="col-sm-10">
-                    <label class="form-control">{{$centroCon->centro_consumo_fecha_ingreso}}</label>
-                </div>
-            </div>         
-            <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Descripcion</label>
                 <div class="col-sm-10">
                     <label class="form-control">{{$centroCon->centro_consumo_descripcion}}</label>
                 </div>
-            </div>    
+            </div>         
+            @if(($centroCon->centro_consumo_nivel)>3)   
             <div class="form-group row">
-            <label for="idTipo" class="col-sm-2 col-form-label">Tipo Centro Consumo</label>
-            <div class="col-sm-10">
-                @if(isset($centroCon->sustento->sustento_codigo))
-                    <label class="form-control">{{$centroCon->sustento->sustento_codigo.'-'.$centroCon->sustento->sustento_nombre}}</label>
-                @endif                
-            </div>
+                <label for="idTipo" class="col-sm-2 col-form-label">Tipo Centro Consumo</label>
+                <div class="col-sm-10">
+                    @if(isset($centroCon->sustento->sustento_codigo))
+                        <label class="form-control">{{$centroCon->sustento->sustento_codigo.'-'.$centroCon->sustento->sustento_nombre}}</label>
+                    @endif                
+                </div>
             </div> 
+            @endif  
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Estado</label>
                 <div class="col-sm-10">
