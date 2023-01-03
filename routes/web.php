@@ -150,7 +150,7 @@ use App\Http\Controllers\tipoExamenController;
 use App\Http\Controllers\tipoImagenController;
 use App\Http\Controllers\medicamentoController;
 use App\Http\Controllers\enfermedadController;
-use App\Http\Controllers\examenController;
+use App\Http\Controllers\ExamenController;
 use App\Http\Controllers\imagenController;
 use App\Http\Controllers\listaFaltanteCajaController;
 use App\Http\Controllers\listaSobranteCajaController;
@@ -949,7 +949,7 @@ Route::get('/ordenAtencionConsolidado/{id}/consolidado', [ordenAtencionConsolida
 Route::get('/verificarDocumentos', [ordenAtencionController::class, 'verificarDocumentosOrden'])->middleware('auth');
 Route::get('/facturarOrden/{id}', [facturarOrdenAtencionController::class, 'facturarOrden'])->middleware('auth');
 Route::post('/facturarOrden', [facturarOrdenAtencionController::class, 'facturarOrdenGuardar'])->middleware('auth');
-Route::post('/facturarOrdenexamen', [examenController::class, 'facturarOrdenGuardar'])->middleware('auth');
+Route::post('/facturarOrdenexamen', [ExamenController::class, 'facturarOrdenGuardar'])->middleware('auth');
 
 
 //BuscarHorarios

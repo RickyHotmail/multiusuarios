@@ -26,7 +26,7 @@ class Orden_Examen extends Model
                     )->join('paciente','paciente.paciente_id','=','orden_atencion.paciente_id'
                     )->join('sucursal','sucursal.sucursal_id','=','orden_atencion.sucursal_id'
                     )->where('sucursal.empresa_id','=',Auth::user()->empresa_id       
-                    )->where('orden_examen.orden_estado','=','1');               
+    /* )->where('orden_examen.orden_estado','=','1'*/);               
     }
     public function scopeOrdenExamenesHOY($query){
         return $query->join('expediente','expediente.expediente_id','=','orden_examen.expediente_id'
@@ -35,7 +35,8 @@ class Orden_Examen extends Model
                     )->join('sucursal','sucursal.sucursal_id','=','orden_atencion.sucursal_id'
                     )->where(DB::raw('DATE(orden_examen.created_at)'), '=', date("Y-m-d")
                     )->where('sucursal.empresa_id','=',Auth::user()->empresa_id       
-                    )->where('orden_examen.orden_estado','=','1');               
+                    )->where('orden_examen.orden_estado','=','1'
+                    )->orderBy('orden_atencion.orden_numero','desc');
     }
     public function scopeOrdenExamen($query, $id){
         return $query->join('expediente','expediente.expediente_id','=','orden_examen.expediente_id'
