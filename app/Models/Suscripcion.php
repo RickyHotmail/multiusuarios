@@ -22,6 +22,7 @@ class Suscripcion extends Model
         'suscripcion_ilimitada',
         'suscripcion_estado'
     ];
+
     protected $guarded=[
     ];
 
@@ -43,7 +44,7 @@ class Suscripcion extends Model
     
     public function scopeByEmpresa($query, $id){
         return $query->join('empresa', 'empresa.empresa_id','=','suscripcion.empresa_id')
-                     ->where('empresa.empresa_id', '=', $id)
-                     ->where('suscripcion_estado','=',1);
+                     ->where('empresa.empresa_id', '=', $id);
+                     //->where('suscripcion_estado','=',1);
     }
 }

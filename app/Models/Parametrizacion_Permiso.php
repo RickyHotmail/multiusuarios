@@ -44,9 +44,10 @@ class Parametrizacion_Permiso extends Model
         return $this->hasOne(Permiso::class, 'permiso_id', 'permiso_id');
     }
 
-    public function scopeByTipo($query, $nombre){
+    public function scopeByTipo($query, $pg_id){
         $query->join('permiso', 'permiso.permiso_id', '=', 'parametrizacion_permiso.permiso_id')
-              ->where('parametrizacionp_estado', 1);
+              ->where('parametrizacionp_estado', 1)
+              ->where('parametrizaciong_id','=', $pg_id);
 
         return $query->select('permiso.permiso_id', 'permiso.permiso_nombre', 'permiso.permiso_ruta', 'permiso.permiso_tipo','permiso.permiso_icono','permiso.permiso_orden','permiso.grupo_id', 'permiso.tipo_id');
     }
