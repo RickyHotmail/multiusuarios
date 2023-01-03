@@ -196,8 +196,8 @@ class ordenExamenController extends Controller
                             $datos[$count]['%Cobertura']=$copagos->ep_valor.' %';
                             $datos[$count]['Cobertura']=(($producto->procedimientoA_valor*$copagos->ep_valor)/100);
 
-                            $datos[$count]['Copago']=$producto->procedimientoA_valor+round(($producto->procedimientoA_valor*$copagos->ep_valor/100), 2);
-                            $tcopago=($producto->procedimientoA_valor)+round(($producto->procedimientoA_valor*$copagos->ep_valor/100), 2);
+                            $datos[$count]['Copago']=$producto->procedimientoA_valor-round(($producto->procedimientoA_valor*$copagos->ep_valor/100), 2);
+                            $tcopago=($producto->procedimientoA_valor)-round(($producto->procedimientoA_valor*$copagos->ep_valor/100), 2);
                         }
                     }
                     $count++;
@@ -209,9 +209,9 @@ class ordenExamenController extends Controller
                 if($rangoDocumento){
                     $secuencial=$rangoDocumento->rango_inicio;
                     $secuencialAux=Analisis_Laboratorio::secuencial($rangoDocumento->rango_id)->max('analisis_secuencial');
-                    if($secuencialAux){$secuencial=$secuencialAux+1;}
-                    
-                    $data=[
+                    if($secuencialAux) $secuencial=$secuencialAux+1;
+
+                    return view('admin.laboratorio.ordenesExamen.facturar', [
                         'especialidad'=>$especialidad,
                         'total'=>$total,
                         'datos'=>$datos,
@@ -229,9 +229,7 @@ class ordenExamenController extends Controller
                         'formasPago'=>Forma_Pago::formaPagos()->get(),
                         'rangoDocumento'=>$rangoDocumento,'PE'=>Punto_Emision::puntos()->get(),
                         'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin
-                    ];
-
-                    return view('admin.laboratorio.ordenesExamen.facturar', $data);
+                    ]);
                 }else{
                     return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir facturas de venta, configueros y vuelva a intentar');
                 }
@@ -369,6 +367,7 @@ class ordenExamenController extends Controller
         ];
 
         //return $detalleExamen;
+        return $data;
 
         return view('admin.citasMedicas.examen.editar', $data);
     }

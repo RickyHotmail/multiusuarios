@@ -249,8 +249,10 @@ class atencionCitasController extends Controller
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     ///////////////////////////////////////////////////////creo un examen de laboratorio que no lleva factura //////////////////////////////////////////////////////////////////////////////
-                    $puntoEmision = Punto_Emision::PuntoSucursalUser($atencion->expediente->ordenatencion->sucursal_id, Auth::user()->user_id)->first();
+                    //$puntoEmision = Punto_Emision::PuntoSucursalUser($atencion->expediente->ordenatencion->sucursal_id, Auth::user()->user_id)->first();
+                    $puntoEmision = Punto_Emision::PuntoxSucursal($atencion->expediente->ordenatencion->sucursal_id)->first();
                     $rangoDocumento=Rango_Documento::PuntoRango($puntoEmision->punto_id, 'Analisis de Laboratorio')->first();
+                    
                     $secuencial=1;
                     $analisis=new Analisis_Laboratorio();
 
@@ -950,7 +952,11 @@ class atencionCitasController extends Controller
             $tiposDetalles=Tipo_Detalle_Consulta::tiposDetalles()->get();
             
             $signoVital=Signos_Vitales::SignoVitalOrdenId($ordenAtencion->orden_id)->get();
-            $examenes= Examen::buscarProductosProcedimiento($ordenAtencion->paciente->paciente_id, $ordenAtencion->especialidad_id)->get();
+
+            $espLaboratorio=Especialidad::especialidadBuscar('laboratorio')->first();
+            $examenes= Examen::buscarProductosProcedimiento($ordenAtencion->paciente->paciente_id, $espLaboratorio->especialidad_id
+                                )->select('examen.examen_id', 'producto.producto_codigo', 'producto.producto_nombre'
+                                )->get();
 
             //return $examenes;
             

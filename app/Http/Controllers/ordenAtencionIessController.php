@@ -10,6 +10,7 @@ use App\Models\Empleado;
 use App\Models\Medico;
 use App\Models\User;
 use App\Models\Documento_Anulado;
+use App\Models\Documento_Cita_Medica;
 use App\Models\Documento_Orden_Atencion;
 use App\Models\Documento_Orden_Paciente;
 use App\Models\Empresa;
@@ -103,7 +104,8 @@ class ordenAtencionIessController extends Controller{
     }
 
     public function store(Request $request){
-        try {
+        //return $request;
+        //try {
             DB::beginTransaction();
            
             $general = new generalController();
@@ -112,6 +114,7 @@ class ordenAtencionIessController extends Controller{
             /***************SABER SI SE GENERAR UN ASIENTO DE COSTO****************/
             $cierre = $general->cierre($request->get('fechaCitaID'),$request->get('idSucursal'));
             if ($cierre) {
+                return 0;
                 return redirect('ordenAtencion')->with('error2', 'No puede realizar la operacion por que pertenece a un mes bloqueado');
             }
             $ordenAtencion = new Orden_Atencion();
@@ -163,7 +166,7 @@ class ordenAtencionIessController extends Controller{
                         mkdir($ruta, 0777, true);
                     }
                     if ($request->file($file)->isValid()) {
-                        $name = $documento->documento_nombre.'.'.$request->file($file)->getClientOriginalExtension();
+                       /*  $name = $documento->documento_nombre.'.'.$request->file($file)->getClientOriginalExtension();
                         $path = $request->file($file)->move($ruta, $name);
                         $documento_orden_paciente=new Documento_Orden_Paciente();
                         //$documen_orden_paciente->docpaciente_url=$name;
@@ -171,10 +174,26 @@ class ordenAtencionIessController extends Controller{
                         $documento_orden_paciente->docpaciente_estado='1';
                         $documento_orden_paciente->orden_id=$ordenAtencion->orden_id;
                         $documento_orden_paciente->documento_id=$documento->documento_id;
-                        $documento_orden_paciente->save();
+                        $documento_orden_paciente->save(); */
+
+                        ///////
+                        $documento=Documento_Orden_Atencion::findOrFail($request->documento_id);
+
+                        $name = $documento->documento_nombre.'.'.$request->file($file)->getClientOriginalExtension();
+                        $path = $request->file($file)->move(public_path().'/'.$ruta, $name);
+
+                        $documentos_cita_medica=new Documento_Cita_Medica();
+                        $documentos_cita_medica->doccita_nombre=$name;
+                        $documentos_cita_medica->doccita_url=$ruta.'/'.$name;
+                        $documentos_cita_medica->doccita_estado='1';
+                        $documentos_cita_medica->orden_id=$ordenAtencion->orden_id;
+                        $documentos_cita_medica->documento_id=$documento->documento_id;
+                        $documentos_cita_medica->save();
                     }
                 }
             }
+
+            //return 1210;
 
             $empresa = Empresa::empresa()->first();
             $view =  \View::make('admin.formatosPDF.ordenesAtenciones.ordenAtencionIess', ['orden'=>$ordenAtencion,'empresa'=>$empresa]);
@@ -185,13 +204,22 @@ class ordenAtencionIessController extends Controller{
             $nombreArchivo = 'Orden de atencion';
             PDF::loadHTML($view)->save($ruta.'/'.$nombreArchivo.'.pdf');
             DB::commit();
-            return redirect('ordenAtencionIess')->with('success', 'Datos guardados exitosamente')->with('pdf2', 'DocumentosOrdenAtencion/'.$empresa->empresa_ruc.'/'.(new DateTime($request->get('fechaCitaID')))->format('d-m-Y').'/'.$ordenAtencion->orden_numero.'/Documentos/'.$nombreArchivo.'.pdf');
+
+            //return 234;
+            return redirect('ordenAtencionIess')->with('success', 'Datos guardados exitosamente')
+
+            ->with('pdf2', '/DocumentosOrdenAtencion/'.$empresa->empresa_ruc.'/'.(new DateTime($request->get('fechaCitaID')))->format('d-m-Y').'/'.$ordenAtencion->orden_numero.'/Documentos/'.$nombreArchivo.'.pdf');
+
+            return redirect('ordenAtencionIess');//->with('success', 'Datos guardados exitosamente'
+                                               /*->with('pdf2', '/DocumentosOrdenAtencion/'.$empresa->empresa_ruc.'/'.(new DateTime($request->get('fechaCitaID'))
+                                               )->format('d-m-Y').'/'.$ordenAtencion->orden_numero.'/Documentos/'.$nombreArchivo.'.pdf');*/
+                                               ;
           
-        }
+        /* }
         catch(\Exception $ex){    
             DB::rollBack();  
             return redirect('ordenAtencionIess')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        } 
+        }  */
     }
 
     /**
