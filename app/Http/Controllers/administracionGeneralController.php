@@ -168,15 +168,19 @@ class administracionGeneralController extends Controller{
             DB::beginTransaction();
             $permisosGrupo=Parametrizacion_Permiso::parametrizacionesPermiso($request->permiso_general)->get();
             $rol=DB::select(DB::raw("select * from rol where rol_nombre='Administrador' and empresa_id=$id"));
-            
             DB::select(DB::raw("delete from rol_permiso where rol_id=".$rol[0]->rol_id));
-
-            
             foreach($permisosGrupo as $param){
                 $rolPermiso=new Rol_Permiso();
                 $rolPermiso->permiso_id=$param->permiso_id;
                 $rolPermiso->rol_id=$rol[0]->rol_id;
                 $rolPermiso->save();
+            }
+
+            $suscripcion=Suscripcion::suscripcion()->first();
+
+            if($suscripcion){
+                $suscripcion->suscripcion_permiso=$request->permiso_general;
+                $suscripcion->save();
             }
 
             DB::commit();
