@@ -26,10 +26,10 @@
                         </select>
                     </div>
                     <label for="Codigo" class="col-sm-2 col-form-label"><center>Orden de Atencion : </center></label>
-                    <div class="col-sm-1">                                                          
-                        <input type="text" class="form-control negrita" id="Codigo" name="Codigo" placeholder="OA-" readonly required>                  
+                    <div class="col-sm-1">
+                        <input type="text" class="form-control negrita" id="Codigo" name="Codigo" placeholder="OA-" readonly required>
                     </div>
-                    <div class="col-sm-2">                                
+                    <div class="col-sm-2">
                         <input type="text" class="form-control negrita" id="Secuencial" name="Secuencial" value="{{$secuencial}}" placeholder="000000001" readonly required>
                     </div>
                     <label for="idReclamo" class="col-sm-1 col-form-label">Reclamo:</label>

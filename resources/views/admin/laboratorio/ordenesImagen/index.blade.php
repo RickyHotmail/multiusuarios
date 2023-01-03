@@ -54,17 +54,16 @@
                 ?>
                 <tr class="text-center">
                     <td>
+                        {{$ordenImagen->orden_id}}
                         @if($ordenImagen->orden_estado == 1  &&  !$iess)
                             <a href="{{ url("ordenImagen/{$ordenImagen->orden_id}/facturarOrden") }}" class="btn btn-xs btn-primary " style="padding: 2px 8px; border-radius: 6px" data-toggle="tooltip" data-placement="top" title="NO FACTURADO">
                                 <i class="fas fa-edit"></i> Facturar
                             </a>
-                        @endif
-                        @if($ordenImagen->orden_estado==2 || ($ordenImagen->orden_estado==3 && $iess))
+                        @elseif($ordenImagen->orden_estado==2 || ($ordenImagen->orden_estado==3 && $iess))
                             <a href="{{ url("ordenImagen/{$ordenImagen->orden_id}/subirImagenes") }}" class="btn btn-xs btn-primary " style="padding: 2px 8px; border-radius: 6px" data-toggle="tooltip" data-placement="top" title="Subir Resultados">
                                 <i class="fas fa-upload"></i> &nbsp;&nbsp;&nbsp; Subir
                             </a>
-                        @endif
-                        @if($ordenImagen->orden_estado==3)
+                        @elseif($ordenImagen->orden_estado==3)
                             <a href="{{ url("ordenImagen/{$ordenImagen->orden_id}/verResultadosImagen") }}" class="btn btn-xs btn-primary " style="padding: 2px 8px; border-radius: 6px" data-toggle="tooltip" data-placement="top" title="ver Resultados">
                                 <i class="fa fa-eye"></i>
                             </a>
