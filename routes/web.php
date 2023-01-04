@@ -283,6 +283,7 @@ use App\Http\Controllers\tareasProgramadasController;
 use App\Http\Controllers\tipoMovimientoEmpleadoController;
 use App\Http\Controllers\tipoPiscinaController;
 use App\Http\Controllers\transaccionCompraActivoFijoController;
+use App\Http\Controllers\transaccionCompraCuentaController;
 use App\Http\Controllers\transferenciaSiembraController;
 use App\Http\Controllers\verificarComprasSriController;
 use App\Models\Beneficios_Sociales;
@@ -513,7 +514,7 @@ Route::resource('listadecimocuarto', listadecimoCuartoController::class)->middle
 Route::resource('contabilizacionMensual', contabilizacionMensualController::class)->middleware('auth');
 Route::resource('modificarConsumo', modificarConsumoController::class)->middleware('auth');
 Route::resource('casilleroTributario', CasilleroTributarioController::class)->middleware('auth');
-
+Route::resource('transaccionCompraC', transaccionCompraCuentaController::class)->middleware('auth');
 
 
 Route::resource('tipoMedicamento', tipoMedicamentoController::class)->middleware('auth');
@@ -870,6 +871,11 @@ Route::get('/procedimientoEspecialidad/{especialidad_id}', [procedimientoEspecia
 Route::get('/procedimientoEspecialidad/{id}/especialidad', [procedimientoEspecialidadController::class, 'especialidad'])->middleware('auth')->middleware('acceso');
 Route::post('/procedimientoEspecialidad/guardarEspecialidades/{id}', [procedimientoEspecialidadController::class, 'guardarEspecialidades'])->name('procedimientoEspecialidad.guardarEspecialidades')->middleware('auth');
 Route::post('/procedimiento/actualizarGrupo', [procedimientoEspecialidadController::class, 'actualizarPorEspecialidad'])->middleware('auth');
+Route::get('/transaccionCompraC/new/{id}', [transaccionCompraCuentaController::class, 'nuevo'])->middleware('auth');
+Route::get('/transaccioncompraC/{id}/edit',  [transaccionCompraCuentaController::class, 'editar'])->middleware('auth');
+Route::get('/transaccioncompraC/{id}/ver',  [listatransaccionCompraController::class, 'ver'])->middleware('auth');
+Route::post('listatransaccionCompraC',  [transaccionCompraCuentaController::class, 'buscar'])->middleware('auth');
+
 
 Route::get('/aseguradoraProcedimiento/{id}/procedimiento', [aseguradoraProcedimientoController::class, 'procedimiento'])->middleware('auth')->middleware('acceso');
 Route::post('/aseguradoraProcedimiento/guardarProcedimiento/{id}', [aseguradoraProcedimientoController::class, 'guardarProcedimiento'])->name('aseguradoraProcedimiento.guardarProcedimiento')->middleware('auth');
