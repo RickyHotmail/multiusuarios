@@ -84,6 +84,7 @@
                                 <tr class="neo-fondo-tabla">
                                     <th class="borde-celda-top borde-celda-bottom borde-celda-left">CÓDIGO</th>
                                     <th class="borde-celda-top borde-celda-bottom">CUENTA</th>
+                                    <th class="borde-celda-top borde-celda-bottom">C.C</th>
                                     <th class="borde-celda-top borde-celda-bottom">DESCRIPCIÓN </th>
                                     <th class="centrar-texto borde-celda-top borde-celda-bottom">DEBE</th>
                                     <th class="centrar-texto borde-celda-top borde-celda-bottom borde-celda-right">HABER</th>
@@ -96,6 +97,7 @@
                                 <tr>
                                     <td class="sin-salto">{{ $detalle->cuenta->cuenta_numero }}</td>
                                     <td class="sin-salto">{{ $detalle->cuenta->cuenta_nombre }}</td>
+                                    <td class="sin-salto">@if(isset($detalle->centrocosto)) {{$detalle->centrocosto->centro_consumo_numero}}   @endif</td>
                                     <td>{{ $detalle->detalle_comentario }}</td>
                                     <td class="centrar-texto">{{ number_format($detalle->detalle_debe,2) }}</td>
                                     <td class="centrar-texto">{{ number_format($detalle->detalle_haber,2) }}</td>

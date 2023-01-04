@@ -10,7 +10,7 @@
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-        <table id="example1" class="table table-bordered table-hover table-responsive sin-salto">
+        <table id="example4" class="table table-bordered table-hover table-responsive sin-salto">
             <thead>
                 <tr class="text-center neo-fondo-tabla">
                     <th></th>

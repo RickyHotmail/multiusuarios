@@ -1,7 +1,7 @@
 @extends ('admin.layouts.admin')
 @section('principal')
 <div class="card card-primary card-outline" style="position: absolute; width: 100%">
-    <form id="idForm" class="form-horizontal" method="POST"  action="{{ url("transaccionCompra") }} " onsubmit="return validarForm();">
+    <form id="idForm" class="form-horizontal" method="POST"  action="{{ url("transaccionCompraC") }} " onsubmit="return validarForm();">
         @csrf
         <div class="card-header">
             <div class="row">
@@ -282,14 +282,66 @@
                     </div>
                     
                     <div class="row" style="background: #dadada; padding-top: 20px;margin-top: 5px;">
-                        <div class="col-sm-4" style="margin-bottom: 0px;">
+                        <div id="Idotro" class="col-lg-1 col-md-1 col-sm-1 col-xs-1 form-control-label  " 
+                        style="margin-bottom: 0px;">
+                            <center><label></label></center>
+                            <center>
+                                <div class="form-group" style="margin-bottom: 0px;">
+                                    <div class="custom-control custom-checkbox">
+                                        <input id="tieneCuenta" name="tieneCuenta" type="checkbox"
+                                            class="custom-control-input" onchange="otro();"  disabled />
+                                        <label for="tieneCuenta" class="custom-control-label">Cuenta</label>
+                                    </div>
+                                </div>
+                            </center>
+                        </div>
+                        <div id='idVentas' class="col-sm-4 invisible" style="margin-bottom: 0px;" >
+                            <label>Cuenta de Venta</label>
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <select class="custom-select select2" id="id_cuenta" name="id_cuenta" onchange="cuenta();">
+                                        <option value="" label>--Seleccione una opcion--</option>
+                                        @foreach($cuentas as $cuenta)
+                                            <option value="{{$cuenta->cuenta_id}}">{{$cuenta->cuenta_numero.' - '.$cuenta->cuenta_nombre}}</option>
+                                        @endforeach
+                                    </select>
+                                    <select class="invisible" class="custom-select select2" id="id_cuentaC" name="id_cuentaC" >
+                                        <option value="" label>--Seleccione una opcion--</option>
+                                        @foreach($cuentas as $cuenta)
+                                            <option value="{{$cuenta->cuenta_id}}">{{$cuenta->cuenta_numero}}</option>
+                                        @endforeach
+                                    </select>
+                                    <select class="invisible" class="custom-select select2" id="id_cuentaP" name="id_cuentaP" >
+                                        <option value="" label>--Seleccione una opcion--</option>
+                                        @foreach($cuentas as $cuenta)
+                                            <option value="{{$cuenta->cuenta_id}}">{{$cuenta->cuenta_nombre}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="Idproducto" class="col-sm-4" style="margin-bottom: 0px;">
                             <label>Nombre de Producto</label>
                             <div class="form-group">
                                 <div class="form-line">
-                                    <input id="codigoProducto" name="codigoProducto" type="hidden">
+                                    <input id="codigoProducto" name="idProducto" type="hidden">
                                     <input id="idProductoID" name="idProductoID" type="hidden">
                                     <input id="tipoProductoID" name="tipoProductoID" type="hidden">
                                     <input id="buscarProducto" name="buscarProducto" type="text" class="form-control" placeholder="Buscar producto" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="IdTipo" class="col-sm-1 invisible" style="margin-bottom: 0px;"">
+                            <label>Tipo</label>
+                            <div class="form-group">
+                                <div class="form-line">
+                                <select class="form-control select2" id="TipoP" name="TipoP"
+                                    data-live-search="true">
+                                    <option value="Bien">Bien
+                                    </option>
+                                    <option value="Servicio">Servicio
+                                    </option>
+                                </select>
                                 </div>
                             </div>
                         </div>
@@ -314,7 +366,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-2" style="margin-bottom: 0px;">
+                        <div class="col-sm-1" style="margin-bottom: 0px;">
                             <center><label>Precio</label></center>
                             <div class="form-group">
                                 <div class="form-line">
@@ -323,7 +375,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-2" style="margin-bottom: 0px;">
+                        <div class="col-sm-1" style="margin-bottom: 0px;">
                             <center><label>Desc. %</label></center>
                             <div class="form-group">
                                 <div class="form-line">
@@ -394,7 +446,7 @@
                     <div class="row">
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-bottom: 0px;">
                             <div class="table-responsive">
-                                @include ('admin.compras.transaccionCompra.itemFactura')
+                                @include ('admin.compras.transaccionCompraC.itemFactura')
                                 <table id="cargarItemFactura"
                                     class="table table-striped table-hover boder-sar tabla-item-factura sin-salto"
                                     style="margin-bottom: 6px;">
@@ -940,6 +992,7 @@ function nuevo() {
     document.getElementById("baseFuente").disabled = false;
     document.getElementById("valorFuente").disabled = false;
     document.getElementById("baseIva").disabled = false;
+    document.getElementById("tieneCuenta").disabled = false;
     document.getElementById("valorIva").disabled = false;
 }
 function showDiff(){
@@ -961,10 +1014,24 @@ function agregarItem() {
             descuento = Number(total * (document.getElementById("id_descuento").value / 100));
             var linea = $("#plantillaItemFactura").html();
             linea = linea.replace(/{ID}/g, id_item);
-            linea = linea.replace(/{Dcantidad}/g, document.getElementById("id_cantidad").value);
+           
+
+            if(document.getElementById("tieneCuenta").checked == true){
+                var cuenta = document.getElementById("id_cuenta");
+                var cuentas = document.getElementById("id_cuentaP");
+                linea = linea.replace(/{idep}/g, "C");
+                linea = linea.replace(/{Dnombre}/g, cuentas.options[cuenta.selectedIndex].text);
+                document.getElementById("tipoProductoID").value=document.getElementById("TipoP").value;
+            }
+            else{
+                linea = linea.replace(/{idep}/g, "P");
+                linea = linea.replace(/{Dnombre}/g, document.getElementById("buscarProducto").value);
+            }
             linea = linea.replace(/{Dcodigo}/g, document.getElementById("codigoProducto").value);
-            linea = linea.replace(/{DprodcutoID}/g, document.getElementById("idProductoID").value);
-            linea = linea.replace(/{Dnombre}/g, document.getElementById("buscarProducto").value);
+                linea = linea.replace(/{DprodcutoID}/g, document.getElementById("idProductoID").value);
+               
+            linea = linea.replace(/{Dcantidad}/g, document.getElementById("id_cantidad").value);
+           
             if (document.getElementById("tieneIva").checked) {
                 linea = linea.replace(/{Diva}/g, "SI");
                 linea = linea.replace(/{DViva}/g, round(Number((total - descuento) * porcentajeIva)));
@@ -1060,7 +1127,30 @@ function calcularTotales() {
     document.getElementById("total").innerHTML = total;
     document.getElementById("idTotal").value = total;
 }
-
+function otro() {
+    if(document.getElementById("tieneCuenta").checked == true){
+        document.getElementById("Idproducto").classList.add('invisible');
+        document.getElementById("idVentas").classList.remove('invisible');
+        document.getElementById("IdTipo").classList.remove('invisible');
+        document.getElementById("tieneIva").disabled=false;
+    }else{
+        document.getElementById("Idproducto").classList.remove('invisible');
+        document.getElementById("idVentas").classList.add('invisible');
+        document.getElementById("IdTipo").classList.add('invisible');
+        document.getElementById("tieneIva").disabled=true;
+    }
+}
+function cuenta() {
+    var cuentas = document.getElementById("id_cuenta");
+    var cuentasp = document.getElementById("id_cuentaP");
+    var cuentasc = document.getElementById("id_cuentaC");
+    document.getElementById("idProductoID").value=document.getElementById("id_cuenta").value;
+    document.getElementById("tipoProductoID").value=document.getElementById("TipoP").value;
+    document.getElementById("codigoProducto").value=cuentasc.options[cuentas.selectedIndex].text;
+    document.getElementById("buscarProducto").value='asda';
+    document.getElementById("descripcionProducto").value= cuentasp.options[cuentas.selectedIndex].text;
+    
+}
 function resetearCampos() {
     document.getElementById("descripcionProducto").value = "";
     document.getElementById("id_cantidad").value = 1;

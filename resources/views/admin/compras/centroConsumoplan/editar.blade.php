@@ -25,7 +25,7 @@
             <div class="form-group row">
                 <label for="cuenta_numero" class="col-sm-2 col-form-label">Numero</label>
                 <div class="col-sm-4">
-                    <input type="hidden" id="cuenta_padre" name="cuenta_padre" value="{{$centroCon->cuentapadre->centro_consumo_id}}"/>
+                    <input type="hidden" id="cuenta_padre" name="cuenta_padre" value="{{$centroCon->cuentapadre->centro_consumo_numero}}"/>
                     <label class="form-control">{{$centroCon->cuentapadre->centro_consumo_numero.'.'}}</label>
                 </div>
                 <div class="col-sm-6">

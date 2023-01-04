@@ -221,9 +221,9 @@
                                         @foreach($compras->detalles as $x)
                                         <tr class="text-center">
                                             <td>{{ $x->detalle_cantidad}}</td>  
-                                            <td>{{ $x->producto->producto_codigo}}</td>  
-                                            <td>{{ $x->producto->producto_nombre}}</td>  
-                                            <td>{{ $x->producto->producto_tiene_iva}}</td>  
+                                            <td>@if(isset($x->producto)) {{ $x->producto->producto_codigo}} @else {{ $x->cuenta->cuenta_numero}} @endif</td>  
+                                            <td>@if(isset($x->producto)) {{ $x->producto->producto_nombre}} @else {{ $x->cuenta->cuenta_nombre}} @endif</td>  
+                                            <td>@if($x->detalle_iva > 0) SI @else NO @endif</td>  
                                             <td>{{ $x->detalle_iva}}</td>  
                                             <td>{{ $x->detalle_precio_unitario}}</td>  
                                             <td>{{ $x->detalle_descuento}}</td> 
@@ -231,7 +231,9 @@
                                             <td>{{ $x->bodega->bodega_nombre}}</td>  
                                             <td>{{ $x->centroConsumo->centro_consumo_nombre}}</td>  
                                             <td>{{ $x->detalle_descripcion}}</td>  
-                                            <td>@if($x->producto->producto_tipo==1) ARTICULO @endif @if($x->producto->producto_tipo==2) SERVICIO @endif</td>  
+                                            <td>@if(isset($x->producto)) @if($x->producto->producto_tipo==1) Bien @endif @if($x->producto->producto_tipo==2) Servicio @endif
+                                            @else {{ $x->detalle_tipo}} @endif
+                                            </td>  
                                         </tr>
                                         @endforeach
                                     </tbody>

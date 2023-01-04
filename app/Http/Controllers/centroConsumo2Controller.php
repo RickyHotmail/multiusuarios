@@ -277,9 +277,8 @@ class centroConsumo2Controller extends Controller{
             DB::beginTransaction();
             $centroCon = Centro_Consumo::findOrFail($id);
             $centroCon->centro_consumo_nombre = $request->get('centro_consumo_nombre');
-            $centroCon->centro_consumo_descripcion = $request->get('centro_consumo_descripcion');
-            $centroCon->centro_consumo_descripcion = $request->get('centro_consumo_descripcion');
-            $centroCon->centro_consumo_numero = $request->get('cuenta_numero');  
+            $centroCon->centro_consumo_numero = $request->get('cuenta_padre').'.'.$request->get('cuenta_numero');
+            $centroCon->centro_consumo_secuencial = $request->get('cuenta_numero');  
             if ($request->get('centro_consumo_descripcion')){
                 $centroCon->centro_consumo_descripcion = $request->get('centro_consumo_descripcion');
             }  

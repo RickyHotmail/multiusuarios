@@ -35,6 +35,7 @@
             <tr class="centrar letra12">
                 <th class="borde-izquierdo cabecera-diario izquierda">CÓDIGO</th>    
                 <th class="cabecera-diario izquierda">CUENTA</th>
+                <th class="cabecera-diario izquierda">C.C.</th>
                 <th class="cabecera-diario izquierda">DESCRIPCIÓN</th>
                 <th class="cabecera-diario">DEBE</th>
                 <th class="borde-derecho cabecera-diario">HABER</th>   
@@ -43,12 +44,13 @@
         <tbody>
             @if(isset($diario))
             <?php $debe = 0; $haber = 0; ?>
-                <tr><td colspan="5" style="padding-top: 5px;"></td></tr>
+                <tr><td colspan="6" style="padding-top: 5px;"></td></tr>
                 @foreach($diario->detalles->sortBy('detalle_haber') as $detalle)
                     <?php $debe = $debe + $detalle->detalle_debe; $haber = $haber + $detalle->detalle_haber; ?>
                     <tr class="letra10">
                         <td class="detalle-diario"><b>{{ $detalle->cuenta->cuentaPadre->cuenta_numero }}</b></td>
                         <td class="detalle-diario"><b>{{ $detalle->cuenta->cuentaPadre->cuenta_nombre }}</b></td>
+                        <td class="detalle-diario"><b>@if(isset($detalle->centrocosto)) {{$detalle->centrocosto->cuentapadre->centro_consumo_numero }} @endif</b></td>
                         <td rowspan="2" class="detalle-diario">{{ $detalle->detalle_comentario }}</td>
                         <td rowspan="2" class="detalle-diario dereche">@if($detalle->detalle_debe <> 0) {{ number_format($detalle->detalle_debe,2) }} @endif</td>
                         <td rowspan="2" class="detalle-diario dereche">@if($detalle->detalle_haber <> 0) {{ number_format($detalle->detalle_haber,2) }} @endif</td>
@@ -56,10 +58,12 @@
                     <tr class="letra10">
                         <td class="detalle-diario">{{ $detalle->cuenta->cuenta_numero }}</td>
                         <td class="detalle-diario" style="padding-left: 20px;">{{ $detalle->cuenta->cuenta_nombre }}</td>
+                        <td class="detalle-diario">@if(isset($detalle->centrocosto)) {{ $detalle->centrocosto->centro_consumo_numero }} @endif</td>
                     </tr>
                 @endforeach
-                <tr><td colspan="5" style="padding-top: 5px;"></td></tr>
+                <tr><td colspan="6" style="padding-top: 5px;"></td></tr>
                 <tr class="letra12">
+                    <td style="border-top: 1px solid black;"></td>
                     <td style="border-top: 1px solid black;"></td>
                     <td style="border-top: 1px solid black;"></td>
                     <td class="foot-diario centrar">TOTAL</td>

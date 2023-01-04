@@ -91,7 +91,6 @@ class permisoController extends Controller
             $permiso->permiso_icono = $request->get('idIcono');
             $permiso->permiso_orden = $request->get('idOrden');
             $permiso->permiso_estado = 1;
-            $permiso->empresa_id = Auth::user()->empresa_id;
             $permiso->grupo_id  = $request->get('idGrupo');
             $permiso->tipo_id  = $tipo->tipo_id;
             $permiso->save();

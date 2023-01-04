@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Activo_Fijo;
+use App\Http\Controllers\Controller;
 use App\Models\Anticipo_Proveedor;
 use App\Models\Arqueo_Caja;
 use App\Models\Bodega;
@@ -23,7 +23,6 @@ use App\Models\Firma_Electronica;
 use App\Models\Grupo_Activo;
 use App\Models\Movimiento_Caja;
 use App\Models\Movimiento_Producto;
-use App\Models\Orden_Recepcion;
 use App\Models\Pago_CXP;
 use App\Models\Parametrizacion_Contable;
 use App\Models\Producto;
@@ -44,7 +43,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class transaccionCompraController extends Controller
+class transaccionCompraCuentaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -53,7 +52,18 @@ class transaccionCompraController extends Controller
      */
     public function index()
     {
-        return redirect('/denegado');
+        try{
+            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
+            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            $compas=null; 
+            $sucursal= Transaccion_Compra::SucursalDistinsc()->select('sucursal.sucursal_id','sucursal_nombre')->distinct()->get();  
+            $proveedores= Transaccion_Compra::ProveedorDistinsc()->select('proveedor.proveedor_id','proveedor_nombre')->distinct()->get();  
+            return view('admin.compras.transaccionCompraC.index',['proveedores'=>$proveedores,'sucursales'=>$sucursal,'compas'=>$compas, 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+        }
+        catch(\Exception $ex){      
+            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
     }
 
     /**
@@ -63,15 +73,65 @@ class transaccionCompraController extends Controller
      */
     public function create()
     {
-        return redirect('/denegado');
+        //
     }
-
+    public function nuevo($id){
+        try{
+            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
+            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();        
+            $rangoDocumento=Rango_Documento::PuntoRango($id,'Comprobante de Retención')->first();
+            $cajaAbierta=Arqueo_Caja::arqueoCajaxuser(Auth::user()->user_id)->first();
+            $secuencial=1;   
+            $cosechas=null;
+            $empresa=Empresa::findOrFail(Auth::user()->empresa_id);
+            $cuentas=Cuenta::CuentasMovimiento()->get();
+            if(Schema::hasTable('camaronera')){
+                $cosechas=Siembra::SiembrasActiva()->get();
+            }
+            if($rangoDocumento){
+                $secuencial=$rangoDocumento->rango_inicio;
+                $secuencialAux=Retencion_Compra::secuencial($rangoDocumento->rango_id)->max('retencion_secuencial');
+                if($secuencialAux){$secuencial=$secuencialAux+1;}
+                $firmaElectronica = Firma_Electronica::firma()->first();
+                $pubKey =Crypt::decryptString($firmaElectronica->firma_pubKey);
+                $data=openssl_x509_parse($pubKey,true);
+                $general = new generalController();
+                if($general->documentos()){
+                    return view('admin.compras.transaccionCompraC.nuevo',['empresa'=>$empresa,'cuentas'=>$cuentas,'cosechas'=>$cosechas,'caduca'=>$data['validTo_time_t'],'cajaAbierta'=>$cajaAbierta,'rangoDocumento'=>$rangoDocumento,'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'centros'=>Centro_Consumo::CentroConsumosNivel()->get(),'bodegas'=>Bodega::bodegasSucursal($id)->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'proveedores'=>Proveedor::proveedores()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
+                }
+                return view('admin.compras.transaccionCompraC.nuevo',['empresa'=>$empresa,'cuentas'=>$cuentas,'cosechas'=>$cosechas,'caduca'=>$data['validTo_time_t'],'cajaAbierta'=>$cajaAbierta,'rangoDocumento'=>$rangoDocumento,'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'centros'=>Centro_Consumo::CentroConsumosNivel()->get(),'bodegas'=>Bodega::bodegasSucursal($id)->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'proveedores'=>Proveedor::proveedores()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+            }else{
+                return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir retenciones, configueros y vuelva a intentar');
+            }
+        }
+        catch(\Exception $ex){      
+            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
+    }
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    public function buscar(Request $request)
+    {
+        try{
+            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
+            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            $sucursal= Transaccion_Compra::SucursalDistinsc()->select('sucursal.sucursal_id','sucursal_nombre')->distinct()->get();  
+            $proveedores= Transaccion_Compra::ProveedorDistinsc()->select('proveedor.proveedor_id','proveedor_nombre')->distinct()->get();  
+            $compras=Transaccion_Compra::TransaccionFiltrar($request->get('fecha_todo'),$request->get('fecha_desde'), $request->get('fecha_hasta'), $request->get('descripcion'), $request->get('sucursal'),$request->get('idproveedor'))->distinct()->orderBy('transaccion_fecha','asc')->get();
+            
+            return view('admin.compras.transaccionCompraC.index',['idproveedor'=>$request->get('idproveedor'),'idsucursal'=>$request->get('sucursal'),'fecha_todo'=>$request->get('fecha_todo'),'fecha_desde'=>$request->get('fecha_desde'),'fecha_hasta'=>$request->get('fecha_hasta'),'descripcion'=>$request->get('descripcion'),'proveedores'=>$proveedores,'sucursales'=>$sucursal,'compras'=>$compras, 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+        }
+        catch(\Exception $ex){      
+            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
+    }
+
     public function store(Request $request)
     {
         try{            
@@ -83,6 +143,7 @@ class transaccionCompraController extends Controller
             $valorCXP= $request->get('idTotal')-$request->get('id_total_fuente')-$request->get('id_total_iva');
             /********************detalle de la compra ********************/
             $cantidad = $request->get('Dcantidad');
+            $dide = $request->get('Dide');
             $isProducto = $request->get('DprodcutoID');
             $nombre = $request->get('Dnombre');
             $iva = $request->get('DViva');
@@ -92,6 +153,7 @@ class transaccionCompraController extends Controller
             $bodega = $request->get('Dbodega');
             $cconsumo = $request->get('Dcconsumo');
             $descripcion = $request->get('Ddescripcion');
+            $bienServ = $request->get('DbienServ');
             /****************************************************************/
             /***********************detalle de la retencion **********************/
             $baseF = $request->get('DbaseRF');
@@ -592,17 +654,24 @@ class transaccionCompraController extends Controller
             /********************detalle de transaccion de compra********************/
             for ($i = 1; $i < count($cantidad); ++$i){
                 $detalleTC = new Detalle_TC();
+                if($dide[$i]=='P'){
+                    $detalleTC->producto_id = $isProducto[$i];
+                }
+                else{
+                    $detalleTC->cuenta_id = $isProducto[$i];
+                }
                 $detalleTC->detalle_cantidad = $cantidad[$i];
                 $detalleTC->detalle_precio_unitario =$pu[$i];
                 $detalleTC->detalle_descuento = $descuento[$i];
                 $detalleTC->detalle_iva = $iva[$i];
                 $detalleTC->detalle_total = $total[$i];
                 $detalleTC->detalle_descripcion = $descripcion[$i];
+                $detalleTC->detalle_tipo = $bienServ[$i];
                 $detalleTC->detalle_estado = '1';
-                $detalleTC->producto_id = $isProducto[$i];
+                
                 $detalleTC->bodega_id = $bodega[$i];
                 $detalleTC->centro_consumo_id = $cconsumo[$i];
-                
+                if($dide[$i]=='P'){
                     /******************registro de movimiento de producto******************/
                     $movimientoProducto = new Movimiento_Producto();
                     $movimientoProducto->movimiento_fecha=$request->get('transaccion_inventario');
@@ -648,7 +717,8 @@ class transaccionCompraController extends Controller
                     $detalleDiario->detalle_numero_documento = $diario->diario_numero_documento;
                     $detalleDiario->detalle_conciliacion = '0';
                     $detalleDiario->detalle_estado = '1';
-                  
+                    $detalleDiario->centro_consumo_id = $cconsumo[$i];
+
                     $detalleDiario->movimientoProducto()->associate($movimientoProducto); 
                     if($producto->producto_compra_venta == '3'){
                         $parametrizacionContable  = Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'INVENTARIO')->first();
@@ -670,10 +740,33 @@ class transaccionCompraController extends Controller
                     $diario->detalles()->save($detalleDiario);
                     $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta_id.' por un valor de -> '.$total[$i]);
                     /**********************************************************************/
-                
-               
+                }
+                else{
+                    $detalleDiario = new Detalle_Diario();
+                    if($tipoComprobante->tipo_comprobante_codigo <> '04'){
+                        $detalleDiario->detalle_debe = $total[$i];
+                        $detalleDiario->detalle_haber = 0.00;
+                    }else{
+                        $detalleDiario->detalle_debe = 0.00;
+                        $detalleDiario->detalle_haber = $total[$i];
+                    }
+                    $detalleDiario->detalle_comentario = 'P/R '.$descripcion[$i];
+                    $detalleDiario->detalle_tipo_documento = strtoupper($tipoComprobante->tipo_comprobante_nombre);
+                    $detalleDiario->detalle_numero_documento = $diario->diario_numero_documento;
+                    $detalleDiario->detalle_conciliacion = '0';
+                    $detalleDiario->detalle_estado = '1';
+                    $detalleDiario->centro_consumo_id = $cconsumo[$i];
+        
+                    $detalleDiario->cuenta_id = $isProducto[$i];
+                    
+                    
+                    $diario->detalles()->save($detalleDiario);
+                    $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta_id.' por un valor de -> '.$total[$i]);
+                    /**********************************************************************/
+                }
+                if($dide[$i]=='P'){
                     $detalleTC->movimiento()->associate($movimientoProducto);
-                
+                }
                 $transaccion->detalles()->save($detalleTC);
                 $general->registrarAuditoria('Registro de detalle de '. strtoupper($tipoComprobante->tipo_comprobante_nombre) .' de compra numero -> '.$request->get('factura_serie').$request->get('factura_numero'),$request->get('factura_serie').$request->get('factura_numero'),'Registro de detalle de '. strtoupper($tipoComprobante->tipo_comprobante_nombre) .' numero -> '.$request->get('factura_serie').$request->get('factura_numero').' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' a un precio unitario de -> '.$pu[$i]);
             }
@@ -902,17 +995,18 @@ class transaccionCompraController extends Controller
             }
             DB::commit();
             if($tipoComprobante->tipo_comprobante_codigo == '04'){
-                return redirect('/transaccionCompra/new/'.$request->get('punto_id'))->with('success','Transaccion registrada exitosamente')->with('diario',$url);
+                return redirect('/transaccionCompraC/new/'.$request->get('punto_id'))->with('success','Transaccion registrada exitosamente')->with('diario',$url);
             }else if($retencion->retencion_xml_estado == 'AUTORIZADO' and $tipoComprobante->tipo_comprobante_codigo <> '04'){
-                return redirect('/transaccionCompra/new/'.$request->get('punto_id'))->with('success','Transaccion registrada y autorizada exitosamente')->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $retencion->retencion_fecha)->format('d-m-Y').'/'.$retencion->retencion_xml_nombre.'.pdf')->with('diario',$url);
+                return redirect('/transaccionCompraC/new/'.$request->get('punto_id'))->with('success','Transaccion registrada y autorizada exitosamente')->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $retencion->retencion_fecha)->format('d-m-Y').'/'.$retencion->retencion_xml_nombre.'.pdf')->with('diario',$url);
             }else{
-                return redirect('/transaccionCompra/new/'.$request->get('punto_id'))->with('success','Transaccion registrada exitosamente')->with('error2','ERROR SRI--> '.$retencionAux->retencion_xml_estado.' : '.$retencionAux->retencion_xml_mensaje)->with('diario',$url);
+                return redirect('/transaccionCompraC/new/'.$request->get('punto_id'))->with('success','Transaccion registrada exitosamente')->with('error2','ERROR SRI--> '.$retencionAux->retencion_xml_estado.' : '.$retencionAux->retencion_xml_mensaje)->with('diario',$url);
             }
         }catch(\Exception $ex){
             DB::rollBack();
-            return redirect('/transaccionCompra/new/'.$request->get('punto_id'))->with('error2','Oucrrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+            return redirect('/transaccionCompraC/new/'.$request->get('punto_id'))->with('error2','Oucrrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
+
 
     /**
      * Display the specified resource.
@@ -922,7 +1016,7 @@ class transaccionCompraController extends Controller
      */
     public function show($id)
     {
-        return redirect('/denegado');
+        //
     }
 
     /**
@@ -933,9 +1027,26 @@ class transaccionCompraController extends Controller
      */
     public function edit($id)
     {
-        return redirect('/denegado');
+        //
     }
-
+    public function editar($id)
+    {
+        try{
+            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
+            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            $compras=Transaccion_Compra::TransaccionID($id)->get()->first(); 
+            if(isset($compras->activo)){
+                return view('admin.compras.transaccionCompraC.editactivo',['activos'=>Grupo_Activo::GrupoxSucursal($compras->sucursal_id)->get(),'conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'bodegas'=>Bodega::SucursalBodega($compras->sucursal_id)->get(),'cuentas'=>Cuenta::CuentasMovimiento()->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'compras'=>$compras, 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+            }else{
+                return view('admin.compras.transaccionCompraC.edit',['conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'bodegas'=>Bodega::SucursalBodega($compras->sucursal_id)->get(),'cuentas'=>Cuenta::CuentasMovimiento()->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'compras'=>$compras, 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+            }  
+            
+        }
+        catch(\Exception $ex){      
+            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
+    }
     /**
      * Update the specified resource in storage.
      *
@@ -945,8 +1056,8 @@ class transaccionCompraController extends Controller
      */
     public function update(Request $request, $id)
     {
-      try{            
-            DB::beginTransaction();
+     
+       
             $transaccion=Transaccion_Compra::findOrFail($id);
             $numero=$request->get('transaccion_serie').substr(str_repeat(0, 9).$request->get('transaccion_secuencial'), - 9);
             $numeroante=$transaccion->transaccion_serie.substr(str_repeat(0, 9). $transaccion->transaccion_numero , - 9);
@@ -958,7 +1069,7 @@ class transaccionCompraController extends Controller
             }
             $general = new generalController();
             if($general->documentos()){
-                return redirect('listatransaccionCompra')->with('error2','No puede generar documentos electronicos contrate un plan');
+                return redirect('listatransaccionCompraC')->with('error2','No puede generar documentos electronicos contrate un plan');
             }
             $tipoComprobante = Tipo_Comprobante::tipo($request->get('tipo_comprobante_id'))->first();
 
@@ -972,7 +1083,7 @@ class transaccionCompraController extends Controller
             $porcentajeI = $request->get('DporcentajeRI');
             $valorI = $request->get('DvalorRI');
             $docElectronico = new facturacionElectronicaController();
-
+            $bienServ = $request->get('DbienServ');
            
             $banderaOrdenRecepcion =  true;
             foreach($transaccion->ordenrecepcion as $ordenRecepcion){
@@ -981,11 +1092,11 @@ class transaccionCompraController extends Controller
             $general = new generalController();
             $cierre = $general->cierre($transaccion->transaccion_fecha,$transaccion->diario->sucursal_id);          
             if($cierre){
-                return redirect('listatransaccionCompra')->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
+                return redirect('listatransaccionCompraC')->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
             }
             $cierre = $general->cierre($transaccion->transaccion_inventario,$transaccion->diario->sucursal_id);          
             if($cierre){
-                return redirect('listatransaccionCompra')->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
+                return redirect('listatransaccionCompraC')->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
             }
             $tipoComprobante = Tipo_Comprobante::tipo($transaccion->tipo_comprobante_id)->first();
             $general = new generalController();
@@ -1064,13 +1175,21 @@ class transaccionCompraController extends Controller
                     $aux = $detalles->movimiento;
                     $detalles->movimiento->delete();
                     $general = new generalController();
-                    $general->registrarAuditoria('Eliminacion de Movimiento de producto por Transaccion compra: -> '.$transaccion->transaccion_numero, $id, 'Con Producto '.$detalles->producto->producto_nombre.' Con la cantidad de producto de '.$aux->movimiemovimiento_totalnto_cantidad.' y total '.$aux->movimiento_total);
+                    if(isset($detalles->producto)){
+                        $general->registrarAuditoria('Eliminacion de Movimiento de producto por Transaccion compra: -> '.$transaccion->transaccion_numero, $id, 'Con Producto '.$detalles->producto->producto_nombre.' Con la cantidad de producto de '.$aux->movimiemovimiento_totalnto_cantidad.' y total '.$aux->movimiento_total);
+                    }
                 }
             
                 $aux = $detalles;
                 $detalles->delete();
                 $general = new generalController();
-                $general->registrarAuditoria('Eliminacion de detalles de producto por Transaccion compra: -> '.$transaccion->transaccion_numero, $id, 'Con Producto '.$aux->producto->producto_nombre.' Con la cantidad de producto de '.$aux->detalle_cantidad.' y total '.$aux->detalle_total);
+                if(isset($aux->producto)){
+                    $general->registrarAuditoria('Eliminacion de detalles de producto por Transaccion compra: -> '.$transaccion->transaccion_numero, $id, 'Con Producto '.$aux->producto->producto_nombre.' Con la cantidad de producto de '.$aux->detalle_cantidad.' y total '.$aux->detalle_total);
+       
+                }else{
+                    $general->registrarAuditoria('Eliminacion de detalles de producto por Transaccion compra: -> '.$transaccion->transaccion_numero, $id, 'Con la cantidad de producto de '.$aux->detalle_cantidad.' y total '.$aux->detalle_total);
+       
+                }
             }
             $ntransaccion=Transaccion_Compra::findOrFail($transaccion->transaccion_id);
             
@@ -1122,6 +1241,7 @@ class transaccionCompraController extends Controller
             /********************detalle de la compra ********************/
             $cantidad = $request->get('Dcantidad');
             $isProducto = $request->get('DprodcutoID');
+            $dide = $request->get('Dide');
             $nombre = $request->get('Dnombre');
             $iva = $request->get('DViva');
             $pu = $request->get('Dpu');
@@ -1561,6 +1681,12 @@ class transaccionCompraController extends Controller
             for ($i = 1; $i < count($cantidad); ++$i){
 
                 $detalleTC = new Detalle_TC();
+                if($dide[$i]=='P'){
+                    $detalleTC->producto_id = $isProducto[$i];
+                }
+                
+                $detalleTC->detalle_tipo = $bienServ[$i];
+
                 $detalleTC->detalle_cantidad = $cantidad[$i];
                 $detalleTC->detalle_precio_unitario =$pu[$i];
                 $detalleTC->detalle_descuento = $descuento[$i];
@@ -1568,88 +1694,109 @@ class transaccionCompraController extends Controller
                 $detalleTC->detalle_total = $total[$i];
                 $detalleTC->detalle_descripcion = $descripcion[$i];
                 $detalleTC->detalle_estado = '1';
-                $detalleTC->producto_id = $isProducto[$i];
                 $detalleTC->bodega_id = $bodega[$i];
                 $detalleTC->centro_consumo_id = $cconsumo[$i];
-                if($banderaOrdenRecepcion){
-                    
-                    /******************registro de movimiento de producto******************/
-                    $movimientoProducto = new Movimiento_Producto();
-                    $movimientoProducto->movimiento_fecha=$request->get('transaccion_inventario');
-                    $movimientoProducto->movimiento_cantidad=$cantidad[$i];
-                    
-                    $movimientoProducto->movimiento_precio=$pu[$i];
-                    $movimientoProducto->movimiento_iva=$iva[$i];
-                    $movimientoProducto->movimiento_total=$total[$i];
-                    $movimientoProducto->movimiento_stock_actual=0;
-                    $movimientoProducto->movimiento_costo_promedio=0;
-                    $movimientoProducto->movimiento_documento=strtoupper($tipoComprobante->tipo_comprobante_nombre);
-                    $movimientoProducto->movimiento_motivo='COMPRA';
-                    if($tipoComprobante->tipo_comprobante_codigo <> '04'){
-                        $movimientoProducto->movimiento_tipo='ENTRADA';
-                    }else{
-                        $movimientoProducto->movimiento_tipo='SALIDA';
-                    }
-                    $movimientoProducto->movimiento_descripcion=strtoupper($tipoComprobante->tipo_comprobante_nombre).' No. '.$transaccion->transaccion_numero.' POR '.$request->get('transaccion_descripcion');
-                    $movimientoProducto->movimiento_estado='1';
-                    $movimientoProducto->producto_id=$isProducto[$i];
-                    $movimientoProducto->bodega_id=$detalleTC->bodega_id;
-                    $movimientoProducto->centro_consumo_id=$detalleTC->centro_consumo_id;
-                    $movimientoProducto->empresa_id=Auth::user()->empresa_id;
+                if($dide[$i]=='P'){
+                    if($banderaOrdenRecepcion){                   
+                        /******************registro de movimiento de producto******************/
+                        $movimientoProducto = new Movimiento_Producto();
+                        $movimientoProducto->movimiento_fecha=$request->get('transaccion_inventario');
+                        $movimientoProducto->movimiento_cantidad=$cantidad[$i];
+                        
+                        $movimientoProducto->movimiento_precio=$pu[$i];
+                        $movimientoProducto->movimiento_iva=$iva[$i];
+                        $movimientoProducto->movimiento_total=$total[$i];
+                        $movimientoProducto->movimiento_stock_actual=0;
+                        $movimientoProducto->movimiento_costo_promedio=0;
+                        $movimientoProducto->movimiento_documento=strtoupper($tipoComprobante->tipo_comprobante_nombre);
+                        $movimientoProducto->movimiento_motivo='COMPRA';
+                        if($tipoComprobante->tipo_comprobante_codigo <> '04'){
+                            $movimientoProducto->movimiento_tipo='ENTRADA';
+                        }else{
+                            $movimientoProducto->movimiento_tipo='SALIDA';
+                        }
+                        $movimientoProducto->movimiento_descripcion=strtoupper($tipoComprobante->tipo_comprobante_nombre).' No. '.$transaccion->transaccion_numero.' POR '.$request->get('transaccion_descripcion');
+                        $movimientoProducto->movimiento_estado='1';
 
-                    $movimientoProducto->save();
-                    $general->registrarAuditoria('Registro de movimiento de producto por '. strtoupper($tipoComprobante->tipo_comprobante_nombre) .' de compra numero -> '.$transaccion->transaccion_numero,$transaccion->transaccion_numero,'Registro de movimiento de producto por '. strtoupper($tipoComprobante->tipo_comprobante_nombre) .' de compra numero -> '.$transaccion->transaccion_numero.' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' con un stock actual de -> '.$movimientoProducto->movimiento_stock_actual);
-                   
+                        $movimientoProducto->producto_id=$isProducto[$i];
+
+                        $movimientoProducto->bodega_id=$detalleTC->bodega_id;
+                        $movimientoProducto->centro_consumo_id=$detalleTC->centro_consumo_id;
+                        $movimientoProducto->empresa_id=Auth::user()->empresa_id;
+
+                        $movimientoProducto->save();
+                        $general->registrarAuditoria('Registro de movimiento de producto por '. strtoupper($tipoComprobante->tipo_comprobante_nombre) .' de compra numero -> '.$transaccion->transaccion_numero,$transaccion->transaccion_numero,'Registro de movimiento de producto por '. strtoupper($tipoComprobante->tipo_comprobante_nombre) .' de compra numero -> '.$transaccion->transaccion_numero.' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' con un stock actual de -> '.$movimientoProducto->movimiento_stock_actual);
+                    
+                    }
+                
+                    /********************detalle de diario de compra********************/
+                    $producto = Producto::findOrFail($isProducto[$i]);
+                    $detalleDiario = new Detalle_Diario();
+                    if($tipoComprobante->tipo_comprobante_codigo <> '04'){
+                        $detalleDiario->detalle_debe = $total[$i];
+                        $detalleDiario->detalle_haber = 0.00;
+                    }else{
+                        $detalleDiario->detalle_debe = 0.00;
+                        $detalleDiario->detalle_haber = $total[$i];
+                    }
+                    $detalleDiario->detalle_comentario = 'P/R '.$descripcion[$i];
+                    $detalleDiario->detalle_tipo_documento = strtoupper($tipoComprobante->tipo_comprobante_nombre);
+                    $detalleDiario->detalle_numero_documento = $diario->diario_numero_documento;
+                    $detalleDiario->detalle_conciliacion = '0';
+                    $detalleDiario->detalle_estado = '1';
+                    $detalleDiario->centro_consumo_id = $cconsumo[$i];        
+                    if($banderaOrdenRecepcion){
+                        $detalleDiario->movimientoProducto()->associate($movimientoProducto);
+                        if($producto->producto_compra_venta == '3'){
+                            $parametrizacionContable  = Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'INVENTARIO')->first();
+                            if($parametrizacionContable->parametrizacion_cuenta_general=='1'){
+                                $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
+                            }else{
+                                
+                                $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;
+                            }
+                        }else{
+                            $parametrizacionContable  = Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'COSTOS DE MERCADERIA')->first();
+                            if($parametrizacionContable->parametrizacion_cuenta_general=='1'){
+                                $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
+                            }else{
+                                
+                                $detalleDiario->cuenta_id = $producto->producto_cuenta_gasto;
+                            }
+                        }       
+                    }else{
+                        $parametrizacionContable=Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'MERCADERIA POR RECEPTAR')->first();
+                        $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
+                    }
+                    $diario->detalles()->save($detalleDiario);
+                    $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta_id.' por un valor de -> '.$total[$i]);
+                    /**********************************************************************/
+                    if($banderaOrdenRecepcion){
+                            $detalleTC->movimiento()->associate($movimientoProducto);
+                        
+                    }
+                }
+                else{
+                    $detalleDiario = new Detalle_Diario();
+                    if($tipoComprobante->tipo_comprobante_codigo <> '04'){
+                        $detalleDiario->detalle_debe = $total[$i];
+                        $detalleDiario->detalle_haber = 0.00;
+                    }else{
+                        $detalleDiario->detalle_debe = 0.00;
+                        $detalleDiario->detalle_haber = $total[$i];
+                    }
+                    $detalleDiario->detalle_comentario = 'P/R '.$descripcion[$i];
+                    $detalleDiario->detalle_tipo_documento = strtoupper($tipoComprobante->tipo_comprobante_nombre);
+                    $detalleDiario->detalle_numero_documento = $diario->diario_numero_documento;
+                    $detalleDiario->detalle_conciliacion = '0';
+                    $detalleDiario->detalle_estado = '1';
+                    $detalleDiario->centro_consumo_id = $cconsumo[$i];        
+                    $detalleDiario->cuenta_id = $isProducto[$i];
+                    $diario->detalles()->save($detalleDiario);
+                    $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta_id.' por un valor de -> '.$total[$i]);
+                    
                 }
                 
-                /********************detalle de diario de compra********************/
-                $producto = Producto::findOrFail($isProducto[$i]);
-                $detalleDiario = new Detalle_Diario();
-                if($tipoComprobante->tipo_comprobante_codigo <> '04'){
-                    $detalleDiario->detalle_debe = $total[$i];
-                    $detalleDiario->detalle_haber = 0.00;
-                }else{
-                    $detalleDiario->detalle_debe = 0.00;
-                    $detalleDiario->detalle_haber = $total[$i];
-                }
-                $detalleDiario->detalle_comentario = 'P/R '.$descripcion[$i];
-                $detalleDiario->detalle_tipo_documento = strtoupper($tipoComprobante->tipo_comprobante_nombre);
-                $detalleDiario->detalle_numero_documento = $diario->diario_numero_documento;
-                $detalleDiario->detalle_conciliacion = '0';
-                $detalleDiario->detalle_estado = '1';
-                if($banderaOrdenRecepcion){
-                    $detalleDiario->movimientoProducto()->associate($movimientoProducto);
-                    if($producto->producto_compra_venta == '3'){
-                        $parametrizacionContable  = Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'INVENTARIO')->first();
-                        if($parametrizacionContable->parametrizacion_cuenta_general=='1'){
-                            $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
-                        }else{
-                            
-                            $detalleDiario->cuenta_id = $producto->producto_cuenta_inventario;
-                        }
-                    }else{
-                        $parametrizacionContable  = Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'COSTOS DE MERCADERIA')->first();
-                        if($parametrizacionContable->parametrizacion_cuenta_general=='1'){
-                            $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
-                        }else{
-                            
-                            $detalleDiario->cuenta_id = $producto->producto_cuenta_gasto;
-                        }
-                    }       
-                }else{
-                    $parametrizacionContable=Parametrizacion_Contable::ParametrizacionByNombre($diario->sucursal_id, 'MERCADERIA POR RECEPTAR')->first();
-                    $detalleDiario->cuenta_id = $parametrizacionContable->cuenta_id;
-                }
-               
-                $diario->detalles()->save($detalleDiario);
-                $general->registrarAuditoria('Registro de detalle de diario con codigo -> '.$diario->diario_codigo,$transaccion->transaccion_numero,'Registro de detalle de diario con codigo -> '.$diario->diario_codigo.' con cuenta contable -> '.$detalleDiario->cuenta_id.' por un valor de -> '.$total[$i]);
-                /**********************************************************************/
-                if($banderaOrdenRecepcion){
-                   
-                   
-                        $detalleTC->movimiento()->associate($movimientoProducto);
-                    
-                }
                 $transaccion->detalles()->save($detalleTC);
                 $general->registrarAuditoria('Registro de detalle de '. strtoupper($tipoComprobante->tipo_comprobante_nombre) .' de compra numero -> '.$request->get('factura_serie').$request->get('factura_numero'),$request->get('factura_serie').$request->get('factura_numero'),'Registro de detalle de '. strtoupper($tipoComprobante->tipo_comprobante_nombre) .' numero -> '.$request->get('factura_serie').$request->get('factura_numero').' producto de nombre -> '.$nombre[$i].' con la cantidad de -> '.$cantidad[$i].' a un precio unitario de -> '.$pu[$i]);
             }
@@ -1865,28 +2012,13 @@ class transaccionCompraController extends Controller
                 }
                 /******************************************************************/
             }
-            $url ="";
-            if (Auth::user()->empresa->empresa_contabilidad == '1') {
-                $url = $general->pdfDiario($diario);
-            }
-            DB::commit();
-            if ($request->get('editret')=="on") {
-                if($tipoComprobante->tipo_comprobante_codigo == '04'){
-                    return redirect('listatransaccionCompra')->with('success','Transaccion registrada exitosamente')->with('diario',$url);
-                }else if($retencion->retencion_xml_estado == 'AUTORIZADO' and $tipoComprobante->tipo_comprobante_codigo <> '04'){
-                    return redirect('listatransaccionCompra')->with('success','Transaccion registrada y autorizada exitosamente')->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $retencion->retencion_fecha)->format('d-m-Y').'/'.$retencion->retencion_xml_nombre.'.pdf')->with('diario',$url);
-                }else{
-                    return redirect('listatransaccionCompra')->with('success','Transaccion registrada exitosamente')->with('error2','ERROR SRI--> '.$retencionAux->retencion_xml_estado.' : '.$retencionAux->retencion_xml_mensaje)->with('diario',$url);
-                }
-            }
-            else{
-                return redirect('listatransaccionCompra')->with('success', 'Transaccion registrada exitosamente')->with('diario',$url);
-            }
+            
+               
+                
+                return redirect('listatransaccionCompraC')->with('success', 'Transaccion registrada exitosamente');
+            
 
-        }catch(\Exception $ex){
-            DB::rollBack();
-            return redirect('listatransaccionCompra')->with('error2','Oucrrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        }
+      
          
        
     }
@@ -1899,308 +2031,6 @@ class transaccionCompraController extends Controller
      */
     public function destroy($id)
     {
-        try{
-            DB::beginTransaction();
-            $jo=false;
-            $transaccion=Transaccion_Compra::findOrFail($id); 
-            $general = new generalController();
-            $cierre = $general->cierre($transaccion->transaccion_fecha,$transaccion->diario->sucursal_id);          
-            if($cierre){
-                return redirect('listatransaccionCompra')->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
-            }
-            $cierre = $general->cierre($transaccion->transaccion_inventario,$transaccion->diario->sucursal_id);          
-            if($cierre){
-                return redirect('listatransaccionCompra')->with('error2','No puede realizar la operacion por que pertenece a un mes bloqueado');
-            } 
-            $tipoComprobante = Tipo_Comprobante::tipo($transaccion->tipo_comprobante_id)->first();
-            $general = new generalController();
-            if(isset($transaccion->activo)){
-                $activo=Activo_Fijo::findOrFail($transaccion->activo->activo_id);
-                $activo->delete();
-                $general->registrarAuditoria('Eliminacion de Activo Fijo -> '.$activo->activo_descripcion,'0','');
-            }
-            if($tipoComprobante->tipo_comprobante_codigo == '04'){
-                if($transaccion->transaccion_tipo_pago <> 'EN EFECTIVO'){
-                    $jo = true;
-                }
-                if(isset($transaccion->diario->anticipoproveedor)){
-                    $anticipo=Anticipo_Proveedor::findOrFail($transaccion->diario->anticipoproveedor->anticipo_id);
-                    $anticipo->delete();
-                    $general->registrarAuditoria('Eliminacion de Anticipo de Proveedor con valor-> '.$transaccion->diario->anticipoproveedor->anticipo_valor,'0','Con motivo: Nota de Crédito');
-                }
-                if (isset($transaccion->diario->pagocuentapagar->detalles)) {
-                    foreach ($transaccion->diario->pagocuentapagar->detalles as $pagos) {
-                        $detalle=Detalle_Pago_CXP::findOrFail($pagos->detalle_pago_id);
-                        $detalle->delete();
-                        $general->registrarAuditoria('Eliminacion del detalle de la cuenta por pagar  -> '.$transaccion->transaccion_numero, $transaccion->transaccion_numero, 'Registro de cuenta por pagar de factura -> '.$transaccion->transaccion_numero.' con proveedor -> '.$transaccion->proveedor->proveedor_nombre.' con un total de -> '.$transaccion->transaccion_total);
-                    }
-                    $cxcobrar=Pago_CXP::findOrFail($transaccion->diario->pagocuentapagar->pago_id);
-                    $cxcobrar->delete();
-                    $general->registrarAuditoria('Eliminacion de cuenta por pagar  -> '.$transaccion->transaccion_numero, $transaccion->transaccion_numero, 'Registro de cuenta por pagar de factura -> '.$transaccion->transaccion_numero.' con proveedor -> '.$transaccion->proveedor->proveedor_nombre.' con un total de -> '.$transaccion->transaccion_total);
-                
-                
-                    $cxpAux=Cuenta_Pagar::findOrFail($transaccion->facturaModificar->cuenta_id);
-                    $cxpAux->cuenta_saldo = $cxpAux->cuenta_monto-round(Cuenta_Pagar::CuentaPagarPagos($cxpAux->cuenta_id)->sum('detalle_pago_valor'),2);
-                    if($cxpAux->cuenta_saldo == 0){
-                        $cxpAux->cuenta_estado = '2';
-                    }else{
-                        $cxpAux->cuenta_estado = '1';
-                    }
-                    $cxpAux->update();
-                }     
-                
-            }  
-            if($tipoComprobante->tipo_comprobante_codigo <> '04'){ 
-                if($transaccion->transaccion_tipo_pago=='EN EFECTIVO'){
-                    if(isset($transaccion->diario->pagocuentapagar)){
-                        $pago = $transaccion->diario->pagocuentapagar;
-                        $cajaAbierta=Arqueo_Caja::ArqueoCajaxid($pago->arqueo_id)->first();
-                        if(isset($cajaAbierta->arqueo_id)){
-                            $movimientoCaja = Movimiento_Caja::MovimientoCajaxarqueo($pago->arqueo_id, $pago->diario_id)->first();
-                            $movimientoCaja->delete();
-                            $jo=true;
-                        }else{                            
-                            $cajaAbierta=Arqueo_Caja::arqueoCajaxuser(Auth::user()->user_id)->first();
-                            if ($cajaAbierta){
-                                /**********************movimiento caja****************************/
-                                $movimientoCaja = new Movimiento_Caja();          
-                                $movimientoCaja->movimiento_fecha=date("Y")."-".date("m")."-".date("d");
-                                $movimientoCaja->movimiento_hora=date("H:i:s");
-                                $movimientoCaja->movimiento_tipo="ENTRADA";
-                                $movimientoCaja->movimiento_descripcion= 'P/R ELIMINACION DE FACTURA DE COMPRA EN EFECTIVO :'.$pago->pago_descripcion;
-                                $movimientoCaja->movimiento_valor= $pago->pago_valor;
-                                $movimientoCaja->movimiento_documento="P/R ELIMINACION DE PAGO EN EFECTIVO";
-                                $movimientoCaja->movimiento_numero_documento= 0;
-                                $movimientoCaja->movimiento_estado = 1;
-                                $movimientoCaja->arqueo_id = $cajaAbierta->arqueo_id;                                
-                                $movimientoCaja->save();
-                                
-                                $movimientoAnterior = Movimiento_Caja::MovimientoCajaxarqueo($pago->arqueo_id,$pago->diario_id)->first();
-                                $movimientoAnterior->diario_id = null;
-                                $movimientoAnterior->update();
-
-                                $jo=true;
-                            /*********************************************************************/                               
-                            }else{
-                                $noTienecaja = 'Lo valores en Efectivo no pudieron ser eliminados, porque no dispone de CAJA ABIERTA';                               
-                            }
-                        }
-                        if($jo){
-                            foreach ($transaccion->diario->pagocuentapagar->detalles as $pagos) {
-                                $detalle=Detalle_Pago_CXP::findOrFail($pagos->detalle_pago_id);
-                                $detalle->delete();
-                                $general->registrarAuditoria('Eliminacion del detalle de pago de cuenta por pagar por Transaccion compra:-> '.$transaccion->transaccion_numero,$transaccion->transaccion_numero,'Registro de cuenta por pagar de factura -> '.$transaccion->transaccion_numero.' con proveedor -> '.$transaccion->proveedor->proveedor_nombre.' con un total de -> '.$transaccion->transaccion_total);
-                            
-                            }
-                            
-                            $cxcobrar=Pago_CXP::findOrFail($transaccion->diario->pagocuentapagar->pago_id);
-                            $cxcobrar->delete();
-                            $general->registrarAuditoria('Eliminacion de pago de cuenta por pagar por Transaccion compra:-> '.$transaccion->transaccion_numero,$transaccion->transaccion_numero,'Registro de cuenta por pagar de factura -> '.$transaccion->transaccion_numero.' con proveedor -> '.$transaccion->proveedor->proveedor_nombre.' con un total de -> '.$transaccion->transaccion_total);
-                        }
-                    }
-
-                }else{
-                    $jo=true; 
-                }
-                if($jo){
-                    if(isset($transaccion->cuentaPagar)){
-                        $ntransaccion=Transaccion_Compra::findOrFail($transaccion->transaccion_id);
-                        $ntransaccion->cuenta_id=null;
-                        $ntransaccion->save();
-
-                        $cxpAux=Cuenta_Pagar::findOrFail($transaccion->cuenta_id);
-                        $cxpAux->delete();
-                        $general->registrarAuditoria('Eliminacion de cuenta por pagar por Transaccion compra:-> '.$transaccion->transaccion_numero,$transaccion->transaccion_numero,'Registro de cuenta por pagar de factura -> '.$transaccion->transaccion_numero.' con proveedor -> '.$transaccion->proveedor->proveedor_nombre.' con un total de -> '.$transaccion->transaccion_total);
-                    
-                    } 
-                }
-            }
-            if($jo){
-                foreach ($transaccion->diario->detalles as $detalles) {
-                    $aux=$detalles;
-                    $detalles->delete();
-                
-                    $general->registrarAuditoria('Eliminacion de detalle de diario por Transaccion compra numero: -> '.$transaccion->transaccion_numero, $id, 'Con id de diario-> '.$aux->diario_id.'Comentario -> '.$aux->detalle_comentario);
-                }
-                foreach ($transaccion->detalles as $detalles) {
-                    $detall=Detalle_TC::findOrFail($detalles->detalle_id);
-                    if (isset($detalles->movimiento)) {
-                        $detall->movimiento_id=null;
-                        $detall->save();
-
-                        $aux = $detalles->movimiento;
-                        $detalles->movimiento->delete();
-                        $general = new generalController();
-                        $general->registrarAuditoria('Eliminacion de Movimiento de producto por Transaccion compra: -> '.$transaccion->transaccion_numero, $id, 'Con Producto '.$detalles->producto->producto_nombre.' Con la cantidad de producto de '.$aux->movimiemovimiento_totalnto_cantidad.' y total '.$aux->movimiento_total);
-                    }
-                
-                    $aux = $detalles;
-                    $detalles->delete();
-                    $general = new generalController();
-                    $general->registrarAuditoria('Eliminacion de detalles de producto por Transaccion compra: -> '.$transaccion->transaccion_numero, $id, 'Con Producto '.$aux->producto->producto_nombre.' Con la cantidad de producto de '.$aux->detalle_cantidad.' y total '.$aux->detalle_total);
-                }            
-                if(isset($transaccion->retencionCompra)){
-                    foreach ($transaccion->retencionCompra->detalles as $detalles) {
-                        $aux=$detalles;
-                        $detalles->delete();
-                        $general->registrarAuditoria('Eliminacion de detalle de retencion por Transaccion compra numero: -> '.$transaccion->transaccion_numero, $id, 'Con tipo -> '.$aux->detalle_tipo.' con valor -> '.$aux->detalle_valor);
-                    }
-                    $aux = $transaccion->retencionCompra;
-                    $transaccion->retencionCompra->delete();
-                    $general = new generalController();
-                    $general->registrarAuditoria('Eliminacion de retencion por Transaccion compra: -> '.$transaccion->transaccion_numero, $id, 'Numero '.$aux->retencion_numero);
-                }
-                if(isset($transaccion->ordenrecepcion)){
-                    foreach ($transaccion->ordenrecepcion as $detalles) {
-                        $orden=Orden_Recepcion::findOrFail($detalles->ordenr_id);
-                        $diarioOrden = $orden->diario;
-                        $orden->transaccion_id=null;
-                        $orden->ordenr_estado='1';
-                        $orden->diario_id = null;
-                        $orden->save();
-                        $general->registrarAuditoria('Actualizacion de Orden de recepcion a null numero: -> '.$orden->ordenr_numero, $id, 'por Transaccion compra: -> '.$transaccion->transaccion_numero);
-                        foreach ($diarioOrden->detalles as $detalle) {
-                            $aux=$detalle;
-                            $detalle->delete();
-                        
-                            $general->registrarAuditoria('Eliminacion de detalle de diario de orden de recepcion '.$orden->ordenr_numero.' por eliminacion de Transaccion compra numero: -> '.$transaccion->transaccion_numero, $id, 'Con id de diario-> '.$aux->diario_id.'Comentario -> '.$aux->detalle_comentario);
-                        }
-                        $diarioOrden->delete();
-                    }
-                }
-                $diarioTransaccion = $transaccion->diario;
-                $transaccion->transaccion_id_f = null;
-                $transaccion->save();
-                $aux=$transaccion;
-                $transaccion->delete();
-                $general->registrarAuditoria('Eliminacion de Transaccion compra numero: -> '.$transaccion->transaccion_numero.' con sustento tributario '.Sustento_Tributario::sustento($transaccion->sustento_id)->first()->sustento_codigo, $transaccion->transaccion_numero,'Con Proveedor '.$aux->proveedor->proveedor_nombre.' con un total de -> '.$aux->transaccion_total );
-                $diarioTransaccion->delete();
-                $general->registrarAuditoria('Eliminacion de diario: -> '.$diarioTransaccion->diario_codigo, $diarioTransaccion->diario_codigo,'Con Proveedor '.$aux->proveedor->proveedor_nombre.' con un total de -> '.$aux->transaccion_total );
-            }
-            DB::commit();
-            return redirect('/listatransaccionCompra')->with('success','Transaccion eliminada exitosamente');           
-        }
-        catch(\Exception $ex){
-            DB::rollBack();      
-            return redirect('listatransaccionCompra')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        }
-
-    }
-
-    public function nuevo($id){
-        try{
-            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
-            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();        
-            $rangoDocumento=Rango_Documento::PuntoRango($id,'Comprobante de Retención')->first();
-            $cajaAbierta=Arqueo_Caja::arqueoCajaxuser(Auth::user()->user_id)->first();
-            $secuencial=1;
-            
-           
-            $cosechas=null;
-            $empresa=Empresa::findOrFail(Auth::user()->empresa_id);
-            if(Schema::hasTable('camaronera')){
-                $cosechas=Siembra::SiembrasActiva()->get();
-            }
-            if($rangoDocumento){
-                $secuencial=$rangoDocumento->rango_inicio;
-                $secuencialAux=Retencion_Compra::secuencial($rangoDocumento->rango_id)->max('retencion_secuencial');
-                if($secuencialAux){$secuencial=$secuencialAux+1;}
-                $firmaElectronica = Firma_Electronica::firma()->first();
-                $pubKey =Crypt::decryptString($firmaElectronica->firma_pubKey);
-                $data=openssl_x509_parse($pubKey,true);
-                $general = new generalController();
-                if($general->documentos()){
-                    return view('admin.compras.transaccionCompra.nuevo',['empresa'=>$empresa,'cosechas'=>$cosechas,'caduca'=>$data['validTo_time_t'],'cajaAbierta'=>$cajaAbierta,'rangoDocumento'=>$rangoDocumento,'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'bodegas'=>Bodega::bodegasSucursal($id)->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'proveedores'=>Proveedor::proveedores()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin])->with('error2Msg','No puede generar documentos electronicos contrate un plan');
-                }
-                return view('admin.compras.transaccionCompra.nuevo',['empresa'=>$empresa,'cosechas'=>$cosechas,'caduca'=>$data['validTo_time_t'],'cajaAbierta'=>$cajaAbierta,'rangoDocumento'=>$rangoDocumento,'secuencial'=>substr(str_repeat(0, 9).$secuencial, - 9),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'bodegas'=>Bodega::bodegasSucursal($id)->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'tarifasIva'=>Tarifa_Iva::TarifaIvas()->get(),'proveedores'=>Proveedor::proveedores()->get(),'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
-            }else{
-                return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir retenciones, configueros y vuelva a intentar');
-            }
-        }
-        catch(\Exception $ex){      
-            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        }
-    }
-    public function editar($id)
-    {
-        try{
-            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
-            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-        $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
-            $compras=Transaccion_Compra::TransaccionID($id)->get()->first(); 
-            if(isset($compras->activo)){
-                return view('admin.compras.listatransaccionCompra.editactivo',['activos'=>Grupo_Activo::GrupoxSucursal($compras->sucursal_id)->get(),'conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'bodegas'=>Bodega::SucursalBodega($compras->sucursal_id)->get(),'cuentas'=>Cuenta::CuentasMovimiento()->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'compras'=>$compras, 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
-            }else{
-                return view('admin.compras.listatransaccionCompra.edit',['conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'bodegas'=>Bodega::SucursalBodega($compras->sucursal_id)->get(),'cuentas'=>Cuenta::CuentasMovimiento()->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'compras'=>$compras, 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
-            }  
-            
-        }
-        catch(\Exception $ex){      
-            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        }
-    }
-    public function eliminar($id)
-    {
-        try{
-            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
-            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-    $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
-            $compras=Transaccion_Compra::TransaccionID($id)->get()->first();
-            if (isset($compras->activo)) {
-                return view('admin.compras.listatransaccionCompra.eliminaractivo', ['conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'cuentas'=>Cuenta::CuentasMovimiento()->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'compras'=>$compras, 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
-            }
-            else{
-                return view('admin.compras.listatransaccionCompra.eliminar', ['conceptosIva'=>Concepto_Retencion::ConceptosIva()->get(),'conceptosFuente'=>Concepto_Retencion::ConceptosFuente()->get(),'centros'=>Centro_Consumo::CentroConsumos()->get(),'cuentas'=>Cuenta::CuentasMovimiento()->get(),'sustentos'=>Sustento_Tributario::Sustentos()->get(),'comprobantes'=>Tipo_Comprobante::tipos()->get(),'compras'=>$compras, 'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
-            }
-        }
-        catch(\Exception $ex){      
-            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        }
-    }
-    public function buscarByProveedor($buscar){
-        return Transaccion_Compra::Transacciones($buscar)->get();
-    }
-    public function buscarByProveedoractiva($buscar){
-        return Transaccion_Compra::Transaccionactiva($buscar)->get();
-    }
-    public function buscarByTransaccion($buscar){
-        return Transaccion_Compra::Transaccion($buscar)->first();
-    }
-    public function buscarByDetalleFactura(Request $request){
-        return Detalle_TC::DetalleFactura($request->get('factura_id'))->get();
-    }
-    public function buscarByNumeroFacturaAnt(Request $request){
-        $resultado = [];
-        $resultado[0] = Transaccion_Compra::FacturaNumeroAnt($request->get('buscar'),$request->get('proveedor_id'))->get();
-        $resultado[1] = Cuenta_Pagar::CuentaByNumero($request->get('buscar'),$request->get('proveedor_id'))->get();
-        return $resultado;
-    }
-    public function buscarByAliemtacion(Request $request){
-        return Transaccion_Compra::Transaccionesalimentacion($request->get('buscar'),$request->get('proveedor'))->get();
-    }
-    public function buscarBy($buscar){
-        $datos=null;
-        $Compra=Retencion_Compra::findOrFail($buscar);
-        $rangoDocumento=Rango_Documento::PuntoRango($Compra->rangoDocumento->punto_id,'Comprobante de Retención')->first();
-        $secuencial=1;
-        if($rangoDocumento){
-            $secuencial=$rangoDocumento->rango_inicio;
-            $secuencialAux=Retencion_Compra::secuencial($rangoDocumento->rango_id)->max('retencion_secuencial');
-            if($secuencialAux){$secuencial=$secuencialAux+1;}
-         }
-        $datos[0]=$rangoDocumento->puntoEmision->punto_id;
-        $datos[1]=$rangoDocumento->rango_id;
-        $datos[2]=$rangoDocumento->puntoEmision->sucursal->sucursal_codigo.$rangoDocumento->puntoEmision->punto_serie;
-        $datos[3]=substr(str_repeat(0, 9).$secuencial, - 9);
-
-        return $datos;
-    }
-    public function compraByClaveAcceso($clave){
-        $transaccion = Transaccion_Compra::TransaccionByAutorizacion($clave)->first();
-        if(isset($transaccion->transaccion_id) == false){
-            return 1;
-        }
-        return 0;
+        //
     }
 }

@@ -53,7 +53,7 @@ class cargarXMLController extends Controller
     }
     public function cargarproducto(Request $request)
     {
-       
+        try{
             DB::beginTransaction();
             $nombre = $request->get('DLdias');
             $provedor = $request->get('idproveedor');
@@ -208,7 +208,10 @@ class cargarXMLController extends Controller
                 DB::commit();
                 return redirect('inicio')->with('error','No tiene configurado, un punto de emisión o un rango de documentos para emitir retenciones, configueros y vuelva a intentar');
             }
-       
+        }
+        catch(\Exception $ex){      
+            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
     }
     public function cargar(Request $request)
     {
@@ -259,6 +262,7 @@ class cargarXMLController extends Controller
     public function cargarxml(Request $request)
     {
         try{
+
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
             $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
@@ -276,6 +280,7 @@ class cargarXMLController extends Controller
                     $data[$i] = explode("\t", $registros[$i]);
                     if(count($data[$i])>1){
                         $electrocnico = new facturacionElectronicaController();
+                        ini_set('max_execution_time', 0);
                         $consultaDoc = $electrocnico->consultarDOC($data[$i][9]);
                         if(isset($consultaDoc['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['estado'])){
                             if($data[$i][0] == 'Factura' or $data[$i][0] == 'Notas de Crédito' or $data[$i][0] == 'Notas de Débito'){

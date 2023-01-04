@@ -23,6 +23,8 @@ class Detalle_TC extends Model
         'detalle_estado',
         'transaccion_id',
         'producto_id',
+        'cuenta_id',
+        'centro_consumo_id',
         'bodega_id',
         'centro_consumo_id',
         'movimiento_id',
@@ -52,5 +54,8 @@ class Detalle_TC extends Model
     }
     public function producto(){
         return $this->belongsTo(Producto::class, 'producto_id', 'producto_id');
+    }
+    public function cuenta(){
+        return $this->belongsTo(Cuenta::class, 'cuenta_id', 'cuenta_id');
     }
 }

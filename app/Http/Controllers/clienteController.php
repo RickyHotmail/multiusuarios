@@ -678,7 +678,7 @@ class clienteController extends Controller
                             $cliente->ciudad()->associate($ciudad);
                         }
                         $categoriaClient = Categoria_Cliente::CategoriaClienteNombre($array[0][$i][11])->first();
-                        if (isset($categoriaClient->categoria_proveedor_nombre)) {
+                        if (isset($categoriaClient->categoria_cliente_nombre)) {
                             $cliente->categoria_cliente_id = $categoriaClient->categoria_cliente_id;
                         } else {
                             $categoriaClient = new Categoria_Cliente();
@@ -725,6 +725,15 @@ class clienteController extends Controller
                             $cliente->credito()->associate($credito);
                         }
                         $cliente->cliente_estado = '1';
+                        $cuentaa = Cuenta::buscarCuenta($array[0][$i][13])->first();
+                        if (isset($cuentaa->cuenta_id)) {
+                            $cliente->cliente_cuenta_anticipo=$cuentaa->cuenta_id;
+                        }
+                        $cuentaac = Cuenta::buscarCuenta($array[0][$i][14])->first();
+                        if (isset($cuentaac->cuenta_id)) {
+                            $cliente->cliente_cuenta_cobrar=$cuentaac->cuenta_id;
+                        }
+                        /*
                         $cuentap=Cuenta::BuscarByCuenta('ANTICIPO DE CLIENTE')->first();
            
                         if ($cuentap) {
@@ -742,7 +751,7 @@ class clienteController extends Controller
                             $cuentaa->cuenta_estado = 1;
                             $cuentaa->empresa_id = Auth::user()->empresa_id;
                             $cuentaa->save();
-                            /*Inicio de registro de auditoria */
+                            
                             $auditoria = new generalController();
                             $auditoria->registrarAuditoria('Registro de cuenta -> ANTICIPO DE CLIENTE -'.$cliente->cliente_nombre, '0', 'Numero de la cuenta registrada es -> '.$numerocuenta);
                             $cliente->cliente_cuenta_anticipo=$cuentaa->cuenta_id;
@@ -764,11 +773,12 @@ class clienteController extends Controller
                             $cuentap->cuenta_estado = 1;
                             $cuentap->empresa_id = Auth::user()->empresa_id;
                             $cuentap->save();
-                            /*Inicio de registro de auditoria */
+                            
                             $auditoria = new generalController();
                             $auditoria->registrarAuditoria('Registro de cuenta -> CUENTA POR COBRAR -'.$cliente->cliente_nombre, '0', 'Numero de la cuenta registrada es -> '.$numerocuenta);
                             $cliente->cliente_cuenta_cobrar=$cuentap->cuenta_id;
                         }
+                        */
                         $cliente->save();
                         /*Inicio de registro de auditoria */
                         $auditoria = new generalController();

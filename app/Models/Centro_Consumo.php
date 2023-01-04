@@ -29,6 +29,9 @@ class Centro_Consumo extends Model
     public function scopeCentroConsumos($query){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('centro_consumo_estado','=','1')->orderBy('centro_consumo_numero','asc');
     }  
+    public function scopeCentroConsumosNivel($query){
+        return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('centro_consumo_estado','=','1')->where('centro_consumo_nivel','=','4')->orderBy('centro_consumo_numero','asc');
+    }  
     public function scopeCentroConsumo($query, $id){
         return $query->where('empresa_id','=',Auth::user()->empresa_id)->where('centro_consumo_id','=',$id);
     }
