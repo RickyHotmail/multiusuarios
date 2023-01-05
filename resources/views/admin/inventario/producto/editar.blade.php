@@ -21,7 +21,7 @@
                     <div class="form-group row">
                         <label for="producto_codigo" class="col-sm-3 col-form-label">Codigo</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="producto_codigo" name="producto_codigo" value="{{$producto->producto_codigo}}" readonly required>
+                            <input type="text" class="form-control" id="producto_codigo" name="producto_codigo" value="{{$producto->producto_codigo}}" required>
                         </div>
                     </div>
                     <div class="form-group row">

@@ -52,17 +52,20 @@ class productoController extends Controller
             $unidadMedidas=Unidad_Medida_Producto::unidadMedidas()->get();
             $tamanos=Tamano_Producto::tamanos()->get();
             $grupos=Grupo_Producto::grupos()->get();
-            return view('admin.inventario.producto.index',['productos'=>$productos, 'productosGastos'=>$productosGastos,
-            'cuentas'=>$cuentas,
-            'PE'=>Punto_Emision::puntos()->get(),
-            'sucursales'=>Sucursal::sucursales()->get(),
-            'categorias'=>$categorias,
-            'marcas'=>$marcas,
-            'unidadMedidas'=>$unidadMedidas,
-            'tamanos'=>$tamanos,
-            'grupos'=>$grupos,
-            'gruposPermiso'=>$gruposPermiso,
-            'permisosAdmin'=>$permisosAdmin]);    
+
+            return view('admin.inventario.producto.index',[
+                'productos'=>$productos, 'productosGastos'=>$productosGastos,
+                'cuentas'=>$cuentas,
+                'PE'=>Punto_Emision::puntos()->get(),
+                'sucursales'=>Sucursal::sucursales()->get(),
+                'categorias'=>$categorias,
+                'marcas'=>$marcas,
+                'unidadMedidas'=>$unidadMedidas,
+                'tamanos'=>$tamanos,
+                'grupos'=>$grupos,
+                'gruposPermiso'=>$gruposPermiso,
+                'permisosAdmin'=>$permisosAdmin
+            ]);
         }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
