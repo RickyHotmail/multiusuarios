@@ -49,6 +49,18 @@ class Proveedor extends Model
     public function scopeProveedoresByNombre($query, $buscar){
         return $query->join('categoria_proveedor', 'categoria_proveedor.categoria_proveedor_id','=','proveedor.categoria_proveedor_id')->where('categoria_proveedor.empresa_id','=',Auth::user()->empresa_id)->where('proveedor_estado','=','1')->where(DB::raw('lower(proveedor_nombre)'), 'like', '%'.strtolower($buscar).'%')->orderBy('proveedor_nombre','asc');
     }
+
+    public function scopeProveedoresByNombreRuc($query, $buscar){
+        return $query->join('categoria_proveedor', 'categoria_proveedor.categoria_proveedor_id','=','proveedor.categoria_proveedor_id'
+                    )->where('categoria_proveedor.empresa_id','=',Auth::user()->empresa_id
+                    )->where('proveedor_estado','=','1'
+                    )->where(function($query2) use ($buscar){
+                            $query2->orWhere(DB::raw('lower(proveedor_nombre)'), 'like', '%'.strtolower($buscar).'%');
+                            $query2->orWhere(DB::raw('lower(proveedor_ruc)'), 'like', '%'.$buscar.'%');
+                        }
+                    )->orderBy('proveedor_nombre','asc');
+    }
+
     public function scopeexiste($query, $ruc){
         return $query->join('categoria_proveedor', 'categoria_proveedor.categoria_proveedor_id','=','proveedor.categoria_proveedor_id')->where('categoria_proveedor.empresa_id','=',Auth::user()->empresa_id)->where('proveedor_estado','=','1')->where('proveedor_ruc','=',$ruc)->orderBy('proveedor_nombre','asc');
     }
