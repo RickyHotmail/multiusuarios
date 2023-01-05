@@ -1056,8 +1056,9 @@ class transaccionCompraCuentaController extends Controller
      */
     public function update(Request $request, $id)
     {
-     
-       
+        try{            
+           
+            DB::beginTransaction();
             $transaccion=Transaccion_Compra::findOrFail($id);
             $numero=$request->get('transaccion_serie').substr(str_repeat(0, 9).$request->get('transaccion_secuencial'), - 9);
             $numeroante=$transaccion->transaccion_serie.substr(str_repeat(0, 9). $transaccion->transaccion_numero , - 9);
@@ -1684,7 +1685,9 @@ class transaccionCompraCuentaController extends Controller
                 if($dide[$i]=='P'){
                     $detalleTC->producto_id = $isProducto[$i];
                 }
-                
+                else{
+                    $detalleTC->cuenta_id = $isProducto[$i];
+                }
                 $detalleTC->detalle_tipo = $bienServ[$i];
 
                 $detalleTC->detalle_cantidad = $cantidad[$i];
@@ -2012,13 +2015,28 @@ class transaccionCompraCuentaController extends Controller
                 }
                 /******************************************************************/
             }
-            
-               
-                
-                return redirect('listatransaccionCompraC')->with('success', 'Transaccion registrada exitosamente');
-            
+            $url ="";
+            if (Auth::user()->empresa->empresa_contabilidad == '1') {
+                $url = $general->pdfDiario($diario);
+            }
+            DB::commit();
+            if ($request->get('editret')=="on") {
+                if($tipoComprobante->tipo_comprobante_codigo == '04'){
+                    return redirect('listatransaccionCompra')->with('success','Transaccion registrada exitosamente')->with('diario',$url);
+                }else if($retencion->retencion_xml_estado == 'AUTORIZADO' and $tipoComprobante->tipo_comprobante_codigo <> '04'){
+                    return redirect('listatransaccionCompra')->with('success','Transaccion registrada y autorizada exitosamente')->with('pdf','documentosElectronicos/'.Empresa::Empresa()->first()->empresa_ruc.'/'.DateTime::createFromFormat('Y-m-d', $retencion->retencion_fecha)->format('d-m-Y').'/'.$retencion->retencion_xml_nombre.'.pdf')->with('diario',$url);
+                }else{
+                    return redirect('listatransaccionCompra')->with('success','Transaccion registrada exitosamente')->with('error2','ERROR SRI--> '.$retencionAux->retencion_xml_estado.' : '.$retencionAux->retencion_xml_mensaje)->with('diario',$url);
+                }
+            }
+            else{
+                return redirect('listatransaccionCompra')->with('success', 'Transaccion registrada exitosamente')->with('diario',$url);
+            }
 
-      
+        }catch(\Exception $ex){
+            DB::rollBack();
+            return redirect('listatransaccionCompra')->with('error2','Oucrrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
          
        
     }

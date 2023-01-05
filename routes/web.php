@@ -574,6 +574,7 @@ Route::resource('listanotaDebito', listanotaDebitoController::class)->middleware
 Route::resource('listaFactura', listaFacturaController::class)->middleware('auth');
 Route::resource('listaliquidacionCompra', listaliquidacionCompraController::class)->middleware('auth');
 Route::resource('listatransaccionCompra', listatransaccionCompraController::class)->middleware('auth');
+Route::resource('listatransaccionCompraC', transaccionCompraCuentaController::class)->middleware('auth');
 Route::resource('eliminacionComprantes', elimiacionComprobantesCompraController::class)->middleware('auth');
 Route::resource('listaIngresoBanco', listaIngresoBancoController::class)->middleware('auth');
 Route::resource('listaIngresoBanco', listaIngresoBancoController::class)->middleware('auth');
