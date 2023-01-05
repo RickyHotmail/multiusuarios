@@ -198,7 +198,15 @@ class ordenExamenEditarController extends Controller{
         $expediente=$ordenAtencion->expediente;
         //return $expediente;
         //$ordenAtencion=$expediente->ordenatencion;
-        $examenes = Examen::buscarProductosProcedimiento($ordenAtencion->paciente_id, $ordenAtencion->especialidad_id)->get();
+        //$examenes = Examen::buscarProductosProcedimiento($ordenAtencion->paciente_id, $ordenAtencion->especialidad_id)->get();
+
+
+        $espLaboratorio=Especialidad::especialidadBuscar('laboratorio')->first();
+        $examenes= Examen::buscarProductosProcedimiento($ordenAtencion->paciente->paciente_id, $espLaboratorio->especialidad_id
+                            )->select('examen.examen_id', 'producto.producto_codigo', 'producto.producto_nombre'
+                            )->get();
+
+                            
         $detalleExamen=[];
 
         if($ordenExamen){
