@@ -225,7 +225,7 @@
                         <td>@if($productosGasto->cuentaInventario) {{ $productosGasto->cuentaInventario->cuenta_numero.' - '.$productosGasto->cuentaInventario->cuenta_nombre}} @else SIN CUENTA @endif</td>                                                                        
                         <td>@if($productosGasto->cuentaGasto) {{ $productosGasto->cuentaGasto->cuenta_numero.' - '.$productosGasto->cuentaGasto->cuenta_nombre}} @else SIN CUENTA @endif</td>                                      
                         @endif
-                        <td><img style="padding-top: 4px; height: 20px;" src="data:image/png;base64,{{DNS1D::getBarcodePNG($producto->producto_codigo_barras, 'C128')}}" alt="barcode" /></td>                    
+                        <td><img style="padding-top: 4px; height: 20px;" src="data:image/png;base64,{{DNS1D::getBarcodePNG($productosGasto->producto_codigo_barras, 'C128')}}" alt="barcode" /></td>                    
                         <td>@if(isset($productosGasto->sucursal->sucursal_id)) {{ $productosGasto->sucursal->sucursal_nombre }} @else Todas @endif</td>
                     </tr>
                     @endforeach

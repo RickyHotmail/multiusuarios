@@ -176,7 +176,6 @@ use App\Http\Controllers\CasilleroTributarioController;
 use App\Http\Controllers\categoriaCostoController;
 use App\Http\Controllers\categoriaRolController;
 use App\Http\Controllers\centroConsumo2Controller;
-use App\Http\Controllers\centroConsumoController2;
 use App\Http\Controllers\cierreAnualController;
 use App\Http\Controllers\cierreMesController;
 use App\Http\Controllers\contabilizacionMensualController;
@@ -229,12 +228,14 @@ use App\Http\Controllers\valorLaboratorioController;
 use App\Http\Controllers\valorReferencialController;
 use App\Http\Controllers\tipoDependenciaController;
 use App\Http\Controllers\documentoOrdenAtencionController;
+use App\Http\Controllers\egresoBodegaCuentaController;
 use App\Http\Controllers\facturarOrdenAtencionController;
 use App\Http\Controllers\facturarOrdenesAtencionController;
 use App\Http\Controllers\facturasinOrdenController;
 use App\Http\Controllers\formulariosController;
 use App\Http\Controllers\IdentificacionController;
 use App\Http\Controllers\informesMedicosController;
+use App\Http\Controllers\ingresoBodegaCuentaController;
 use App\Http\Controllers\ingresoPrestamoProductoController;
 use App\Http\Controllers\inicializarCuentasCobrarController;
 use App\Http\Controllers\inicializarCuentasPagarController;
@@ -558,6 +559,8 @@ Route::resource('listaGuias', guiaremisionController::class)->middleware('auth')
 Route::resource('listaOrdenes', ordenDespachoController::class)->middleware('auth');
 Route::resource('egresoBodega', egresoBodegaController::class)->middleware('auth');
 Route::resource('ingresoBodega', ingresoBodegaController::class)->middleware('auth');
+Route::resource('ingresoBodegaC', ingresoBodegaCuentaController::class)->middleware('auth');
+Route::resource('egresoBodegaC', egresoBodegaCuentaController::class)->middleware('auth');
 Route::resource('ordenesdespacho', ordenDespachoController::class)->middleware('auth');
 Route::resource('ordenesdespachoCM', ordenDespachoCMController::class)->middleware('auth');
 Route::resource('rolConsolidado', rolConsolidadoController::class)->middleware('auth');
@@ -1502,6 +1505,9 @@ Route::get('/ingresoBodega/new/{id}', [ingresoBodegaController::class, 'nuevo'])
 Route::get('/ingresoBodega/eliminar/{id}', [ingresoBodegaController::class, 'Presentardelete'])->middleware('auth');
 Route::get('/ingresoBodega/visualizar/{id}', [ingresoBodegaController::class, 'Presentarvisualizar'])->middleware('auth');
 Route::post('/ingresoBodega/buscar', [ingresoBodegaController::class, 'consultar'])->middleware('auth');
+
+Route::get('/ingresoBodegaC/new/{id}', [ingresoBodegaCuentaController::class, 'nuevo'])->middleware('auth');
+Route::get('/egresoBodegaC/new/{id}', [EgresoBodegaCuentaController::class, 'nuevo'])->middleware('auth');
 
 Route::post('/listarContabilizado/extraer', [listarContabilizadoController::class, 'extraer'])->middleware('auth');
 

@@ -34,6 +34,7 @@ class Detalle_Diario extends Model
         'cheque_id',
         'deposito_id',
         'voucher_id',
+        'centro_consumo_id'
     ];
     protected $guarded =[
     ];

@@ -29,6 +29,7 @@
 
     .ver-paciente, .ver-afiliado, .ver-documento{
         border-radius: 5px 0px 0px 5px;
+        height: 33px;
     }
 
 
@@ -154,6 +155,7 @@
                                 <input onchange="subirDocumentoPaciente('paciente',{{ $ordenAtencion->paciente_id }});" style="display: none" class="foto" id="documentoPaciente{{ $ordenAtencion->paciente_id }}" data-toggle="tooltip" data-placement="top" title="Subir escaneado" name="fotoDocumento" type="file"  accept=".pdf">
 
                                 @if($ordenAtencion->paciente->paciente_dependiente==1)
+                                    <br>
                                     @if($ordenAtencion->paciente->documento_afiliado!=null)
                                         <a class="btn btn-sm btn-primary ver-afiliado" href="{{ $ordenAtencion->paciente->documento_afiliado }}" target="_blank" data-original-title="Ver Documento">
                                             Afiliado &nbsp;&nbsp;

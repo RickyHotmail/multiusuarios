@@ -805,8 +805,8 @@ class proveedorController extends Controller
     }
 
     public function buscarByNombre($buscar){
-        return Proveedor::ProveedoresByNombre($buscar)->get();
-    } 
+        return Proveedor::ProveedoresByNombreRuc($buscar)->get();
+    }
     public function buscarByProveedor($buscar){
         return Proveedor::Proveedor($buscar)->get();
     }   
