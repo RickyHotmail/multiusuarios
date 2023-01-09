@@ -3,7 +3,10 @@
 <div class="card card-secondary">
     <div class="card-header">
         <h3 class="card-title">Concepto de Retencion</h3>
-        <button class="btn btn-default btn-sm float-right" data-toggle="modal" data-target="#modal-nuevo"><i class="fa fa-plus"></i>&nbsp;Nuevo</button>
+        <div class="float-right">
+            <button class="btn btn-default btn-sm float-right" data-toggle="modal" data-target="#modal-nuevo"><i class="fa fa-plus"></i>&nbsp;Nuevo</button>
+            <a class="btn btn-success btn-sm" href="{{ url("excelConceptos")}}"><i class="fas fa-file-excel"></i>&nbsp;Cargar Excel</a>  
+        </div>
     </div>
     <!-- /.card-header -->
     <div class="card-body">
@@ -37,8 +40,8 @@
                         @endif
                     </td>    
                     <td>{{ $conceptoRetencion->concepto_objeto }}</td>              
-                    <td>{{ $conceptoRetencion->cuentaEmitida->cuenta_nombre }}</td>
-                    <td>{{ $conceptoRetencion->cuentaRecibida->cuenta_nombre }}</td>     
+                    <td>@if(isset($conceptoRetencion->cuentaEmitida->cuenta_numero)) {{$conceptoRetencion->cuentaEmitida->cuenta_numero}} - {{ $conceptoRetencion->cuentaEmitida->cuenta_nombre }} @endif</td>
+                    <td>@if(isset($conceptoRetencion->cuentaRecibida->cuenta_numero)) {{$conceptoRetencion->cuentaRecibida->cuenta_numero}} - {{ $conceptoRetencion->cuentaRecibida->cuenta_nombre }} @endif</td>     
      
                 </tr>
                 @endforeach

@@ -6,9 +6,11 @@ use App\Models\Concepto_Retencion;
 use App\Models\Cuenta;
 use App\Models\Punto_Emision;
 use App\Http\Controllers\Controller;
+use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class conceptoRetencionController extends Controller
 {
@@ -41,7 +43,17 @@ class conceptoRetencionController extends Controller
     {
         //
     }
-
+    public function CargarExcel(){
+        try{
+            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
+            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
+            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+            return view('admin.sri.conceptoRetencion.cargarExcel',['PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+        }
+        catch(\Exception $ex){      
+            return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
+        }
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -74,7 +86,40 @@ class conceptoRetencionController extends Controller
             return redirect('conceptoRetencion')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
-
+    public function CargarExcelConcepto(Request $request){
+        try{
+            DB::beginTransaction();
+            if($request->file('excelClient')->isValid()){
+                $empresa = Empresa::empresa()->first();
+                $name = $empresa->empresa_ruc. '.' .$request->file('excelClient')->getClientOriginalExtension();
+                $path = $request->file('excelClient')->move(public_path().'\temp', $name); 
+                $array = Excel::toArray(new Concepto_Retencion(), $path); 
+                for ($i=1;$i < count($array[0]);$i++) {
+                    $validar=trim($array[0][$i][0]);
+                    if ($validar) {
+                        $validacion=Concepto_Retencion::ConceptoRetencionByCodigo($validar)->get();
+                        if (count($validacion)==0) {
+                            $conceptoRetencion = new Concepto_Retencion();
+                            $conceptoRetencion->concepto_nombre = ($array[0][$i][1]);
+                            $conceptoRetencion->concepto_codigo = ($array[0][$i][0]);
+                            $conceptoRetencion->concepto_porcentaje = ($array[0][$i][2]);
+                            $conceptoRetencion->concepto_tipo =($array[0][$i][3]);
+                            $conceptoRetencion->concepto_objeto = ($array[0][$i][4]); 
+                            $conceptoRetencion->empresa_id = Auth::user()->empresa_id;
+                            $conceptoRetencion->concepto_estado = 1;
+                            $conceptoRetencion->save();
+                           
+                        }
+                    }
+                }
+            }
+        DB::commit();
+        return redirect('conceptoRetencion')->with('success','Datos guardados exitosamente');
+        }catch(\Exception $ex){
+            DB::rollBack();
+            return redirect('conceptoRetencion')->with('error2','Ocurrio un error vuelva a intentarlo('.$ex->getMessage().')');
+        }
+    }
     /**
      * Display the specified resource.
      *

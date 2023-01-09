@@ -290,6 +290,7 @@ use App\Models\Beneficios_Sociales;
 use App\Models\Cabecera_Rol_CM;
 use App\Models\Camaronera;
 use App\Models\Casillero_tributario;
+use App\Models\Concepto_Retencion;
 use App\Models\Cuenta_Pagar;
 use App\Models\Imagen;
 use App\Models\Ingreso_Prestamo_Producto;
@@ -781,6 +782,8 @@ Route::post('/caja/guardarUsuario/{id}', [cajaController::class, 'guardarUsuario
 Route::get('/excelProvincia', [provinciaController::class, 'CargarExcel'])->middleware('auth');
 Route::post('/excelProvincia', [provinciaController::class, 'CargarExcelProvincia'])->middleware('auth');
 
+Route::get('/excelConceptos', [conceptoRetencionController::class, 'CargarExcel'])->middleware('auth');
+Route::post('/excelConceptos', [conceptoRetencionController::class, 'CargarExcelConcepto'])->middleware('auth');
 
 Route::get('/excelCXP', [cuentaPagarController::class, 'CargarExcel'])->middleware('auth');
 Route::post('/excelCXP', [cuentaPagarController::class, 'CargarExcelCuentaPagar'])->middleware('auth');

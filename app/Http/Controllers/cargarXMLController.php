@@ -280,7 +280,7 @@ class cargarXMLController extends Controller
                     $data[$i] = explode("\t", $registros[$i]);
                     if(count($data[$i])>1){
                         $electrocnico = new facturacionElectronicaController();
-                        ini_set('max_execution_time', 0);
+                        
                         $consultaDoc = $electrocnico->consultarDOC($data[$i][9]);
                         if(isset($consultaDoc['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['estado'])){
                             if($data[$i][0] == 'Factura' or $data[$i][0] == 'Notas de Crédito' or $data[$i][0] == 'Notas de Débito'){
@@ -295,6 +295,7 @@ class cargarXMLController extends Controller
                                 $impuesto0 = 0;
                                 $impuesto12 = 0;
                                 if ($consultaDoc['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['estado'] == 'AUTORIZADO') {
+                                    ini_set('max_execution_time', 600);
                                     $xmlEnvio = simplexml_load_string($consultaDoc['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['comprobante']);
                                     foreach ($xmlEnvio->detalles->detalle as $adicional) {
                                         $descuento=$descuento+$adicional->descuento;
