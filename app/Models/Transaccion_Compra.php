@@ -123,12 +123,14 @@ class Transaccion_Compra extends Model
     }
     public function scopeTransaccionByFecha($query, $fechaInicio, $fechaFin){
         return $query->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
+                    ->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')
                     ->where('sucursal.empresa_id','=',Auth::user()->empresa_id)
                     ->where('transaccion_fecha','>=',$fechaInicio)
                     ->where('transaccion_fecha','<=',$fechaFin);
     }
     public function scopeTransaccionSinFecha($query){
         return $query->join('sucursal','sucursal.sucursal_id','=','transaccion_compra.sucursal_id')
+                     ->join('tipo_comprobante','tipo_comprobante.tipo_comprobante_id','=','transaccion_compra.tipo_comprobante_id')
                      ->where('sucursal.empresa_id','=',Auth::user()->empresa_id);
     }
     public function scopeMovimientoCConsumo($query, $cc, $fechaInicio, $fechaFin){
