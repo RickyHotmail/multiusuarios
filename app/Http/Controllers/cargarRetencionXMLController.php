@@ -98,6 +98,7 @@ class cargarRetencionXMLController extends Controller
                 if(isset($retencionXML['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['estado'])){
                     if($retencionXML['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['estado'] == 'AUTORIZADO'){
                         $xmlRet = simplexml_load_string($retencionXML['RespuestaAutorizacionComprobante']['autorizaciones']['autorizacion']['comprobante']);
+                        $version=$xmlRet['version'];
                         $factura = null;
                         $nd = null;
                         $doc = '0';
@@ -105,31 +106,51 @@ class cargarRetencionXMLController extends Controller
                         $baseRenta = 0;
                         $baseIva = 0;
                         $danderaError =  true;
-                        try{ 
-                            foreach($xmlRet->impuestos->impuesto as $impuesto){
-                                if($impuesto->codigo == '1'){
-                                    $baseRenta = $baseRenta + $impuesto->baseImponible;
-                                }else if($impuesto->codigo == '2'){
-                                    $baseIva = $baseIva + $impuesto->baseImponible;
+                        $leyendo="1";
+                        try{
+                            if($version=="2.0.0"){
+                                $leyendo="2";
+                                foreach($xmlRet->docsSustento->docSustento->retenciones->retencion as $impuesto){
+                                    if($impuesto->codigo == '1'){
+                                        $baseRenta = $baseRenta + $impuesto->baseImponible;
+                                    }else if($impuesto->codigo == '2'){
+                                        $baseIva = $baseIva + $impuesto->baseImponible;
+                                    }
+                                    $valorRetenido = $valorRetenido + floatval($impuesto->valorRetenido);
+                                    $doc = $xmlRet->docsSustento->docSustento->codDocSustento;
+                                    if($xmlRet->docsSustento->docSustento->codDocSustento == '01' || $xmlRet->docsSustento->docSustento->codDocSustento=='17'){
+                                        $factura = Factura_Venta::FacturasbyNumero($xmlRet->docsSustento->docSustento->numDocSustento)->first();
+                                    }else{
+                                        $nd = Nota_Debito::NDbyNumero($xmlRet->docsSustento->docSustento->numDocSustento)->first();
+                                    }
                                 }
-                                $valorRetenido = $valorRetenido + floatval($impuesto->valorRetenido);
-                                $doc = $impuesto->codDocSustento;
-                                if($impuesto->codDocSustento == '01' || $impuesto->codDocSustento=='17'){
-                                    $factura = Factura_Venta::FacturasbyNumero($impuesto->numDocSustento)->first();
-                                }else{
-                                    $nd = Nota_Debito::NDbyNumero($impuesto->numDocSustento)->first();
+                            }
+                            else{
+                                foreach($xmlRet->impuestos->impuesto as $impuesto){
+                                    if($impuesto->codigo == '1'){
+                                        $baseRenta = $baseRenta + $impuesto->baseImponible;
+                                    }else if($impuesto->codigo == '2'){
+                                        $baseIva = $baseIva + $impuesto->baseImponible;
+                                    }
+                                    $valorRetenido = $valorRetenido + floatval($impuesto->valorRetenido);
+                                    $doc = $impuesto->codDocSustento;
+                                    if($impuesto->codDocSustento == '01' || $impuesto->codDocSustento=='17'){
+                                        $factura = Factura_Venta::FacturasbyNumero($impuesto->numDocSustento)->first();
+                                    }else{
+                                        $nd = Nota_Debito::NDbyNumero($impuesto->numDocSustento)->first();
+                                    }
                                 }
                             }
                         }catch(\Exception $ex){     
                             $danderaError =  false; 
-                            $datos[$i]['mensaje'] = 'Error con estructura XML de la retencion.';
+                            $datos[$i]['mensaje'] = 'Error con estructura XML de la retencion: '.$version.' error: '.$leyendo.'  '.$ex->getMessage();
                             $datos[$i]['estado'] = 'no';
                         }
                         if($danderaError){
-                            if($valorRetenido == 0){
+                            /* if($valorRetenido == 0){
                                 $datos[$i]['mensaje'] = 'Retencion en cero';
                                 $datos[$i]['estado'] = 'no';
-                            }else{
+                            }else{ */
                                 if($doc == '01'  || $doc=='17'){
                                     if(isset($factura->factura_id)){
                                         if($factura->factura_estado == '1'){
@@ -200,7 +221,7 @@ class cargarRetencionXMLController extends Controller
                                         $datos[$i]['estado'] = 'no';
                                     }
                                 }
-                            }
+                            //}
                         }
                     }else{
                         $datos[$i]['mensaje'] = 'La retencion no se encuentra autorizada.';
@@ -221,11 +242,11 @@ class cargarRetencionXMLController extends Controller
             $general = new generalController();
            
             $valorRetencion = 0;
-            foreach($xml->impuestos->impuesto as $impuesto){
+            if($xml['version']=="2.0.0") $impuestos=$xml->docsSustento->docSustento->retenciones->retencion;
+            if($xml['version']!="2.0.0") $impuestos=$xml->impuestos->impuesto;
+
+            foreach($impuestos as $impuesto){
                 $retenido=round(floatval($impuesto->valorRetenido),2);
-                /*VALIDACION PORCENTAJE RETENIDO DIFERENTE*/
-                //if(round(floatval($impuesto->baseImponible) * (floatval($impuesto->porcentajeRetener)/100),2) != round(floatval($impuesto->valorRetenido),2)){
-                    
                 $redondear=generalController::redondear2Dec(floatval($impuesto->baseImponible) * (floatval($impuesto->porcentajeRetener)/100));
                 
                 if(round($redondear,2) != round($retenido,2)  && abs(round($redondear-$retenido,2))>0.011 ){
@@ -233,13 +254,19 @@ class cargarRetencionXMLController extends Controller
                                         .$impuesto->codigoRetencion.'  diferencia '.abs(round($redondear-$retenido,2)));
                 }
 
-
                 /*FIN*/
                 $valorRetencion = round($valorRetencion,2) + round(floatval($impuesto->valorRetenido),2);
                 $factura = null;
                 $nd = null;
-                if($impuesto->codDocSustento == '01'){
-                    $factura = Factura_Venta::FacturasbyNumero($impuesto->numDocSustento)->first();
+
+                if($xml["version"]=="2.0.0") $codDocSustento=$xml->docsSustento->docSustento->codDocSustento;
+                if($xml["version"]!="2.0.0") $codDocSustento=$impuesto->codDocSustento;
+
+                if($xml["version"]=="2.0.0") $numDocSustento=$xml->docsSustento->docSustento->numDocSustento;
+                if($xml["version"]!="2.0.0") $numDocSustento=$impuesto->numDocSustento;
+
+                if($codDocSustento == '01'){
+                    $factura = Factura_Venta::FacturasbyNumero($numDocSustento)->first();
                     $cierre = $general->cierre($factura->factura_fecha,$factura->sucursal_id);          
                     if($cierre){
                         DB::commit();
@@ -251,7 +278,7 @@ class cargarRetencionXMLController extends Controller
                     }
                     $cxcAux = $factura->cuentaCobrar;
                 }else{
-                    $nd = Nota_Debito::NDbyNumero($impuesto->numDocSustento)->first();
+                    $nd = Nota_Debito::NDbyNumero($numDocSustento)->first();
                     $ndaux=Nota_Debito::findOrFail($nd->nd_id);
                     $cierre = $general->cierre($ndaux->nd_fecha,$ndaux->rangoDocumento->puntoEmision->sucursal_id);          
                     if($cierre){
@@ -268,7 +295,7 @@ class cargarRetencionXMLController extends Controller
                
             
             $retencion = new Retencion_Venta();
-            $retencion->retencion_fecha =DateTime::createFromFormat('d/m/Y', $xml->infoCompRetencion->fechaEmision)->format('Y-m-d');
+            $retencion->retencion_fecha = DateTime::createFromFormat('d/m/Y', $xml->infoCompRetencion->fechaEmision)->format('Y-m-d');
             $retencion->retencion_emision = "ELECTRONICA";
             $retencion->retencion_numero = $xml->infoTributaria->estab.$xml->infoTributaria->ptoEmi.substr(str_repeat(0, 9).$xml->infoTributaria->secuencial, - 9);
             $retencion->retencion_serie = $xml->infoTributaria->estab.$xml->infoTributaria->ptoEmi;
@@ -324,7 +351,8 @@ class cargarRetencionXMLController extends Controller
             $retencion->save();
             $general->registrarAuditoria('Registro de retencion de venta numero -> '.$retencion->retencion_numero,$retencion->retencion_numero,'Registro de retencion de venta numero -> '.$retencion->retencion_numero.' y con codigo de diario -> '.$diario->diario_codigo);
             /******************************************************************/
-            foreach($xml->impuestos->impuesto as $impuesto){
+                
+            foreach($impuestos as $impuesto){
                 if(floatval($impuesto->valorRetenido) > 0){
                     if($impuesto->codigo == '1'){
                         if(round(floatval($impuesto->valorRetenido),2) > 0){
