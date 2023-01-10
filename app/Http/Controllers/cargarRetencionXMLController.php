@@ -268,7 +268,7 @@ class cargarRetencionXMLController extends Controller
                
             
             $retencion = new Retencion_Venta();
-            $retencion->retencion_fecha = $xml->infoCompRetencion->fechaEmision;
+            $retencion->retencion_fecha =DateTime::createFromFormat('d/m/Y', $xml->infoCompRetencion->fechaEmision)->format('Y-m-d');
             $retencion->retencion_emision = "ELECTRONICA";
             $retencion->retencion_numero = $xml->infoTributaria->estab.$xml->infoTributaria->ptoEmi.substr(str_repeat(0, 9).$xml->infoTributaria->secuencial, - 9);
             $retencion->retencion_serie = $xml->infoTributaria->estab.$xml->infoTributaria->ptoEmi;
@@ -288,7 +288,7 @@ class cargarRetencionXMLController extends Controller
                 $diario = new Diario();
                 $diario->diario_codigo = $general->generarCodigoDiario(DateTime::createFromFormat('d/m/Y', $xml->infoCompRetencion->fechaEmision)->format('Y-m-d'),'CRER');
                 $diario->diario_tipo = 'CRER';
-                $diario->diario_fecha = $xml->infoCompRetencion->fechaEmision;
+                $diario->diario_fecha = DateTime::createFromFormat('d/m/Y', $xml->infoCompRetencion->fechaEmision)->format('Y-m-d');
                 $diario->diario_referencia = 'COMPROBANTE DIARIO DE RETENCIÓN DE VENTA';
                 $diario->diario_tipo_documento = 'COMPROBANTE DE RETENCION';
                 $diario->diario_numero_documento = $retencion->retencion_numero;
@@ -421,7 +421,7 @@ class cargarRetencionXMLController extends Controller
                 $anticipoCliente->anticipo_numero = $rangoDocumentoRetencion->puntoEmision->sucursal->sucursal_codigo.$rangoDocumentoRetencion->puntoEmision->punto_serie.substr(str_repeat(0, 9).$secuencial, - 9);
                 $anticipoCliente->anticipo_serie = $rangoDocumentoRetencion->puntoEmision->sucursal->sucursal_codigo.$rangoDocumentoRetencion->puntoEmision->punto_serie;
                 $anticipoCliente->anticipo_secuencial = $secuencial;
-                $anticipoCliente->anticipo_fecha = $xml->infoCompRetencion->fechaEmision;
+                $anticipoCliente->anticipo_fecha = DateTime::createFromFormat('d/m/Y', $xml->infoCompRetencion->fechaEmision)->format('Y-m-d');
                 $anticipoCliente->anticipo_tipo = 'COMPROBANTE DE RETENCION';   
                 $anticipoCliente->anticipo_documento = $retencion->retencion_numero;          
                 $anticipoCliente->anticipo_motivo = 'RETENCION DE VENTA';
@@ -459,7 +459,7 @@ class cargarRetencionXMLController extends Controller
                 /********************Pago por Retencion de Venta***************************/
                 $pago = new Pago_CXC();
                 $pago->pago_descripcion = 'Retencion de venta No. '.$retencion->retencion_numero;
-                $pago->pago_fecha = $xml->infoCompRetencion->fechaEmision;
+                $pago->pago_fecha = DateTime::createFromFormat('d/m/Y', $xml->infoCompRetencion->fechaEmision)->format('Y-m-d');
                 $pago->pago_tipo = 'COMPROBANTE DE RETENCION DE VENTA';
                 $pago->pago_valor = $valorRetencion;
                 $pago->pago_estado = '1';
@@ -553,7 +553,7 @@ class cargarRetencionXMLController extends Controller
                 $anticipoCliente->anticipo_numero = $rangoDocumentoRetencion->puntoEmision->sucursal->sucursal_codigo.$rangoDocumentoRetencion->puntoEmision->punto_serie.substr(str_repeat(0, 9).$secuencial, - 9);
                 $anticipoCliente->anticipo_serie = $rangoDocumentoRetencion->puntoEmision->sucursal->sucursal_codigo.$rangoDocumentoRetencion->puntoEmision->punto_serie;
                 $anticipoCliente->anticipo_secuencial = $secuencial;
-                $anticipoCliente->anticipo_fecha = $xml->infoCompRetencion->fechaEmision;
+                $anticipoCliente->anticipo_fecha = DateTime::createFromFormat('d/m/Y', $xml->infoCompRetencion->fechaEmision)->format('Y-m-d');
                 $anticipoCliente->anticipo_tipo = 'COMPROBANTE DE RETENCION';   
                 $anticipoCliente->anticipo_documento = $retencion->retencion_numero;          
                 $anticipoCliente->anticipo_motivo = 'RETENCION DE VENTA';
@@ -589,7 +589,7 @@ class cargarRetencionXMLController extends Controller
                 /********************Pago por Retencion de Venta***************************/
                 $pago = new Pago_CXC();
                 $pago->pago_descripcion = 'Retencion de venta No. '.$retencion->retencion_numero;
-                $pago->pago_fecha = $xml->infoCompRetencion->fechaEmision;
+                $pago->pago_fecha = DateTime::createFromFormat('d/m/Y', $xml->infoCompRetencion->fechaEmision)->format('Y-m-d');
                 $pago->pago_tipo = 'COMPROBANTE DE RETENCION DE VENTA';
                 $pago->pago_valor = $cxcAux->cuenta_saldo;
                 $pago->pago_estado = '1';
