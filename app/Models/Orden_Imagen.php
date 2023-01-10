@@ -34,7 +34,22 @@ class Orden_Imagen extends Model
                     )->join('tipo_imagen','tipo_imagen.tipo_id','=','imagen.tipo_id'
                     )->where('tipo_imagen.empresa_id','=',Auth::user()->empresa_id
                     )->where('orden_imagen.orden_id','=',$id);
-    }   
+    }
+
+    public function scopeOrdenesByFechaSuc($query,$fechaI,$fechaF,$sucursal){
+        return $query->join('expediente','expediente.expediente_id','=','orden_imagen.expediente_id'
+                    )->rightJoin('orden_atencion','orden_atencion.orden_id','=','expediente.orden_id'
+                    )->join('paciente','paciente.paciente_id','=','orden_atencion.paciente_id'
+                    )->join('sucursal', 'sucursal.sucursal_id','=','orden_atencion.sucursal_id'
+                    )->where('orden_fecha','>=',$fechaI
+                    )->where('orden_fecha','<=',$fechaF
+                    )->where('orden_atencion.sucursal_id','=',$sucursal
+                    )->where('sucursal.empresa_id','=',Auth::user()->empresa_id
+                    )->where('orden_atencion.orden_estado','>=', 3
+                    )->orderBy('orden_atencion.orden_fecha','desc');
+    }
+
+
     public function detalleImagen()
     {
         return $this->hasMany(Detalle_Imagen::class, 'orden_id', 'orden_id');
