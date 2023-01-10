@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use DateTime;
 use App\Models\Empresa;
+use App\Models\Orden_Atencion;
 use App\Models\Producto;
 
 class ordenImagenController extends Controller
@@ -48,7 +49,6 @@ class ordenImagenController extends Controller
             //$ordenesAtencion=Orden_Examen::OrdenExamenesHOY()->select('orden_examen.orden_id as orden_examen_id', 'orden_atencion.orden_id', 'orden_fecha','orden_codigo','orden_numero', 'paciente_apellidos','paciente_nombres','orden_otros','orden_examen.orden_estado')->get();
             $ordenesImagen=Orden_Imagen::ordenImagenes()->get();
             
-
             foreach($ordenesImagen as $ordenImagen){
                 if($ordenImagen->expediente){
                     $expediente=$ordenImagen->expediente;
@@ -70,31 +70,66 @@ class ordenImagenController extends Controller
         }
     }
 
-    public function indexEditar()
+    public function indexEditar(Request $request)
     {
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
             $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();         
             //$ordenesAtencion=Orden_Examen::OrdenExamenesHOY()->select('orden_examen.orden_id as orden_examen_id', 'orden_atencion.orden_id', 'orden_fecha','orden_codigo','orden_numero', 'paciente_apellidos','paciente_nombres','orden_otros','orden_examen.orden_estado')->get();
-            $ordenesImagen=Orden_Imagen::ordenImagenes()->get();
+            $sucursales=Sucursal::Sucursales()->get();
+
+            if(isset($request->fecha_desde) && isset($request->fecha_hasta)){
+                $sucursal=$request->sucursal_id;
+                $desde=$request->fecha_desde;
+                $hoy=$request->fecha_hasta;
+            }
+            else{
+                $sucursal=$sucursales[0]->sucursal_id;
+                $desde=date('01-m-Y');
+                $hoy=date('d-m-Y');
+            }
+
+
+            $ordenesAtencion = Orden_Atencion::OrdenesByFechaSuc($desde,$hoy,$sucursal)
+                //->select('orden_examen.orden_id as orden_examen_id', 'orden_atencion.orden_id', 'orden_fecha','orden_codigo','orden_numero', 'paciente_apellidos','paciente_nombres','orden_otros','orden_examen.orden_estado', 'expediente.expediente_id')
+                ->orderBy('orden_numero','asc')
+                ->get();
+
+            foreach($ordenesAtencion as $OA){
+                if($OA->expediente) $OA->expediente->ordenExamen;
+            }
+
+
+            /* $ordenesImagen=Orden_Imagen::OrdenesByFechaSuc($desde,$hoy,$sucursal
+                )->select('orden_imagen.orden_id as orden_imagen_id', 'orden_atencion.orden_id', 'orden_fecha','orden_codigo','orden_numero', 'paciente_apellidos','paciente_nombres','orden_imagen.orden_estado', 'expediente.expediente_id'
+                )->orderBy('orden_numero','desc'
+                )->get();
             
 
-            foreach($ordenesImagen as $ordenImagen){
-                if($ordenImagen->expediente){
-                    $expediente=$ordenImagen->expediente;
+            if($ordenesImagen){
+                foreach($ordenesImagen as $ordenImagen){
+                    if($ordenImagen->expediente){
+                        $expediente=$ordenImagen->expediente;
 
-                    if($expediente){
-                        $ordenesAtencion=$expediente->ordenAtencion;
-
-                        if($ordenesAtencion){
-                            $paciente = $ordenesAtencion->paciente;
+                        if($expediente){
+                            $ordenesAtencion=$expediente->ordenAtencion;
                         }
                     }
                 }
-            }
+            } */
 
-            return view('admin.laboratorio.ordenesImagen.indexEditar',['sucursales'=>Sucursal::Sucursales()->get(),'ordenesImagen'=>$ordenesImagen,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
+            //return $ordenesImagen;
+
+            return view('admin.laboratorio.ordenesImagen.indexEditar',[
+                'sucursales'=>$sucursales,
+                'sucursal'=>$sucursal,
+                'ordenesAtencion'=>$ordenesAtencion,
+                'PE'=>Punto_Emision::puntos()->get(),
+                'tipoPermiso'=>$tipoPermiso,
+                'gruposPermiso'=>$gruposPermiso,
+                'permisosAdmin'=>$permisosAdmin
+            ]);
         }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
@@ -125,19 +160,39 @@ class ordenImagenController extends Controller
         }
     }
 
-    public function editarImagenes($id)
+    public function editarImagenes(Request $request, $idImagen)
     {
-        try{
-            $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
-            $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
-            $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+        /* try{ */
+            //$gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
+            //$tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
+            //$permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
+
+            $ordenImagen=null;
+            $detalleImagen=null;
+
+            if(str_ends_with($idImagen, '_000')){
+                $id=substr($idImagen,0,-4);
+                $ordenAtencion=Orden_Atencion::findOrFail($id);
+            }
+            else{
+                $ordenImagen=Orden_Imagen::find($idImagen);
+                $ordenAtencion=$ordenImagen->expediente->ordenatencion;
+            }
             
             
-            $orden = Orden_Imagen::findOrFail($id);
+            if($ordenImagen){
+                $detalleImagen=$ordenImagen->detalleImagen;
 
-            $detalle=$orden->detalleImagen;
+                foreach($detalleImagen as $detalle){
+                    $imagen=$detalle->imagen;
+                    $producto=$imagen->producto;
+                }
+            }
+            
+            //$orden = Orden_Imagen::findOrFail($id);
+            //$detalle=$orden->detalleImagen;
 
-            if($detalle){
+            /* if($detalle){
                 foreach($detalle as $det){
                     $d=$det->imagen->producto;
                 }
@@ -147,22 +202,44 @@ class ordenImagenController extends Controller
 
             if($expediente){
                 $ordenAtencion=$expediente->ordenAtencion;
-            }
+            } */
 
-            $empresa=Empresa::findOrFail(Auth::user()->empresa_id);
+            //$empresa=Empresa::findOrFail(Auth::user()->empresa_id);
 
-            return view('admin.laboratorio.ordenesImagen.editarImagen',['empresa'=>$empresa, 'orden'=>$orden, 'ordenAtencion'=>$ordenAtencion,'PE'=>Punto_Emision::puntos()->get(),'tipoPermiso'=>$tipoPermiso,'gruposPermiso'=>$gruposPermiso, 'permisosAdmin'=>$permisosAdmin]);
-        }catch(\Exception $ex){
+            return view('admin.laboratorio.ordenesImagen.editarImagen',[
+                //'empresa'=>$empresa,
+                'orden'=>$ordenImagen,
+                'ordenAtencion'=>$ordenAtencion,
+                'PE'=>Punto_Emision::puntos()->get()
+            ]);
+        /* }catch(\Exception $ex){
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        }
+        } */
     }
 
     public function actualizarImagenes(Request $request){
-        $detalleImagenes=Detalle_Imagen::detalleImagenesOrden($request->orden_id)->get();
-        
         try{
             DB::beginTransaction();
+            $ordenAtencion=Orden_Atencion::findOrFail($request->orden_id);
+            if(!$ordenAtencion->expediente) return back()->with('error', 'La Orden de Atención no tiene Expediente Creado');
 
+            if($request->orden_imagen_id){
+                $ordenImagen=Orden_Imagen::findOrfail($request->orden_imagen_id);
+                $detalleImagenes=$ordenImagen->detalleImagen;
+            }
+            else{
+                $ordenImagen=new Orden_Imagen();
+                $ordenImagen->expediente_id=$ordenAtencion->expediente->expediente_id;
+                $ordenImagen->orden_estado=1;
+                if($ordenAtencion->orden_iess==1) $ordenImagen->orden_estado=2;
+                $ordenImagen->save();
+
+                $detalleImagenes=[];
+            }
+            
+            $ordenImagen->orden_observacion=$request->orden_observacion;
+            $ordenImagen->save();
+            
             foreach($detalleImagenes as $det){
                 $det->delete();
             }
@@ -171,20 +248,20 @@ class ordenImagenController extends Controller
                 $detalleImagen=new Detalle_Imagen();
                 $detalleImagen->detalle_indicacion=$request->Iobservacion[$i];
                 $detalleImagen->detalle_estado=1;
-                $detalleImagen->orden_id=$request->orden_id;
+                $detalleImagen->orden_id=$ordenImagen->orden_id;
                 $detalleImagen->imagen_id=$request->ImagenId[$i];
                 $detalleImagen->save();
             }
 
             $auditoria = new generalController();
-            $auditoria->registrarAuditoria('Actualizacion de orden de Imagen #'.$request->orden_id, $request->orden_id, "");
+            $auditoria->registrarAuditoria('Actualizacion de orden de Imagen #'.$ordenImagen->orden_id, $ordenImagen->orden_id, "");
 
             DB::commit();
-            return redirect('ordenImagen')->with('success', 'Datos guardados exitosamente');
+            return redirect('ordenImagenEditar')->with('success', 'Datos guardados exitosamente');
         }
         catch(\Exception $e){
             DB::rollBack();
-            return redirect('ordenImagen')->with('error', 'Se produjo un error al guardar: '.$e->getMessage());
+            return redirect('ordenImagenEditar')->with('error', 'Se produjo un error al guardar: '.$e->getMessage());
         }
     }
 

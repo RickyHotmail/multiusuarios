@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Categoria_Producto;
+use App\Models\Especialidad;
 use App\Models\Imagen;
+use App\Models\Orden_Atencion;
+use App\Models\Orden_Imagen;
 use App\Models\Producto;
 use App\Models\Tipo_Imagen;
 use Illuminate\Http\Request;
@@ -203,7 +206,9 @@ class imagenController extends Controller
         }
     }
 
-    public function buscarBy($buscar){
-        return Imagen::buscarImagenes($buscar)->get();
+    public function buscarBy(Request $request, $buscar){
+        $ordenAtencion=Orden_Atencion::findOrFail($request->orden_id);
+        $espImagen=Especialidad::especialidadBuscar('Imagen')->first();
+        return Imagen::buscarImagenesEspecialidad($buscar, $espImagen->especialidad_id, $ordenAtencion->paciente_id)->get();
     }
 }

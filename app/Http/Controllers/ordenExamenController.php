@@ -26,6 +26,7 @@ use App\Models\Vendedor;
 use App\Models\Tipo_Examen;
 use App\Models\Examen;
 use App\Models\Detalle_Examen;
+use App\Models\Orden_Atencion;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,39 +34,58 @@ use Illuminate\Support\Facades\DB;
 
 class ordenExamenController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
             $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();         
-            $ordenesExamenes=Orden_Examen::OrdenExamenesHOY()->select('orden_examen.orden_id as orden_examen_id', 'orden_atencion.orden_id', 'orden_fecha','orden_codigo','orden_numero', 'paciente_apellidos','paciente_nombres','orden_otros','orden_examen.orden_estado', 'expediente.expediente_id')->get();
-
+            $sucursales=Sucursal::Sucursales()->get();
             $medicos = Medico::medicos()->get();
             $rol=User::findOrFail(Auth::user()->user_id)->roles->first();
 
-            if($ordenesExamenes){
-                foreach($ordenesExamenes as $exa)
-                    $exa->expediente->ordenatencion;
+            if(isset($request->fecha_desde) && isset($request->fecha_hasta)){
+                $sucursal=$request->sucursal_id;
+                $desde=$request->fecha_desde;
+                $hoy=$request->fecha_hasta;
+            }
+            else{
+                $sucursal=$sucursales[0]->sucursal_id;
+                $desde=date('01-m-Y');
+                $hoy=date('d-m-Y');
             }
 
-            $data = [
+            $ordenesAtencion = Orden_Atencion::OrdenesByFechaSuc($desde,$hoy,$sucursal)
+                //->select('orden_examen.orden_id as orden_examen_id', 'orden_atencion.orden_id', 'orden_fecha','orden_codigo','orden_numero', 'paciente_apellidos','paciente_nombres','orden_otros','orden_examen.orden_estado', 'expediente.expediente_id')
+                ->orderBy('orden_numero','asc')
+                ->get();
+            
+            //$ordenesExamenes=Orden_Examen::OrdenExamenesHOY()->select('orden_examen.orden_id as orden_examen_id', 'orden_atencion.orden_id', 'orden_fecha','orden_codigo','orden_numero', 'paciente_apellidos','paciente_nombres','orden_otros','orden_examen.orden_estado', 'expediente.expediente_id')->get();
+
+
+            foreach($ordenesAtencion as $OA){
+                if($OA->expediente) $OA->expediente->ordenExamen;
+            }
+           
+            return view('admin.laboratorio.ordenesExamen.index', [
                 "medicos"=>$medicos,
                 "rol"=>$rol,
                 'sucursales'=>Sucursal::Sucursales()->get(),
-                'ordenesExamenes'=>$ordenesExamenes,
+                'ordenesAtencion'=>$ordenesAtencion,
                 'PE'=>Punto_Emision::puntos()->get(),
                 'gruposPermiso'=>$gruposPermiso,
-                'permisosAdmin'=>$permisosAdmin
-            ];
-           
-            return view('admin.laboratorio.ordenesExamen.index', $data);
+                'permisosAdmin'=>$permisosAdmin,
+                'fecI'=>$request->get('fecha_desde'),
+                'fecF'=>$request->get('fecha_hasta'),
+                'sucurslaC'=>$request->get('sucursal_id'),
+                'sucursales'=>Sucursal::Sucursales()->get(),
+            ]);
         }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         }
     }
-    public function indexEditar()
+    /* public function indexEditar()
     {
         try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
@@ -136,7 +156,7 @@ class ordenExamenController extends Controller
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
         } 
-    }
+    } */
 
     public function atender($id)
     {
@@ -260,14 +280,38 @@ class ordenExamenController extends Controller
      */
     public function store(Request $request)
     {
-        try{
+        return ':(';
+        /* try{
             $gruposPermiso=DB::table('usuario_rol')->select('grupo_permiso.grupo_id', 'grupo_nombre', 'grupo_icono','grupo_orden','grupo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('grupo_permiso','grupo_permiso.grupo_id','=','permiso.grupo_id')->join('tipo_grupo','tipo_grupo.grupo_id','=','grupo_permiso.grupo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('grupo_orden','asc')->distinct()->get();
             $tipoPermiso=DB::table('usuario_rol')->select('tipo_grupo.grupo_id','tipo_grupo.tipo_id', 'tipo_nombre','tipo_icono','tipo_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->join('tipo_grupo','tipo_grupo.tipo_id','=','permiso.tipo_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('tipo_orden','asc')->distinct()->get();
             $permisosAdmin=DB::table('usuario_rol')->select('permiso_ruta', 'permiso_nombre', 'permiso_icono', 'tipo_id', 'grupo_id', 'permiso_orden')->join('rol_permiso','usuario_rol.rol_id','=','rol_permiso.rol_id')->join('permiso','permiso.permiso_id','=','rol_permiso.permiso_id')->where('permiso_estado','=','1')->where('usuario_rol.user_id','=',Auth::user()->user_id)->orderBy('permiso_orden','asc')->get();
-            $ordenesExamenes = Orden_Examen::OrdenesByFechaSuc($request->get('fecha_desde'),$request->get('fecha_hasta'),$request->get('sucursal_id'))
+             $ordenesExamenes = Orden_Examen::OrdenesByFechaSuc($request->get('fecha_desde'),$request->get('fecha_hasta'),$request->get('sucursal_id'))
                 ->select('orden_examen.orden_id as orden_examen_id', 'orden_atencion.orden_id', 'orden_fecha','orden_codigo','orden_numero', 'paciente_apellidos','paciente_nombres','orden_otros','orden_examen.orden_estado', 'expediente.expediente_id')
                 ->orderBy('orden_numero','asc')
-                ->get();
+                ->get(); 
+
+            
+            $ordenesExamenes=DB::select(DB::raw("
+                select 
+                orden_examen.orden_id as orden_examen_id, orden_atencion.orden_id, orden_atencion.orden_estado, 
+                orden_fecha, orden_codigo, orden_numero, paciente_apellidos, paciente_nombres, 
+                orden_otros, orden_examen.orden_estado as examen_estado, expediente.expediente_id 
+            from
+                orden_atencion
+                inner join paciente on paciente.paciente_id = orden_atencion.paciente_id
+                inner join sucursal on sucursal.sucursal_id = orden_atencion.sucursal_id   
+                inner join expediente on expediente.orden_id = orden_atencion.orden_id 
+                left join orden_examen on orden_examen.expediente_id = expediente.expediente_id 
+                
+            where 
+                orden_fecha >= '2023-01-01' and orden_fecha <= '2023-01-10' 
+                and orden_atencion.sucursal_id = 1 
+                and sucursal.empresa_id = 1 
+                and orden_atencion.orden_estado >= '3' 
+            order by 
+                orden_atencion.orden_fecha desc, 
+                orden_numero asc
+            "));
             
             $medicos = Medico::medicos()->get();
             $rol=User::findOrFail(Auth::user()->user_id)->roles->first();
@@ -278,6 +322,8 @@ class ordenExamenController extends Controller
                         $exa->expediente->ordenatencion;
                 }
             }
+
+            return $ordenesExamenes;
 
             $data=[
                 "medicos"=>$medicos,
@@ -296,7 +342,7 @@ class ordenExamenController extends Controller
         }
         catch(\Exception $ex){      
             return redirect('inicio')->with('error2','Ocurrio un error en el procedimiento. Vuelva a intentar. ('.$ex->getMessage().')');
-        } 
+        }  */
     }
 
     /**

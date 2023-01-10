@@ -54,7 +54,8 @@ class productoController extends Controller
             $grupos=Grupo_Producto::grupos()->get();
 
             return view('admin.inventario.producto.index',[
-                'productos'=>$productos, 'productosGastos'=>$productosGastos,
+                'productos'=>$productos,
+                'productosGastos'=>$productosGastos,
                 'cuentas'=>$cuentas,
                 'PE'=>Punto_Emision::puntos()->get(),
                 'sucursales'=>Sucursal::sucursales()->get(),

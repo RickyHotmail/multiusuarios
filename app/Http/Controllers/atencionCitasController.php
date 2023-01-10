@@ -934,7 +934,7 @@ class atencionCitasController extends Controller
             $medicamentos = Medicamento::Medicamentos()->get();
             $enfermedades = Enfermedad::Enfermedades()->get();
            
-            $imagenes = Imagen::Imagenes()->get();
+            $imagenes =[]; //Imagen::Imagenes()->get();
             $sucursales = Sucursal::Sucursales()->get();
             $especialidades = Especialidad::Especialidades()->get();
             //$examenes = Examen::Examenes()->get();
