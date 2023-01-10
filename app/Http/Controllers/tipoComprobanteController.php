@@ -45,7 +45,7 @@ class tipoComprobanteController extends Controller
             $tipoComprobante->tipo_comprobante_codigo = $request->get('idCodigo');
             $tipoComprobante->tipo_comprobante_nombre = $request->get('idNombre');            
             $tipoComprobante->tipo_comprobante_estado  = 1;
-            $tipoComprobante->empresa_id = Auth::user()->empresa_id;
+            //$tipoComprobante->empresa_id = Auth::user()->empresa_id;
             $tipoComprobante->save();
             /*Inicio de registro de auditoria */
             $auditoria = new generalController();
