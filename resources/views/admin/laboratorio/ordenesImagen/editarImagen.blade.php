@@ -18,7 +18,8 @@
 </style>
 
 <form class="form-horizontal" method="post" action="{{ url('actualizarOrdenImagen') }}">
-<input class="invisible" id="orden_id" name="orden_id" value="{{$orden->orden_id}}">
+    <input class="invisible" id="orden_id" name="orden_id" value="{{$ordenAtencion->orden_id}}">
+    <input class="invisible" id="orden_imagen_id" name="orden_imagen_id" value="@if($orden){{$orden->orden_id}}@endif">
     @csrf
     <div class="card card-secondary" style="min-height: 600px">
         <div class="col-12">
@@ -59,23 +60,25 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            @if($orden)
                                             @foreach($orden->detalleImagen as $det)
                                                 <tr class="text-center" id="row_{{ $det->imagen_id }}">
                                                     <td><a onclick='eliminarItem({{ $det->imagen_id }});' class="btn btn-danger waves-effect" style="padding: 2px 8px;">X</a></td>
-                                                    <td>{{ $det->imagen->producto->producto_nombre }}<input class="invisible" name="ImagenNombre[]" value="Rayos x Antebrazo 4Ys-18"> <input class="invisible" name="ImagenId[]" value="{{ $det->imagen_id }}"></td>
+                                                    <td>{{ $det->imagen->producto->producto_nombre }}<input class="invisible" name="ImagenNombre[]"> <input class="invisible" name="ImagenId[]" value="{{ $det->imagen_id }}"></td>
                                                     <td><input class="form-control" name="Iobservacion[]" value="{{ $det->detalle_indicacion }}"></td>           
                                                     <td></td>
                                                     <td></td>
                                                 </tr>
                                             @endforeach
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                             <div class="col-sm-12">
                                 <div class="form-group row">
-                                    <label for="observacion" class="col-sm-5 col-form-label">Otros:</label>
-                                    <textarea class="form-control" id="otros_imagen"   name="otros_imagen" > </textarea>
+                                    <label for="observacion" class="col-sm-5 col-form-label">Observación:</label>
+                                    <textarea class="form-control" id="orden_observacion"   name="orden_observacion" >@if($orden){{$orden->orden_observacion}}@endif</textarea>
                                 </div>  
                             </div> 
                         </div>

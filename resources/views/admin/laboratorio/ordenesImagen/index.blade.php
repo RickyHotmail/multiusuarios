@@ -2,11 +2,11 @@
 @section('principal')
 <div class="card card-secondary">
     <div class="card-header">
-        <h3 class="card-title">Lista de Ordenes de Imagenes</h3>
+        <h3 class="card-title">Lista de Ordenes de Imagenes33</h3>
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-        <form class="form-horizontal" method="POST" action="{{ url("ordenesImagen") }}">
+        <form class="form-horizontal" method="POST" action="{{ url("ordenImagen") }}">
         @csrf
             <div class="form-group row">
                 <div class="col-sm-6">

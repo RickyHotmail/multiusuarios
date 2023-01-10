@@ -12,8 +12,7 @@
                 <tr class="text-center neo-fondo-tabla">
                     <th></th>    
                     <th>Nombre</th>        
-                    <th>Tipo</th> 
-                    
+                    <th>Tipo</th>
                 </tr>
             </thead>
             <tbody>

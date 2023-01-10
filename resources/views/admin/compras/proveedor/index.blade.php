@@ -115,7 +115,7 @@
                             <div class="col-sm-9">
                                 <select class="custom-select select2" id="idSujeto" name="idSujeto"   required>
                                     @foreach($tipoSujetos as $tipoSujeto)
-                                        <option value="{{$tipoSujeto->tipo_sujeto_codigo}}"  @if($tipoSujeto->tipo_sujeto_codigo=='02') selected @endif>{{$tipoSujeto->tipo_sujeto_nombre}}</option>
+                                        <option value="{{$tipoSujeto->tipo_sujeto_id}}" @if($tipoSujeto->tipo_sujeto_codigo=='02') selected @endif>{{$tipoSujeto->tipo_sujeto_nombre}}</option>
                                     @endforeach
                                 </select>
                             </div>

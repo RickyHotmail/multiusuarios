@@ -14,7 +14,8 @@
 					dataType: "json",
 					type: "GET",
 					data: {
-						buscar: request.term
+						buscar: request.term,
+						orden_id: $("#orden_id").val(),
 					},
 					success: function(data){
 						response($.map(data, function(imagen){

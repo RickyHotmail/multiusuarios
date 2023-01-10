@@ -21,7 +21,7 @@
 @method('PUT')
 @csrf
     <div class="card card-secondary">
-        <div class="card-header">
+        <div class="card-header" style="position: sticky;top: 0px;z-index: 9999;">
             <h3 class="card-title">Editar Paciente</h3>
             <div class="float-right">
                 <button type="submit" class="btn btn-success btn-sm"><i class="fa fa-save"></i>&nbsp;Guardar</button>

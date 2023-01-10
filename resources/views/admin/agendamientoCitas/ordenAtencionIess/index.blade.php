@@ -145,14 +145,14 @@
                                 </center>
                             </td>
                             <td>
-                                @if($ordenAtencion->orden_estado == 2 || $ordenAtencion->orden_estado == 3 || $ordenAtencion->orden_estado == 4)
+                                @if($ordenAtencion->orden_estado >= 2)
                                     <center>
                                         <img src="{{ asset('admin/imagenes/pagar.png') }}" data-toggle="tooltip" title="Pagada" class="brand-image" alt="NEOPAGUPA" style="width: 30px;">
                                     </center>
                                 @endif
                             </td>
                             <td>
-                                @if($ordenAtencion->orden_estado == 3)
+                                @if($ordenAtencion->orden_estado >= 3)
                                     <center>
                                         <img src="{{ asset('admin/imagenes/nurse.png') }}" data-toggle="tooltip" title="Preatendida" class="brand-image" alt="NEOPAGUPA" style="width: 30px;">
                                     </center>

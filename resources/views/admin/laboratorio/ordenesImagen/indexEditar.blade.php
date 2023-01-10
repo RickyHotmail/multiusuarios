@@ -45,62 +45,48 @@
                 </tr>
             </thead>
             <tbody>
-
-            @foreach($ordenesImagen as $ordenImagen)
-                <?php
-                    $iess=false;
-                    if($ordenImagen->expediente)
-                        if($ordenImagen->expediente->ordenatencion->orden_iess==1) $iess=true;
-                    
-                ?>  
-                <tr class="text-center">
-                    <td>
-                        @if($ordenImagen->orden_estado == 1 || $iess)
-                            <a href="{{ url("ordenImagen/{$ordenImagen->orden_id}/editar") }}" class="btn btn-xs btn-primary " style="padding: 2px 8px; border-radius: 6px" data-toggle="tooltip" data-placement="top" title="Editar Orden">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        @else
-                            <a href="{{ url("ordenImagen/{$ordenImagen->orden_id}/verResultadosImagen") }}" class="btn btn-xs btn-primary " style="padding: 2px 8px; border-radius: 6px" data-toggle="tooltip" data-placement="top" title="ver Resultados">
-                                <i class="fa fa-eye"></i>&nbsp;&nbsp;&nbsp; Mostrar
-                            </a>
-                        @endif
-                    </td>
-                    <td>
-                        @if($ordenImagen->orden_estado == 1)
-                            <a class="btn btn-xs btn-outline-danger " style="padding: 2px 8px;" data-toggle="tooltip" data-placement="top">
-                                PENDIENTE
-                            </a>
-                        @elseif($ordenImagen->orden_estado==2)
-                            <a class="btn btn-xs btn-outline-primary " style="padding: 2px 8px;" data-toggle="tooltip" data-placement="top">
-                                POR SUBIR
-                            </a>
-                        @else
-                            <a class="btn btn-xs btn-outline-success" style="padding: 2px 8px;" data-toggle="tooltip" data-placement="top">
-                                TODO LISTO
-                            </a>
-                        @endif
-                    </td>
+                @foreach($ordenesAtencion as $ordenAtencion)
+                    @if($ordenAtencion->expediente)
+                        <?php
+                            $iess=false;
+                            if($ordenAtencion->orden_iess==1) $iess=true;
+                        ?>
                         
-                    <td style="text-align: left">
-                        <i class="fas fa-clock" style="color: #2062b4" ></i>
-                        {{  date('d/m/Y',strtotime($ordenImagen->expediente->ordenAtencion->orden_fecha)) }}
-                        <br>
-                        {{ $ordenImagen->expediente->ordenAtencion->orden_numero }}
-                        @if($iess)
-                            @if($ordenImagen->expediente->ordenatencion->orden_iess==1)
-                                <img src="{{ asset('img/iess.png')  }}" width="50px">
-                            @endif
-                        @endif
-                    </td>
-                    <td>
-                        {{ $ordenImagen->expediente->ordenAtencion->paciente->paciente_apellidos}} 
-                        <br>
-                        {{ $ordenImagen->expediente->ordenAtencion->paciente->paciente_nombres }}
-                    </td>
-                    <td>{{ $ordenImagen->expediente->ordenAtencion->orden_otros }}</td>                                         
-                </tr>
-                 
-            @endforeach
+                        <tr class="text-center">
+                            <td style="vertical-align: middle">
+                                @if($ordenAtencion->expediente->ordenImagen)
+                                    <?php $ordenImagen=$ordenAtencion->expediente->ordenImagen ?>
+
+                                    @if($ordenImagen->orden_estado == 1)
+                                        <a href="{{ url("ordenImagen/{$ordenImagen->orden_id}/editar") }}" class="btn btn-xs btn-warning " style="padding: 2px 8px;" data-toggle="tooltip" data-placement="top" title="Editar Orden">&nbsp;&nbsp;<i class="fas fa-edit"></i></a>
+                                    @elseif($ordenImagen->orden_estado == 2)
+                                        <a class="btn btn-sm btn-success" data-toggle="tooltip" data-placement="top" title="Por Subir"><i class="fas fa-clock"></i></a>
+                                    @elseif($ordenImagen->orden_estado == 3)
+                                        <a class="btn btn-xs btn-primary " style="padding: 2px 8px;" data-toggle="tooltip" data-placement="top" title="Listo"><i class="fas fa-check"></i></a>
+                                    @endif 
+                                @else
+                                    <a href="{{ url("ordenImagen/{$ordenAtencion->orden_id}_000/editar") }}" class="btn btn-xs btn-warning " style="padding: 2px 8px;" data-toggle="tooltip" data-placement="top" title="Editar Orden">&nbsp;&nbsp;<i class="fas fa-edit"></i></a>
+                                @endif 
+                            </td>
+
+                            <td style="text-align: left">
+                                <i class="fas fa-clock" style="color: #2062b4"></i>
+                                {{ date('d/m/Y', strtotime($ordenAtencion->orden_fecha)) }}
+                                <br>
+                                {{ $ordenAtencion->orden_numero }}
+                                @if($iess)
+                                    <img src="{{ asset('img/iess.png')  }}" width="50px">
+                                @endif
+                            </td>
+                            <td>
+                                {{ $ordenAtencion->paciente->paciente_apellidos}} 
+                                <br>
+                                {{ $ordenAtencion->paciente->paciente_nombres }}
+                            </td>
+                            <td>-</td>
+                        </tr>
+                    @endif
+                @endforeach
             </tbody>
         </table>
     </div>
