@@ -1,6 +1,6 @@
 @extends ('admin.layouts.admin')
 @section('principal')
-<div class="card card-secondary">
+<div class="card card-secondary" style="position: absolute; width: 100%">
     <div class="card-header">
         <h3 class="card-title">Cargar Retenciones Recibidas</h3>
     </div>
